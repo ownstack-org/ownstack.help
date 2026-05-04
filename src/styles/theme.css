@@ -1,0 +1,37 @@
+/* OwnStack docs theme — calm slate base with cyan accent. */
+
+:root {
+	--sl-color-accent-low: #083f4f;
+	--sl-color-accent: #0891b2;
+	--sl-color-accent-high: #67e8f9;
+
+	--sl-color-white: #ffffff;
+	--sl-color-gray-1: #e2e8f0;
+	--sl-color-gray-2: #cbd5e1;
+	--sl-color-gray-3: #94a3b8;
+	--sl-color-gray-4: #64748b;
+	--sl-color-gray-5: #334155;
+	--sl-color-gray-6: #1e293b;
+	--sl-color-black: #0f172a;
+}
+
+:root[data-theme='light'] {
+	--sl-color-accent-low: #cffafe;
+	--sl-color-accent: #0e7490;
+	--sl-color-accent-high: #155e75;
+}
+
+/* Tighten the hero on the landing page so it doesn't feel sparse. */
+.hero {
+	padding-block: 2rem;
+}
+
+/* Code blocks: slightly more contrast for the chrome. */
+.expressive-code .frame {
+	border-radius: 8px;
+}
+
+/* Anchor link target padding so nav doesn't cover headings. */
+:target {
+	scroll-margin-top: 6rem;
+}

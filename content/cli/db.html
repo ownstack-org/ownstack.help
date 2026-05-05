@@ -1,0 +1,48 @@
+<!-- meta {"title":"ownstack db","desc":"Database commands: check, repair, dump, restore, lifecycle.","section":"CLI"} -->
+
+<h2>Health</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db check        [--app=NAME] [--stack=STACK]
+<span class="prompt">$</span> ownstack db repair       [--app=NAME] [--stack=STACK]
+<span class="prompt">$</span> ownstack db reset-password [--app=NAME] [--stack=STACK]   <span class="out"># alias for repair</span>
+<span class="prompt">$</span> ownstack db version      [--app=NAME]
+<span class="prompt">$</span> ownstack db status       [--app=NAME]
+<span class="prompt">$</span> ownstack db logs         [--app=NAME]</code></pre>
+<p><code>db check</code> verifies connectivity and authentication. <code>db repair</code> re-links the DB, refreshes <code>DATABASE_URL</code>, and resyncs the role password to dokku's stored DSN. <strong>For drift caused by a Postgres dump-restore, see <a href="/databases/postgres/repair/">Repair after import</a> instead</strong> — <code>db repair</code> aligns to the wrong target in that case.</p>
+
+<h2>Dump</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db dump [--app=NAME] [--stack=ID] [--output=FILE]</code></pre>
+<p>Streams a Postgres custom-format dump or MySQL gzipped SQL to a local file. Auto-detects type. See <a href="/databases/postgres/dumps/">Dumps</a>.</p>
+
+<h2>Heroku-side backups (for migration)</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db backups --heroku-app=NAME [--app=NAME]
+<span class="prompt">$</span> ownstack db backups:capture --heroku-app=NAME [--app=NAME]</code></pre>
+
+<h2>Restore</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db restore --heroku-app=NAME [--backup=NUM]
+<span class="prompt">$</span> ownstack db restore --url=URL [--app=NAME]
+<span class="prompt">$</span> ownstack db restore:info ID [--app=NAME] [--follow]
+<span class="prompt">$</span> ownstack db restore:cancel ID [--app=NAME]
+<span class="prompt">$</span> ownstack db restores [--app=NAME]</code></pre>
+
+<h2>Lifecycle</h2>
+<table>
+	<thead><tr><th>Command</th><th>What it does</th></tr></thead>
+	<tbody>
+		<tr><td><code>ownstack db create [--app=NAME] [--version=17]</code></td><td>Create + link a Postgres service.</td></tr>
+		<tr><td><code>ownstack db destroy [--app=NAME] [--force]</code></td><td>Destroy service + data. Irreversible.</td></tr>
+		<tr><td><code>ownstack db recreate [--app=NAME] [--version=17]</code></td><td>Destroy + recreate fresh.</td></tr>
+		<tr><td><code>ownstack db link [--app=NAME]</code></td><td>Re-link existing service to the app.</td></tr>
+	</tbody>
+</table>
+
+<div class="callout danger">
+	<div><strong>Don't <code>recreate</code> on prod</strong><p><code>db recreate</code> destroys before re-creating — there's no path back. Use it for development stacks; never on production.</p></div>
+</div>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/databases/postgres/">Postgres</a></li>
+	<li><a href="/databases/postgres/dumps/">Dumps</a></li>
+	<li><a href="/databases/postgres/restore/">Restore</a></li>
+	<li><a href="/databases/postgres/repair/">Repair after import</a></li>
+</ul>

@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Add a custom domain — OwnStack</title>
+<meta name="description" content="Route a domain to your OwnStack app and get HTTPS automatically.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Add a custom domain — OwnStack">
+<meta property="og:description" content="Route a domain to your OwnStack app and get HTTPS automatically.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a class="active" href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/domains-ssl/">domains ssl</a><span class="sep">›</span><span>Add a custom domain</span></nav>
+			<h1>Add a custom domain</h1>
+			<p class="lede">Two steps: register the domain with the app, then point DNS at the stack. Let's Encrypt issues the cert automatically once DNS resolves.</p>
+
+<h2 id="1-add-the-domain-to-the-app">1. Add the domain to the app</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app domains:add &lt;app&gt; example.com</code></pre>
+<p>This registers the domain with the stack's nginx vhost and (by default) requests a Let's Encrypt cert. Pass <code>--cert=FILE --key=FILE</code> to use your own cert instead.</p>
+
+<h2 id="2-point-dns-at-the-stack">2. Point DNS at the stack</h2>
+<p>Find the stack's IP:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stacks
+<span class="out">  ID            NAME                IP                STATUS
+  jJCsl6B9...   prod-east           54.123.45.67       provisioned</span></code></pre>
+<p>Then create the matching DNS record at your provider:</p>
+<table>
+	<thead><tr><th>Hostname</th><th>Record</th><th>Target</th></tr></thead>
+	<tbody>
+		<tr><td>Apex (<code>example.com</code>)</td><td>A</td><td>The stack IP</td></tr>
+		<tr><td>Subdomain (<code>app.example.com</code>)</td><td>A</td><td>The stack IP</td></tr>
+		<tr><td>Subdomain via CNAME</td><td>CNAME</td><td>The stack's default domain</td></tr>
+	</tbody>
+</table>
+
+<h2 id="3-wait-for-ssl">3. Wait for SSL</h2>
+<p>Once DNS resolves, dokku-letsencrypt issues a cert via HTTP-01 challenge. Inspect:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; certs:report &lt;app&gt;</code></pre>
+<p>If the cert doesn't issue within a couple of minutes, see <a href="/troubleshooting/dns/">DNS &amp; routing troubleshooting</a>. Common cause: port 80 not open from the public internet (Let's Encrypt's prober needs HTTP-01).</p>
+
+<h2 id="multi-stack-apps">Multi-stack apps</h2>
+<p>If your app deploys to multiple stacks and you want one domain to load-balance across all of them, point the DNS record at a load balancer (cloud-provider LB, weighted DNS) instead of a single stack IP. Each stack independently provisions its own Let's Encrypt cert.</p>
+
+<h2 id="wildcard-domains">Wildcard domains</h2>
+<p>Wildcards (<code>*.example.com</code>) need the DNS-01 challenge — Let's Encrypt won't issue wildcards via HTTP-01. See <a href="/domains-ssl/wildcard/">Wildcard certs</a>.</p>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt details</a></li>
+	<li><a href="/domains-ssl/wildcard/">Wildcards</a></li>
+	<li><a href="/troubleshooting/dns/">DNS troubleshooting</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#1-add-the-domain-to-the-app">1. Add the domain to the app</a></li><li class="h2"><a href="#2-point-dns-at-the-stack">2. Point DNS at the stack</a></li><li class="h2"><a href="#3-wait-for-ssl">3. Wait for SSL</a></li><li class="h2"><a href="#multi-stack-apps">Multi-stack apps</a></li><li class="h2"><a href="#wildcard-domains">Wildcard domains</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

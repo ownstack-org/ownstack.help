@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{TITLE}} — OwnStack</title>
+<meta name="description" content="{{DESC}}">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="{{TITLE}} — OwnStack">
+<meta property="og:description" content="{{DESC}}">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+{{HEADER}}
+<div class="layout">
+	{{SIDEBAR}}
+	<main class="content">
+		<article class="article">
+			{{BREADCRUMB}}
+			<h1>{{TITLE}}</h1>
+			{{CONTENT}}
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		{{TOC}}
+	</aside>
+</div>
+{{FOOTER}}
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

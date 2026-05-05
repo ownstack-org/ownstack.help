@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GCP stacks — OwnStack</title>
+<meta name="description" content="Provision a stack as a Google Compute Engine instance in your GCP project.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="GCP stacks — OwnStack">
+<meta property="og:description" content="Provision a stack as a Google Compute Engine instance in your GCP project.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a class="active" href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/stacks/">stacks</a><span class="sep">›</span><span>GCP stacks</span></nav>
+			<h1>GCP stacks</h1>
+			<p class="lede">A GCP stack is a Compute Engine VM running dokku in your project. OwnStack provisions via OAuth — you connect a Google account in the dashboard once, then create stacks in any project that account can administer.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+	<li>A GCP project with billing enabled.</li>
+	<li>The Compute Engine API enabled (<code>compute.googleapis.com</code>).</li>
+	<li>A Google account with at least <code>roles/compute.instanceAdmin.v1</code> on the project, or owner.</li>
+</ul>
+
+<h2 id="connect-your-google-account">Connect your Google account</h2>
+<p>In the dashboard, <strong>Cloud accounts → Add → Google</strong>. Complete OAuth. The control plane stores a refresh token (encrypted) and uses it to provision new stacks.</p>
+
+<h2 id="create-the-stack">Create the stack</h2>
+<p><strong>Stacks → New → GCP</strong>. Choose:</p>
+<table>
+	<thead><tr><th>Field</th><th>What to set</th></tr></thead>
+	<tbody>
+		<tr><td>Project</td><td>Pick from the projects your connected account administers.</td></tr>
+		<tr><td>Zone</td><td><code>us-central1-a</code> is a sensible default; pick something close to your users.</td></tr>
+		<tr><td>Machine type</td><td><code>e2-small</code> (2 vCPU shared, 2 GiB) for small apps; <code>e2-medium</code> or <code>n2-standard-2</code> for real workloads.</td></tr>
+		<tr><td>Disk size</td><td>30 GiB minimum, 50 GiB comfortable.</td></tr>
+		<tr><td>Static external IP</td><td>Recommended — DNS won't break on stop/start.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="firewall">Firewall</h2>
+<p>OwnStack creates firewall rules in your VPC for ports 22, 80, 443. If you have a custom VPC with more restrictive defaults, allow these from <code>0.0.0.0/0</code> (or your trusted IP range for SSH).</p>
+
+<h2 id="sizing">Sizing</h2>
+<table>
+	<thead><tr><th>Workload</th><th>Recommended</th></tr></thead>
+	<tbody>
+		<tr><td>One small app</td><td><code>e2-small</code></td></tr>
+		<tr><td>Real traffic + Postgres on-box</td><td><code>e2-medium</code> or <code>n2-standard-2</code></td></tr>
+		<tr><td>Multiple apps + workers</td><td><code>n2-standard-4</code> or <code>c2-standard-4</code></td></tr>
+		<tr><td>Heavy database workload</td><td>Move Postgres to Cloud SQL; keep stack small.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="decommissioning">Decommissioning</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack destroy &lt;stack&gt;</code></pre>
+<p>Deletes the VM, releases the static IP, removes the firewall rules. Move your apps to another stack first if they're production.</p>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/stacks/backups/">Stack backups</a></li>
+	<li><a href="/databases/">Databases</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#prerequisites">Prerequisites</a></li><li class="h2"><a href="#connect-your-google-account">Connect your Google account</a></li><li class="h2"><a href="#create-the-stack">Create the stack</a></li><li class="h2"><a href="#firewall">Firewall</a></li><li class="h2"><a href="#sizing">Sizing</a></li><li class="h2"><a href="#decommissioning">Decommissioning</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!-- meta {"title":"Wildcard certs","desc":"Issue *.example.com certificates via DNS-01 challenge.","section":"Domains & SSL"} -->
+<p class="lede">Wildcards (<code>*.example.com</code>) require Let's Encrypt's DNS-01 challenge — the prover places a record in your DNS, Let's Encrypt confirms it, and issues. Configure once, then any subdomain matches.</p>
+
+<h2>Pick a DNS plugin</h2>
+<p>The dokku-letsencrypt plugin uses <a href="https://go-acme.github.io/lego/dns/">lego</a> under the hood, which supports many DNS providers. Common choices:</p>
+<table>
+	<thead><tr><th>Provider</th><th>Plugin name</th><th>Credentials</th></tr></thead>
+	<tbody>
+		<tr><td>Route 53</td><td><code>route53</code></td><td>AWS access key + secret with <code>route53:ChangeResourceRecordSets</code> and <code>route53:GetChange</code> on your hosted zone.</td></tr>
+		<tr><td>Cloudflare</td><td><code>cloudflare</code></td><td>API token with Zone:DNS:Edit scoped to the zone.</td></tr>
+		<tr><td>DNSimple</td><td><code>dnsimple</code></td><td>OAuth token from DNSimple account settings.</td></tr>
+		<tr><td>DigitalOcean</td><td><code>digitalocean</code></td><td>Personal access token.</td></tr>
+		<tr><td>Google Cloud DNS</td><td><code>gcloud</code></td><td>Service account JSON key.</td></tr>
+	</tbody>
+</table>
+
+<h2>Configure</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; letsencrypt:set &lt;app&gt; dns-provider route53
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; letsencrypt:set &lt;app&gt; AWS_ACCESS_KEY_ID '...'
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; letsencrypt:set &lt;app&gt; AWS_SECRET_ACCESS_KEY '...'
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; letsencrypt:set &lt;app&gt; AWS_REGION us-east-1</code></pre>
+<p>Each DNS plugin reads its own env vars; check the lego docs for the exact names.</p>
+
+<h2>Add the wildcard</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app domains:add &lt;app&gt; '*.example.com'
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; letsencrypt:enable &lt;app&gt;</code></pre>
+<p>The first command registers the domain with nginx; <code>letsencrypt:enable</code> kicks off the issuance. The plugin will:</p>
+<ol>
+	<li>Request a wildcard cert from Let's Encrypt.</li>
+	<li>Receive a TXT record token to publish.</li>
+	<li>Use your DNS provider credentials to publish the TXT record.</li>
+	<li>Wait for DNS propagation, signal Let's Encrypt to validate.</li>
+	<li>Receive the cert, install it, reload nginx.</li>
+	<li>Clean up the TXT record.</li>
+</ol>
+
+<h2>Subdomains under the wildcard</h2>
+<p>Once the wildcard cert is in place, subdomains like <code>app1.example.com</code> and <code>app2.example.com</code> are covered by the same cert. You still need DNS A records for each (pointing at the stack IP) for traffic to reach the stack.</p>
+
+<h2>Renewal</h2>
+<p>Same as HTTP-01 — automatic, every 60 days. The DNS-01 flow runs again under the hood.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt details</a></li>
+	<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+</ul>

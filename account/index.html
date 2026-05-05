@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Profiles & tokens — OwnStack</title>
+<meta name="description" content="How OwnStack authentication works: profiles, tokens, app tokens, deploy tokens.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Profiles & tokens — OwnStack">
+<meta property="og:description" content="How OwnStack authentication works: profiles, tokens, app tokens, deploy tokens.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a class="active" href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><span>Profiles & tokens</span></nav>
+			<h1>Profiles & tokens</h1>
+			<p class="lede">OwnStack authentication has three levels: your <strong>account token</strong> (you, against a control plane); the <strong>app token</strong> (per-app, embedded in <code>.ownstack-config</code>); the <strong>deploy token</strong> (CI-friendly, scoped to a single app for git pushes).</p>
+
+<h2 id="account-tokens">Account tokens</h2>
+<p>Created when you <code>ownstack login</code>. Stored in <code>~/.ownstack/profiles/&lt;name&gt;</code>. Acts on behalf of your user across every app you have access to.</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack profile list
+<span class="prompt">$</span> ownstack profile show
+<span class="prompt">$</span> ownstack profile use &lt;name&gt;
+<span class="prompt">$</span> ownstack login --token &lt;token&gt;     <span class="out"># non-interactive (CI)</span></code></pre>
+<p>Rotate via the dashboard's <strong>Account → Tokens</strong> page; old tokens revoke immediately.</p>
+
+<h2 id="app-tokens">App tokens</h2>
+<p>Per-app, generated when you <code>ownstack remote -a &lt;app&gt;</code>. Stored in <code>./.ownstack-config</code> (gitignored). Lets the local checkout deploy and run commands without re-auth.</p>
+<p>App tokens are scoped to the specific app — useful for shared workstations or when you want a token that can't reach your other apps.</p>
+
+<h2 id="deploy-tokens">Deploy tokens</h2>
+<p>For CI: a token that can deploy a single app and nothing else. Generate in the dashboard (<strong>App → Settings → Deploy token</strong>) or via:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app deploy-token:show &lt;app&gt;
+<span class="prompt">$</span> ownstack app deploy-token:rotate &lt;app&gt;</code></pre>
+<p>In CI, log in with it: <code>ownstack login --token &lt;deploy-token&gt;</code>. Then <code>ownstack deploy</code>.</p>
+
+<h2 id="multiple-control-planes">Multiple control planes</h2>
+<p>Each control plane is a separate profile. Hosted (<code>api.ownstack.org</code>) is a profile; your self-hosted instance is another. Switch with <code>ownstack profile use</code>.</p>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/cli/profile/"><code>ownstack profile</code> reference</a></li>
+	<li><a href="/account/billing/">Billing</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#account-tokens">Account tokens</a></li><li class="h2"><a href="#app-tokens">App tokens</a></li><li class="h2"><a href="#deploy-tokens">Deploy tokens</a></li><li class="h2"><a href="#multiple-control-planes">Multiple control planes</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

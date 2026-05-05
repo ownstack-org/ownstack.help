@@ -1,0 +1,53 @@
+<!-- meta {"title":"Let's Encrypt","desc":"How dokku-letsencrypt issues, renews, and manages your certs.","section":"Domains & SSL"} -->
+<p class="lede">OwnStack stacks ship with the dokku-letsencrypt plugin pre-installed. It uses the ACME HTTP-01 challenge by default, runs renewals nightly, and reloads nginx automatically when certs roll.</p>
+
+<h2>HTTP-01 challenge: how it works</h2>
+<ol>
+	<li>You add a domain to an app and Let's Encrypt issuance is triggered (automatic on <code>app domains:add</code>).</li>
+	<li>The plugin spins up a temporary web server that responds to <code>http://&lt;domain&gt;/.well-known/acme-challenge/&lt;token&gt;</code> with a known signature.</li>
+	<li>Let's Encrypt's prober fetches that URL — for this to work, your DNS must resolve and port 80 must be reachable from the internet.</li>
+	<li>If the prober gets the right response, Let's Encrypt issues a cert.</li>
+	<li>Plugin installs the cert, reloads nginx, traffic is now HTTPS.</li>
+</ol>
+
+<h2>Renewals</h2>
+<p>Certs are valid for 90 days; the plugin renews 30 days before expiry. Cron job runs nightly. Manual renewal:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; letsencrypt:auto-renew &lt;app&gt;</code></pre>
+
+<h2>Inspecting</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; certs:report &lt;app&gt;
+<span class="out">       Ssl enabled:                   true
+       Ssl hostnames:                 example.com www.example.com
+       Ssl expires at:                Aug  1 02:14:27 2026 GMT
+       Ssl issuer:                    C = US, O = Let's Encrypt, CN = R10</span>
+
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; letsencrypt:list
+<span class="out">App name           Certificate Expiry        Time before expiry
+my-app             2026-08-01 02:14:27       2m 25d</span></code></pre>
+
+<h2>Account email</h2>
+<p>Let's Encrypt requires an account email for renewal notices. Set it once per app or per stack:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; letsencrypt:set --global email you@example.com</code></pre>
+
+<h2>Rate limits</h2>
+<p>Let's Encrypt rate-limits at:</p>
+<ul>
+	<li><strong>50 certs per registered domain per week.</strong> Includes renewals — enough for almost everyone.</li>
+	<li><strong>5 failed authorizations per hostname per hour.</strong> If you misconfigured DNS and tried five times, you're blocked for the rest of the hour.</li>
+	<li><strong>5 duplicate certs per week.</strong> If your hostnames don't change, no concern.</li>
+</ul>
+<p>If you get rate-limited, fix the underlying issue (DNS, port 80) and wait. Don't keep retrying — it counts against you.</p>
+
+<h2>When HTTP-01 won't work</h2>
+<ul>
+	<li><strong>Wildcards</strong> — must use DNS-01. See <a href="/domains-ssl/wildcard/">Wildcard certs</a>.</li>
+	<li><strong>Port 80 closed</strong> — corporate firewall, weird CDN setup. Use DNS-01 or supply your own cert.</li>
+	<li><strong>Internal-only domains</strong> — Let's Encrypt's prober has to reach your domain from the public internet.</li>
+</ul>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+	<li><a href="/domains-ssl/wildcard/">Wildcards</a></li>
+	<li><a href="/troubleshooting/dns/">DNS troubleshooting</a></li>
+</ul>

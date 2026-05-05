@@ -1,0 +1,33 @@
+<!-- meta {"title":"ownstack profile","desc":"Switch between control planes: hosted vs self-hosted, multi-account.","section":"CLI"} -->
+
+<p class="lede">A <strong>profile</strong> is a saved control-plane endpoint plus an auth token. Each profile lives at <code>~/.ownstack/profiles/&lt;name&gt;</code>.</p>
+
+<h2>List &amp; show</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack profile list
+<span class="out">  budbooks
+* haven (active)
+  ownstack</span>
+
+<span class="prompt">$</span> ownstack profile show
+<span class="out">API URL: https://api.ownstack.org
+Active profile: ownstack
+Token: 9242e4bc…</span></code></pre>
+
+<h2>Switch</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack profile use &lt;name&gt;</code></pre>
+
+<div class="callout warning">
+	<div><strong>Always check before state-changing commands</strong><p>The CLI does not warn when <code>deploy</code>, <code>db</code>, or <code>ssh</code> would run against the wrong profile. Run <code>ownstack profile show</code> first if you've been switching contexts.</p></div>
+</div>
+
+<h2>Adding profiles</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack login                                <span class="out"># creates/refreshes the active profile</span>
+<span class="prompt">$</span> ownstack login --api=https://api.example.com  <span class="out"># new profile pointing at a different control plane</span>
+<span class="prompt">$</span> ownstack login --token &lt;token&gt;                 <span class="out"># skip browser, paste a token directly</span></code></pre>
+<p><code>--token</code> is useful for CI environments and headless machines.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/account/">Account &amp; tokens</a></li>
+	<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+</ul>

@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Git deploys — OwnStack</title>
+<meta name="description" content="The default deploy path: ownstack pushes your repo to dokku and the stack builds the image.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Git deploys — OwnStack">
+<meta property="og:description" content="The default deploy path: ownstack pushes your repo to dokku and the stack builds the image.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a class="active" href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/deployments/">deployments</a><span class="sep">›</span><span>Git deploys</span></nav>
+			<h1>Git deploys</h1>
+			<p class="lede">The default deploy path. <code>ownstack deploy</code> hands your repo to the control plane, which pushes it to the stack via SSH, and dokku builds the image using a buildpack (or your Dockerfile) on the stack itself.</p>
+
+<h2 id="trigger-a-deploy">Trigger a deploy</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack deploy                          <span class="out"># linked app, all its stacks</span>
+<span class="prompt">$</span> ownstack deploy &lt;app&gt;                     <span class="out"># a specific app</span>
+<span class="prompt">$</span> ownstack deploy --stack=&lt;stack&gt;           <span class="out"># one stack only</span>
+<span class="prompt">$</span> ownstack deploy --wait                    <span class="out"># stream the build log</span></code></pre>
+<p>Without <code>--wait</code>, the CLI returns once the deploy is queued; check status with <code>ownstack remote deploy-log</code> or in the dashboard.</p>
+
+<h2 id="what-happens-on-the-stack">What happens on the stack</h2>
+<ol>
+	<li>The control-plane worker connects to the stack as <code>dokku@&lt;stack-ip&gt;</code> via the stack's stored SSH key.</li>
+	<li>It runs <code>dokku apps:create</code> if the app doesn't exist yet (idempotent).</li>
+	<li>It pushes your repo (specifically the configured branch — usually <code>main</code>) to the stack's dokku git endpoint.</li>
+	<li>Dokku triggers the build: detects <code>Procfile</code>, runs the buildpack, builds a docker image.</li>
+	<li>Release task runs (<code>release: bundle exec rails db:migrate</code>, etc.).</li>
+	<li>Healthchecks run on the new container; on success, traffic rotates.</li>
+</ol>
+
+<h2 id="what-s-on-the-wire">What's on the wire</h2>
+<p>The control-plane worker uses <code>git push --force-with-lease</code> to the stack — your branch tip becomes the stack's <code>main</code> ref. The stack does not pull from GitHub; the control plane is the bridge. This means:</p>
+<ul>
+	<li>Private repos work without giving the stack any GitHub credentials.</li>
+	<li>Submodules need to be reachable from the control plane (not the stack).</li>
+	<li>Local commits work as long as you've pushed them to your origin first — the control plane reads from your origin.</li>
+</ul>
+
+<h2 id="submodules">Submodules</h2>
+<p>Submodules are fetched by the control plane during the deploy. They must be reachable using the configured deploy credentials. SSH submodule URLs (<code>git@github.com:org/private.git</code>) require an SSH key registered with the control plane account; HTTPS URLs work without extra config.</p>
+
+<h2 id="the-procfile-is-required">The Procfile is required</h2>
+<p>Every git-deployed app needs a <code>Procfile</code> at the repo root with at least a <code>web</code> entry. Without it, the build succeeds but no process runs and healthchecks fail. See <a href="/apps/procfile/">Procfile</a>.</p>
+
+<h2 id="build-log">Build log</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack remote deploy-log                      <span class="out"># latest deploy</span>
+<span class="prompt">$</span> ownstack remote deploy-log --deployment=412     <span class="out"># a specific one</span>
+<span class="prompt">$</span> ownstack remote deploy-log --follow             <span class="out"># live-stream</span></code></pre>
+
+<h2 id="common-gotchas">Common gotchas</h2>
+<table>
+	<thead><tr><th>Symptom</th><th>Likely cause</th></tr></thead>
+	<tbody>
+		<tr><td><code>Failure during app build</code></td><td>Buildpack mismatch, missing dependency, version pinning. <a href="/troubleshooting/deploy-failures/">More.</a></td></tr>
+		<tr><td><code>Execution of release task failed</code></td><td>Release task ran but exited non-zero. <code>db:migrate</code> against a missing or unreachable DB is the most common cause.</td></tr>
+		<tr><td><code>port listening check: unable to enter</code></td><td>Web process doesn't bind to <code>$PORT</code>.</td></tr>
+		<tr><td><code>Name is already taken</code> on apps:create</td><td>Harmless — dokku saying the app exists. Deploy continues.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/deployments/image-deploys/">Image deploys</a> — pre-built images from a registry.</li>
+	<li><a href="/deployments/build-types/">Build types</a></li>
+	<li><a href="/troubleshooting/deploy-failures/">When deploys fail</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#trigger-a-deploy">Trigger a deploy</a></li><li class="h2"><a href="#what-happens-on-the-stack">What happens on the stack</a></li><li class="h2"><a href="#what-s-on-the-wire">What's on the wire</a></li><li class="h2"><a href="#submodules">Submodules</a></li><li class="h2"><a href="#the-procfile-is-required">The Procfile is required</a></li><li class="h2"><a href="#build-log">Build log</a></li><li class="h2"><a href="#common-gotchas">Common gotchas</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

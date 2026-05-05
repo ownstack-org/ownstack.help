@@ -1,0 +1,62 @@
+<!-- meta {"title":"Bring-your-own (SSH) stacks","desc":"Use any Linux host as an OwnStack stack: bare metal, VPS, on-prem. Just SSH access.","section":"Stacks"} -->
+<p class="lede">If you already have a host you can SSH into — bare metal, DigitalOcean, Hetzner, Vultr, Linode, your homelab — turn it into an OwnStack stack with one credential and one form. No cloud-provider integration required.</p>
+
+<h2>Host requirements</h2>
+<ul>
+	<li>Ubuntu 22.04 LTS (other Debian-derivatives may work; only 22.04 is tested and supported).</li>
+	<li>2 vCPU, 2 GiB RAM minimum. 4 vCPU / 4 GiB for real workloads.</li>
+	<li>30 GiB disk minimum; 50 GiB recommended.</li>
+	<li>A public IP (or anything routable from the control plane).</li>
+	<li>Ports 22, 80, 443 open inbound.</li>
+	<li>SSH access as a user with passwordless <code>sudo</code> (typically <code>root</code> or <code>ubuntu</code>).</li>
+</ul>
+
+<h2>Create the stack</h2>
+<p>In the dashboard, <strong>Stacks → New → SSH</strong>. Paste:</p>
+<ul>
+	<li>Hostname or IP.</li>
+	<li>SSH username (defaults to <code>ubuntu</code>).</li>
+	<li>SSH private key (the corresponding public key must already be in <code>~/.ssh/authorized_keys</code> on the host).</li>
+</ul>
+<p>OwnStack tests the connection, then offers two paths:</p>
+
+<h3>Path A — let OwnStack provision dokku</h3>
+<p>If the host is a fresh Ubuntu, OwnStack runs the dokku bootstrap (the same script the AWS/GCP path runs). Takes 3–5 minutes; the stack flips to <strong>provisioned</strong> when done.</p>
+
+<h3>Path B — adopt an existing dokku host</h3>
+<p>If the host already has dokku installed, mark <strong>Already provisioned</strong>. OwnStack registers it as a stack but skips bootstrap. Apps already on the host stay where they are; you can adopt them into OwnStack later via <code>ownstack import</code>.</p>
+
+<div class="callout note">
+	<div><strong>SSH key handling</strong><p>The private key is encrypted at rest in the control plane and used only for control-plane → stack operations (deploys, scales, log fetches). It is not exposed via the API. You can rotate by creating a new pair on the host and updating the stack's credentials.</p></div>
+</div>
+
+<h2>What you maintain</h2>
+<p>SSH-provider stacks shift some responsibility to you:</p>
+<table>
+	<thead><tr><th>You handle</th><th>OwnStack handles</th></tr></thead>
+	<tbody>
+		<tr><td>Host OS updates (<code>unattended-upgrades</code> recommended)</td><td>Dokku version updates (via <code>ownstack stack patches apply</code>)</td></tr>
+		<tr><td>Disk expansion</td><td>Plugin installs and config</td></tr>
+		<tr><td>Hypervisor / hardware lifecycle</td><td>App deploy + lifecycle</td></tr>
+		<tr><td>Network &amp; firewall (host-side)</td><td>nginx vhost &amp; SSL</td></tr>
+		<tr><td>Backups, if not using <code>ownstack stack backup</code></td><td>Backup orchestration if you opt in to <code>stack backup</code></td></tr>
+	</tbody>
+</table>
+
+<h2>When to pick SSH over AWS/GCP</h2>
+<ul>
+	<li>You already have a server you want to keep using.</li>
+	<li>You're on a provider OwnStack doesn't integrate with directly (Hetzner, OVH bare metal, DigitalOcean Droplets).</li>
+	<li>You want the control plane to never have IAM access to your cloud account.</li>
+	<li>Homelab / on-prem.</li>
+</ul>
+
+<h2>Decommissioning</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack destroy &lt;stack&gt;</code></pre>
+<p>For SSH stacks, this <em>only</em> de-registers the stack from OwnStack — the underlying host is yours, OwnStack doesn't touch it. Run <code>dokku-uninstall</code> manually if you want to remove dokku from the host.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/stacks/backups/">Stack backups</a></li>
+	<li><a href="/cli/stack/">CLI: <code>ownstack stack</code></a></li>
+</ul>

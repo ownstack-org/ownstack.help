@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Migrate from Heroku — OwnStack</title>
+<meta name="description" content="Move an existing Heroku app to OwnStack: code, config vars, Postgres backups, custom domains.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Migrate from Heroku — OwnStack">
+<meta property="og:description" content="Move an existing Heroku app to OwnStack: code, config vars, Postgres backups, custom domains.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a class="active" href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/getting-started/">getting started</a><span class="sep">›</span><span>Migrate from Heroku</span></nav>
+			<h1>Migrate from Heroku</h1>
+			<p class="lede">Most Heroku apps move to OwnStack with no code changes. Buildpacks work the same; <code>app.json</code> is honored; <code>$PORT</code> is set; <code>DATABASE_URL</code> appears the way you expect. The migration is mostly logistics: copy config, restore data, swap DNS.</p>
+
+<h2 id="what-changes-what-doesn-t">What changes, what doesn't</h2>
+<table>
+	<thead><tr><th>Same as Heroku</th><th>Different on OwnStack</th></tr></thead>
+	<tbody>
+		<tr><td>Procfile process types (<code>web</code>, <code>worker</code>, etc.)</td><td><code>app.json</code>'s <code>formation</code> block is honored as authoritative — see <a href="/processes/scaling/">Scaling</a>.</td></tr>
+		<tr><td>Heroku buildpacks (Ruby, Node, Python, etc.)</td><td>You own the host; logs, disk, and instance limits are whatever your stack provides.</td></tr>
+		<tr><td><code>$PORT</code> binding for web processes</td><td>Add-ons are dokku plugins, not Heroku Elements (Postgres, Redis, MySQL, MongoDB are first-class).</td></tr>
+		<tr><td><code>DATABASE_URL</code> + <code>REDIS_URL</code> set automatically</td><td>SSL is automatic via Let's Encrypt — same idea, different mechanism.</td></tr>
+		<tr><td>Release tasks via Procfile <code>release:</code></td><td>No paid dyno tiers; vertical/horizontal scale is your stack's instance type or count.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="step-1-inventory-the-heroku-app">Step 1 — Inventory the Heroku app</h2>
+<pre class="terminal"><code><span class="prompt">$</span> heroku apps:info -a my-heroku-app
+<span class="prompt">$</span> heroku config -a my-heroku-app -s &gt; heroku-config.env
+<span class="prompt">$</span> heroku ps -a my-heroku-app</code></pre>
+<p>Capture the buildpacks, dyno formation, and add-ons (especially Postgres + Redis plans). The <code>-s</code> flag on <code>heroku config</code> emits a shell-quoted env file you can paste into OwnStack later.</p>
+
+<h2 id="step-2-capture-a-postgres-dump">Step 2 — Capture a Postgres dump</h2>
+<pre class="terminal"><code><span class="prompt">$</span> heroku pg:backups:capture -a my-heroku-app
+<span class="prompt">$</span> heroku pg:backups:url -a my-heroku-app
+<span class="out">https://xfer.heroku.com/...</span></code></pre>
+<p>OwnStack can restore directly from a Heroku backup URL — see <a href="/databases/postgres/restore/">Restore</a>.</p>
+
+<h2 id="step-3-create-the-app-on-ownstack">Step 3 — Create the app on OwnStack</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack create --no-interview my-app buildpack
+<span class="prompt">$</span> ownstack remote -a my-app
+<span class="prompt">$</span> ownstack app stacks:add my-app &lt;your-stack&gt;</code></pre>
+
+<h2 id="step-4-push-config-vars">Step 4 — Push config vars</h2>
+<p>OwnStack accepts the same Heroku-formatted env file you exported in step 1:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack config:push --app=my-app --file=heroku-config.env</code></pre>
+<p>Or set vars one at a time with <code>ownstack config:set</code>.</p>
+
+<h2 id="step-5-provision-the-database-then-restore">Step 5 — Provision the database, then restore</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db create --app=my-app
+<span class="prompt">$</span> ownstack db restore --app=my-app --url='https://xfer.heroku.com/...'
+<span class="prompt">$</span> ownstack db restore:info &lt;ID&gt; --follow</code></pre>
+
+<div class="callout warning">
+	<div><strong>Watch for password drift after restore</strong><p>Heroku Postgres backups via <code>pg_dumpall</code> include <code>ALTER ROLE</code> statements that can desync the postgres password from <code>DATABASE_URL</code>. If your first deploy fails with <code>password authentication failed for user "postgres"</code>, see <a href="/databases/postgres/repair/">Repair after import</a>.</p></div>
+</div>
+
+<h2 id="step-6-deploy">Step 6 — Deploy</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack deploy --wait</code></pre>
+<p>If the build succeeds and migrations run, you're live on the stack at the auto-generated subdomain.</p>
+
+<h2 id="step-7-swap-dns">Step 7 — Swap DNS</h2>
+<p>Add your custom domain to the OwnStack app and point DNS at the stack:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app domains:add my-app example.com</code></pre>
+<p>See <a href="/domains-ssl/custom-domain/">Add a custom domain</a> for the DNS records and SSL specifics. Once DNS resolves, Let's Encrypt issues automatically.</p>
+
+<h2 id="step-8-cut-over">Step 8 — Cut over</h2>
+<p>When you're ready to flip:</p>
+<ol>
+	<li>Put Heroku into maintenance: <code>heroku maintenance:on -a my-heroku-app</code>.</li>
+	<li>Take a final Postgres dump and restore on OwnStack (steps 2 + 5 again).</li>
+	<li>Update DNS to point at OwnStack (step 7).</li>
+	<li>Wait for DNS propagation (typically &lt; 5 minutes for short TTLs).</li>
+	<li>Hit your custom domain — it's now served from OwnStack.</li>
+	<li>Leave Heroku running for a day before deleting; rollback is just flipping DNS back.</li>
+</ol>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#what-changes-what-doesn-t">What changes, what doesn't</a></li><li class="h2"><a href="#step-1-inventory-the-heroku-app">Step 1 — Inventory the Heroku app</a></li><li class="h2"><a href="#step-2-capture-a-postgres-dump">Step 2 — Capture a Postgres dump</a></li><li class="h2"><a href="#step-3-create-the-app-on-ownstack">Step 3 — Create the app on OwnStack</a></li><li class="h2"><a href="#step-4-push-config-vars">Step 4 — Push config vars</a></li><li class="h2"><a href="#step-5-provision-the-database-then-restore">Step 5 — Provision the database, then restore</a></li><li class="h2"><a href="#step-6-deploy">Step 6 — Deploy</a></li><li class="h2"><a href="#step-7-swap-dns">Step 7 — Swap DNS</a></li><li class="h2"><a href="#step-8-cut-over">Step 8 — Cut over</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!-- meta {"title":"Repair after import","desc":"Fix password authentication failed for user \"postgres\" after restoring a Postgres dump.","section":"Databases"} -->
+<p class="lede">If your deploys (or release tasks) start failing with <code>password authentication failed for user "postgres"</code> right after a database restore, you've hit the most common post-import foot-gun. This page is the fix.</p>
+
+<h2>What's broken</h2>
+<p><code>pg_dumpall</code> (the cluster-wide variant of <code>pg_dump</code>) includes <strong>role globals</strong> — including each role's password. When you restore that dump, Postgres replays the source cluster's <code>ALTER ROLE postgres WITH PASSWORD '...'</code>, overriding whatever password dokku originally set.</p>
+<p>Meanwhile, dokku's <code>DATABASE_URL</code> for the app still carries dokku's original randomly-generated password. The role now authenticates with the source's password; the app keeps presenting dokku's old password; every connection fails.</p>
+
+<h2>The fix</h2>
+<p>Align the role's password to whatever <code>DATABASE_URL</code> claims. One <code>ALTER ROLE</code> statement does it.</p>
+
+<ol>
+	<li><strong>Read the current <code>DATABASE_URL</code>:</strong>
+		<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; config:get &lt;app&gt; DATABASE_URL
+<span class="out">postgresql://postgres:&lt;PASSWORD&gt;@dokku-postgres-&lt;SERVICE&gt;:5432/&lt;DB&gt;</span></code></pre>
+	</li>
+	<li><strong>Extract <code>&lt;PASSWORD&gt;</code> and <code>&lt;SERVICE&gt;</code></strong> from the URL — between <code>postgres:</code> and <code>@</code> for the password; between <code>dokku-postgres-</code> and <code>:5432</code> for the service name.</li>
+	<li><strong>Pipe the <code>ALTER ROLE</code> into the service:</strong>
+		<pre class="terminal"><code><span class="prompt">$</span> printf "ALTER ROLE postgres WITH PASSWORD '&lt;PASSWORD&gt;';\n\\q\n" | \
+    ssh dokku@&lt;stack-ip&gt; postgres:connect &lt;SERVICE&gt;
+<span class="out">ALTER ROLE</span></code></pre>
+		The output should be exactly <code>ALTER ROLE</code>. Anything else means the alter didn't apply — stop and investigate.
+	</li>
+	<li><strong>Retry the deploy.</strong> Release tasks now authenticate against the role with the matching password.</li>
+</ol>
+
+<h2>Why not just run <code>ownstack db repair</code>?</h2>
+<p>The current <code>ownstack db repair</code> aligns the role to dokku's <em>service DSN</em> (dokku's own stored password). For the dump-import case, the service DSN itself is sometimes already in sync with <code>DATABASE_URL</code>, but the import desync'd the actual <em>role</em> password — so <code>db repair</code> may not see anything wrong, or may re-set the role to a value that still doesn't match the URL.</p>
+<p>The manual <code>ALTER ROLE</code> above is precise: it sets the role to exactly what <code>DATABASE_URL</code> claims, which is what the app uses.</p>
+<p>(See <a href="https://github.com/ownstack-org/control-plane/issues/289">control-plane#289</a> — we're working on a safer redo.)</p>
+
+<h2>Don't do these instead</h2>
+<table>
+	<thead><tr><th>Don't</th><th>Why</th></tr></thead>
+	<tbody>
+		<tr><td><code>ownstack config:set DATABASE_URL=...</code> with a different password</td><td>Dokku rebuilds <code>DATABASE_URL</code> from link metadata on every restart, so your override gets clobbered. The link is the source of truth.</td></tr>
+		<tr><td><code>dokku postgres:reset-password</code></td><td>Generates a brand-new random password on the service side, doesn't update the role inside the container or the app's <code>DATABASE_URL</code>. Three things now disagree instead of two.</td></tr>
+		<tr><td><code>postgres:unlink</code> + <code>postgres:link</code></td><td>This refreshes <code>DATABASE_URL</code> from the service DSN, but doesn't touch the role's password. Fixes nothing.</td></tr>
+	</tbody>
+</table>
+
+<div class="callout note">
+	<div><strong>Use <code>pg_dump</code>, not <code>pg_dumpall</code>, when you can</strong><p>Per-database dumps (<code>pg_dump</code>) don't include role globals, so they don't cause this drift on restore. Only use <code>pg_dumpall</code> when you actually need cluster-wide state (multi-db apps, custom roles).</p></div>
+</div>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/databases/postgres/restore/">Restore</a></li>
+	<li><a href="/databases/postgres/dumps/">Dumps</a></li>
+	<li><a href="/troubleshooting/db-auth/">Troubleshooting: database auth</a></li>
+</ul>

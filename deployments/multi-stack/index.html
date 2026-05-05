@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Multi-stack deploys — OwnStack</title>
+<meta name="description" content="Deploy one app to several stacks: staging+prod, primary+failover, region by region.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Multi-stack deploys — OwnStack">
+<meta property="og:description" content="Deploy one app to several stacks: staging+prod, primary+failover, region by region.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a class="active" href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/deployments/">deployments</a><span class="sep">›</span><span>Multi-stack deploys</span></nav>
+			<h1>Multi-stack deploys</h1>
+			<p class="lede">An OwnStack app can deploy to one stack or many. The shape is the same — same Procfile, same buildpack, same release task — but each stack is its own running instance with its own dokku state, scale, logs, and (optionally) its own per-stack config overrides.</p>
+
+<h2 id="why-deploy-to-multiple-stacks">Why deploy to multiple stacks</h2>
+<ul>
+	<li><strong>Staging + production</strong> — cheap stack for pre-merge testing, beefier stack for prod.</li>
+	<li><strong>Primary + failover</strong> — same code, different region; flip DNS if the primary goes down.</li>
+	<li><strong>Active-active</strong> — multiple regions serving traffic via a global load balancer (the cloud provider's, or your DNS-based one).</li>
+	<li><strong>Multi-tenant isolation</strong> — one app codebase, many stacks, each holding a different customer's data.</li>
+</ul>
+
+<h2 id="add-or-remove-stacks">Add or remove stacks</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app stacks &lt;app&gt;
+<span class="prompt">$</span> ownstack app stacks:add &lt;app&gt; &lt;stack-name&gt;
+<span class="prompt">$</span> ownstack app stacks:remove &lt;app&gt; &lt;stack-name&gt;</code></pre>
+<p>Each new target gets its own dokku app on the new stack on the next deploy. Removing a target stops deploys to that stack but leaves the dokku app and data in place — destroy them via <code>ssh dokku@&lt;stack-ip&gt; apps:destroy</code> if you don't need them.</p>
+
+<h2 id="one-deploy-many-jobs">One <code>deploy</code>, many jobs</h2>
+<p>A single <code>ownstack deploy</code> enqueues one deployment job per stack. They run in parallel. Each has its own status, log, and SHA tracking:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack deploy
+<span class="out">Triggering deploy for app 47…
+✓ Deploy started on prod-east (job 1024)
+✓ Deploy started on prod-west (job 1025)</span>
+
+<span class="prompt">$</span> ownstack app info
+<span class="out">  Stack:   prod-east — deployed abc1234
+  Stack:   prod-west — deployed abc1234</span></code></pre>
+<p>If one job fails, the others keep going. The dashboard <strong>Deployments</strong> tab shows mixed status. Re-deploy just the failed stack with <code>--stack=&lt;name&gt;</code>.</p>
+
+<h2 id="per-stack-config">Per-stack config</h2>
+<p>App-level config vars apply to every stack. For values that differ per stack — different external API URL in staging, different region indicator — set them at the stack level:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack config:set --app=&lt;app&gt; --stack=prod-east  REGION=us-east-1
+<span class="prompt">$</span> ownstack config:set --app=&lt;app&gt; --stack=prod-west  REGION=us-west-2</code></pre>
+<p>Stack-level vars override app-level vars on that stack only.</p>
+
+<h2 id="per-stack-scaling">Per-stack scaling</h2>
+<p>Scale state is per-stack. Larger region runs more workers; a hot-spare runs zero. See <a href="/processes/scaling/">Scaling</a>.</p>
+
+<h2 id="per-stack-databases">Per-stack databases</h2>
+<p>By default, each stack gets its own postgres/mysql/redis service. Two ways to share data across stacks:</p>
+<ul>
+	<li><strong>External DB</strong> — point <code>DATABASE_URL</code> at a managed RDS / Cloud SQL / etc. instance reachable from all stacks. Set <code>needs_postgres: false</code> on the app so OwnStack stops auto-creating per-stack services.</li>
+	<li><strong>Replicate</strong> — use <code>ownstack app replicate</code> to make a sibling app that shares DB and Redis with the source. Useful for blue-green within a stack.</li>
+</ul>
+
+<h2 id="dns-in-front-of-multiple-stacks">DNS in front of multiple stacks</h2>
+<p>OwnStack doesn't run a global load balancer. Either:</p>
+<ul>
+	<li>Use the cloud provider's LB (AWS ALB/NLB, GCP HTTP LB, Cloudflare Load Balancing) and target each stack as an origin.</li>
+	<li>Use weighted DNS records (Route 53, DNSimple, Cloudflare) — split traffic by record weight, fail over with health checks.</li>
+</ul>
+<p>Each stack independently terminates SSL with its own Let's Encrypt cert.</p>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/deployments/pipelines/">Pipelines</a> — staging → production promotions.</li>
+	<li><a href="/processes/scaling/">Scaling</a></li>
+	<li><a href="/domains-ssl/">Domains &amp; SSL</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#why-deploy-to-multiple-stacks">Why deploy to multiple stacks</a></li><li class="h2"><a href="#add-or-remove-stacks">Add or remove stacks</a></li><li class="h2"><a href="#one-deploy-many-jobs">One deploy, many jobs</a></li><li class="h2"><a href="#per-stack-config">Per-stack config</a></li><li class="h2"><a href="#per-stack-scaling">Per-stack scaling</a></li><li class="h2"><a href="#per-stack-databases">Per-stack databases</a></li><li class="h2"><a href="#dns-in-front-of-multiple-stacks">DNS in front of multiple stacks</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

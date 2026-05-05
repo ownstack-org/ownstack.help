@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stacks — OwnStack</title>
+<meta name="description" content="A stack is a server (or cluster) where your apps run. You own the host; OwnStack manages the layer above.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Stacks — OwnStack">
+<meta property="og:description" content="A stack is a server (or cluster) where your apps run. You own the host; OwnStack manages the layer above.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a class="active" href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><span>Stacks</span></nav>
+			<h1>Stacks</h1>
+			<p class="lede">A <strong>stack</strong> is a host (or cluster) that runs apps. You own the underlying server — it lives in your AWS account, your GCP project, or any provider where you have SSH access. OwnStack provisions and configures the dokku layer on top.</p>
+
+<h2 id="provider-types">Provider types</h2>
+<table>
+	<thead><tr><th>Provider</th><th>Used for</th></tr></thead>
+	<tbody>
+		<tr><td><a href="/stacks/aws/">AWS</a></td><td>EC2 instance(s) provisioned from your AWS credentials.</td></tr>
+		<tr><td><a href="/stacks/gcp/">GCP</a></td><td>GCE instance(s) in your GCP project.</td></tr>
+		<tr><td><a href="/stacks/openstack/">OpenStack</a></td><td>Private clouds with an OpenStack API.</td></tr>
+		<tr><td><a href="/stacks/ssh/">Bring-your-own (SSH)</a></td><td>Any Linux host you can SSH into. Bare metal, DigitalOcean, Hetzner, on-prem, anything.</td></tr>
+		<tr><td>Local</td><td><code>ownstack local stack start</code> runs dokku in a Docker container on your machine for development.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="what-s-installed-on-every-stack">What's installed on every stack</h2>
+<p>OwnStack provisioning ensures a working dokku environment — you don't install anything by hand:</p>
+<ul>
+	<li><strong>dokku</strong> — the underlying PaaS engine.</li>
+	<li><strong>Standard plugins</strong> — postgres, mysql, mongo, redis, letsencrypt, http-auth.</li>
+	<li><strong>nginx</strong> — managed by dokku for routing and SSL termination.</li>
+	<li><strong>An SSH endpoint</strong> — the control plane uses this to push deploys, run dokku commands, fetch logs, and configure the app.</li>
+</ul>
+<p>You can install additional dokku plugins as needed:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack plugin-install --stack=&lt;stack&gt; clamav</code></pre>
+
+<h2 id="provisioning">Provisioning</h2>
+<p>Most users create stacks in the dashboard (<strong>Stacks → New</strong>): pick a provider, add credentials, choose a region, hit provision. The control plane creates the instance, installs dokku, configures nginx, runs healthchecks, and marks the stack ready.</p>
+<p>Existing dokku hosts can be imported as SSH-provider stacks — see <a href="/stacks/ssh/">Bring-your-own (SSH)</a>.</p>
+
+<h2 id="what-lives-on-a-stack">What lives on a stack</h2>
+<table>
+	<thead><tr><th>Resource</th><th>Where it lives</th></tr></thead>
+	<tbody>
+		<tr><td>App containers</td><td>Docker on the stack host. <code>dokku ps:report &lt;app&gt;</code> shows the running set.</td></tr>
+		<tr><td>Postgres / MySQL / Mongo / Redis services</td><td>Docker containers on the same host, managed by the matching dokku plugin. Data on the host's disk.</td></tr>
+		<tr><td>nginx vhosts</td><td><code>/home/dokku/&lt;app&gt;/nginx.conf</code></td></tr>
+		<tr><td>SSL certs</td><td><code>/home/dokku/&lt;app&gt;/tls/</code> (or letsencrypt's path).</td></tr>
+		<tr><td>App config vars</td><td><code>/home/dokku/&lt;app&gt;/ENV</code> (don't edit by hand — use <code>ownstack config</code>).</td></tr>
+	</tbody>
+</table>
+
+<h2 id="inspecting">Inspecting</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stacks                                        <span class="out"># list all stacks</span>
+<span class="prompt">$</span> ownstack stack data databases &lt;stack&gt;                  <span class="out"># databases on the stack</span>
+<span class="prompt">$</span> ownstack stack data volumes &lt;stack&gt;                    <span class="out"># persistent volumes</span>
+<span class="prompt">$</span> ownstack stack disk-usage &lt;stack&gt;                      <span class="out"># df + dokku disk via SSH</span>
+<span class="prompt">$</span> ownstack stack patches &lt;stack&gt;                         <span class="out"># pending dokku/system patches</span></code></pre>
+
+<h2 id="scaling-a-stack">Scaling a stack</h2>
+<p>Two paths:</p>
+<ul>
+	<li><strong>Vertical</strong> — bigger instance type. Provisioned in your cloud account; OwnStack respects whatever you set there. Resize is a stack-restart event, so plan a window.</li>
+	<li><strong>Horizontal</strong> — multiple stacks, with apps deploying to several. Combined with a load balancer in front (often the cloud provider's), you get an active-active topology.</li>
+</ul>
+<p>OwnStack itself does not auto-scale stacks. That's a deliberate choice: stack lifecycle should be visible and explicit.</p>
+
+<h2 id="backups">Backups</h2>
+<p>Stacks support manual and scheduled backups via <code>ownstack stack backup</code>. Backups capture databases and persistent volumes; storage destination (typically S3) is configured per-stack. See <a href="/stacks/backups/">Stack backups</a>.</p>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li>Provider-specific provisioning: <a href="/stacks/aws/">AWS</a>, <a href="/stacks/gcp/">GCP</a>, <a href="/stacks/openstack/">OpenStack</a>, <a href="/stacks/ssh/">SSH</a>.</li>
+	<li><a href="/stacks/backups/">Stack backups</a></li>
+	<li><a href="/deployments/">Deployments</a> — what happens when an app deploys to a stack.</li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#provider-types">Provider types</a></li><li class="h2"><a href="#what-s-installed-on-every-stack">What's installed on every stack</a></li><li class="h2"><a href="#provisioning">Provisioning</a></li><li class="h2"><a href="#what-lives-on-a-stack">What lives on a stack</a></li><li class="h2"><a href="#inspecting">Inspecting</a></li><li class="h2"><a href="#scaling-a-stack">Scaling a stack</a></li><li class="h2"><a href="#backups">Backups</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

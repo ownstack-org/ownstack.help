@@ -1,0 +1,40 @@
+<!-- meta {"title":"Redis","desc":"Redis on OwnStack — caching, queues, pub/sub. Provision, link, expose, persist.","section":"Databases","slug":"databases/redis"} -->
+<p class="lede">Redis is the standard pick for caches, background-job queues (Sidekiq, BullMQ, RQ), and pub/sub. OwnStack runs Redis as a dokku service on the stack and links it via <code>REDIS_URL</code>.</p>
+
+<h2>Provisioning</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; redis:create redis-&lt;app&gt; --image-version 7
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; redis:link redis-&lt;app&gt; &lt;app&gt;</code></pre>
+<p>OwnStack auto-creates Redis for apps with <code>needs_redis: true</code> on first deploy. Apps that use Sidekiq typically have this set.</p>
+
+<h2>The REDIS_URL shape</h2>
+<pre><code>redis://:&lt;password&gt;@dokku-redis-&lt;service&gt;:6379</code></pre>
+
+<h2>Connect</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; redis:connect redis-&lt;app&gt;
+<span class="out">redis-&lt;app&gt;:6379&gt;</span></code></pre>
+
+<h2>Persistence</h2>
+<p>The dokku-redis plugin enables AOF persistence by default — writes are durably appended to disk every second. RDB snapshots run periodically. If you only need a cache (no durability requirement), you can disable AOF for performance:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; redis:set redis-&lt;app&gt; appendonly no</code></pre>
+<p>Restart the service afterward.</p>
+
+<h2>Multiple Redis services</h2>
+<p>For separating cache from queues:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; redis:create cache-&lt;app&gt;
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; redis:link cache-&lt;app&gt; &lt;app&gt; --alias CACHE
+<span class="out"># sets CACHE_URL on the app, alongside REDIS_URL</span></code></pre>
+
+<h2>Backups</h2>
+<p>Stack backups capture an RDB snapshot of every Redis service. Restoring a Redis snapshot replaces in-memory state — for cache-only Redis this is rarely useful, but for queue state it can recover an outage.</p>
+
+<h2>Memory sizing</h2>
+<p>Redis memory is bounded by the stack's RAM. For a stack with 8 GiB, a Redis service handling cache + queues should be capped well below total RAM (other apps need memory too). Set the cap with <code>maxmemory</code>:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; redis:set redis-&lt;app&gt; maxmemory 1gb
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; redis:set redis-&lt;app&gt; maxmemory-policy allkeys-lru</code></pre>
+<p><code>allkeys-lru</code> evicts least-recently-used keys when memory is full. <code>volatile-lru</code> evicts only keys with TTLs. <code>noeviction</code> errors on writes when full.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/databases/">Databases overview</a></li>
+	<li><a href="/processes/scaling/">Scaling</a> — pairing workers with a Redis-backed queue.</li>
+</ul>

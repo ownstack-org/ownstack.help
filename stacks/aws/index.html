@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AWS stacks — OwnStack</title>
+<meta name="description" content="Provision a stack as an EC2 instance in your AWS account.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="AWS stacks — OwnStack">
+<meta property="og:description" content="Provision a stack as an EC2 instance in your AWS account.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a class="active" href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/stacks/">stacks</a><span class="sep">›</span><span>AWS stacks</span></nav>
+			<h1>AWS stacks</h1>
+			<p class="lede">An AWS stack is a single EC2 instance (or, optionally, an autoscaling group) running dokku in your AWS account. OwnStack provisions it via your IAM credentials, opens the right security group ports, and installs the platform.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+	<li>An AWS account where you have permission to create EC2 instances, security groups, and (optionally) Elastic IPs.</li>
+	<li>An IAM access key + secret key with the policy below, or an OAuth-style integration if you've connected the account already.</li>
+</ul>
+
+<h2 id="minimum-iam-policy">Minimum IAM policy</h2>
+<pre><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:RunInstances",
+        "ec2:TerminateInstances",
+        "ec2:DescribeInstances",
+        "ec2:CreateTags",
+        "ec2:CreateSecurityGroup",
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeImages",
+        "ec2:DescribeKeyPairs",
+        "ec2:CreateKeyPair",
+        "ec2:AllocateAddress",
+        "ec2:AssociateAddress",
+        "ec2:ReleaseAddress",
+        "ec2:DescribeAddresses"
+      ],
+      "Resource": "*"
+    }
+  ]
+}</code></pre>
+
+<h2 id="create-the-stack">Create the stack</h2>
+<p>In the dashboard, <strong>Stacks → New → AWS</strong>. Pick:</p>
+<table>
+	<thead><tr><th>Field</th><th>What to set</th></tr></thead>
+	<tbody>
+		<tr><td>Region</td><td>Where to provision. Closer is faster; a single region is fine for v1.</td></tr>
+		<tr><td>Instance type</td><td><code>t3.small</code> (2&nbsp;vCPU, 2&nbsp;GiB) is enough for small apps. Bump to <code>t3.medium</code> or <code>m6i.large</code> if you'll run real traffic.</td></tr>
+		<tr><td>EBS volume size</td><td>30 GiB minimum (dokku images add up). 50–100 GiB is comfortable.</td></tr>
+		<tr><td>Elastic IP</td><td>Recommended — DNS won't break on instance restart.</td></tr>
+	</tbody>
+</table>
+<p>Hit <strong>Provision</strong>. It takes 3–5 minutes — you'll see the instance come up, dokku install, and the stack flip to <strong>provisioned</strong>.</p>
+
+<h2 id="network">Network</h2>
+<p>OwnStack creates a security group with these inbound rules:</p>
+<table>
+	<thead><tr><th>Port</th><th>From</th><th>Purpose</th></tr></thead>
+	<tbody>
+		<tr><td>22 (SSH)</td><td>0.0.0.0/0</td><td>Control-plane and CLI SSH. Restrict to known IPs in production.</td></tr>
+		<tr><td>80 (HTTP)</td><td>0.0.0.0/0</td><td>nginx — Let's Encrypt HTTP-01 challenges, then redirected to 443.</td></tr>
+		<tr><td>443 (HTTPS)</td><td>0.0.0.0/0</td><td>nginx — your apps' traffic.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="sizing-for-real-workloads">Sizing for real workloads</h2>
+<table>
+	<thead><tr><th>Workload</th><th>Recommended</th></tr></thead>
+	<tbody>
+		<tr><td>One Rails app, low traffic</td><td><code>t3.small</code> + 30 GiB EBS</td></tr>
+		<tr><td>One Rails app, real traffic + Postgres</td><td><code>t3.medium</code> + 50 GiB</td></tr>
+		<tr><td>Multiple apps + multiple Sidekiq workers</td><td><code>m6i.large</code> + 100 GiB</td></tr>
+		<tr><td>Heavy Postgres workload</td><td>Move Postgres off-box (RDS) and keep the stack small. See <a href="/databases/">Databases</a>.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="backups">Backups</h2>
+<p>OwnStack supports app-level and stack-level backups to S3. Configure under <strong>Stack → Backups</strong> with an S3 bucket in the same account (or cross-account with appropriate IAM). See <a href="/stacks/backups/">Stack backups</a>.</p>
+
+<h2 id="decommissioning">Decommissioning</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack destroy &lt;stack&gt;</code></pre>
+<p>Terminates the EC2 instance, releases the Elastic IP, removes the security group. Apps deployed only to this stack become unreachable; move them to another stack first.</p>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/stacks/backups/">Stack backups</a></li>
+	<li><a href="/databases/">Databases</a></li>
+	<li><a href="/deployments/">Deployments</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#prerequisites">Prerequisites</a></li><li class="h2"><a href="#minimum-iam-policy">Minimum IAM policy</a></li><li class="h2"><a href="#create-the-stack">Create the stack</a></li><li class="h2"><a href="#network">Network</a></li><li class="h2"><a href="#sizing-for-real-workloads">Sizing for real workloads</a></li><li class="h2"><a href="#backups">Backups</a></li><li class="h2"><a href="#decommissioning">Decommissioning</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

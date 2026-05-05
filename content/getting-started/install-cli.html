@@ -1,0 +1,52 @@
+<!-- meta {"title":"Install the OwnStack CLI","desc":"Install the ownstack CLI on macOS or Linux, then point it at a control plane and authenticate.","section":"Getting started"} -->
+<p class="lede">The OwnStack CLI is a Bash script driver plus a small set of helper libraries. macOS and Linux are first-class; Windows users should run it under WSL.</p>
+
+<h2>Install</h2>
+<p>The recommended install is a one-liner that downloads the executable to <code>~/bin</code> and the helper libraries to <code>~/.ownstack/cli</code>:</p>
+<pre class="terminal"><code><span class="prompt">$</span> curl -sSL https://ownstack.org/cli/install.sh | bash</code></pre>
+<p>Verify:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack --version
+<span class="out">ownstack 0.x.x</span></code></pre>
+
+<div class="callout tip">
+	<div><strong>Tip</strong><p>If you've already cloned the CLI repo for development (<code>~/dev/ownstack/cli</code>), you can symlink instead: <code>ln -s ~/dev/ownstack/cli/bin/ownstack ~/bin/ownstack</code>. The CLI resolves its lib path relative to the script.</p></div>
+</div>
+
+<h2>Pick a control plane</h2>
+<p>The CLI talks to a control plane. By default that's the hosted one at <code>https://api.ownstack.org</code>. If you're self-hosting, point at your own URL when you log in.</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack login                                      <span class="out"># hosted</span>
+<span class="prompt">$</span> ownstack login --api=https://api.example.com        <span class="out"># self-hosted</span></code></pre>
+<p>Login opens a browser, completes the OAuth flow, and writes the resulting token to <code>~/.ownstack/profiles/&lt;name&gt;</code>.</p>
+
+<h2>Profiles</h2>
+<p>Each control-plane endpoint is a <strong>profile</strong>. Run multiple at once if you have a hosted account and a self-hosted instance, or one profile per organization.</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack profile list
+<span class="out">  budbooks
+* haven (active)
+  ownstack</span>
+
+<span class="prompt">$</span> ownstack profile show
+<span class="out">API URL: https://api.ownstack.org
+Active profile: ownstack
+Token: 9242e4bc…</span>
+
+<span class="prompt">$</span> ownstack profile use haven</code></pre>
+
+<div class="callout warning">
+	<div><strong>Always check before state-changing commands</strong><p>The CLI does <em>not</em> warn you when <code>deploy</code>, <code>db</code>, or <code>ssh</code> would run against the wrong profile. Run <code>ownstack profile show</code> first if you've been switching contexts.</p></div>
+</div>
+
+<h2>Where things live</h2>
+<table>
+	<thead><tr><th>Path</th><th>What's there</th></tr></thead>
+	<tbody>
+		<tr><td><code>~/bin/ownstack</code></td><td>The CLI executable.</td></tr>
+		<tr><td><code>~/.ownstack/cli/</code></td><td>Helper libraries (lib/db.sh, lib/control_plane.sh, etc.).</td></tr>
+		<tr><td><code>~/.ownstack/profiles/&lt;name&gt;</code></td><td>One file per profile, holding API URL and token.</td></tr>
+		<tr><td><code>~/.ownstack/config</code></td><td>Global config (active profile, defaults).</td></tr>
+		<tr><td><code>./.ownstack-config</code></td><td>Per-repo: links the local checkout to a specific app on the active control plane.</td></tr>
+	</tbody>
+</table>
+
+<h2>Next</h2>
+<p>You're ready to <a href="/getting-started/quickstart/">deploy your first app</a>.</p>

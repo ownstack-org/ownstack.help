@@ -1,0 +1,37 @@
+<!-- meta {"title":"ownstack stack","desc":"Stack management: list, backups, plugins, data, disk usage.","section":"CLI"} -->
+
+<h2>Listing</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stacks
+<span class="prompt">$</span> ownstack stack list [--json]</code></pre>
+
+<h2>Plugins</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack plugin-install [--stack=NAME] &lt;plugin&gt;</code></pre>
+
+<h2>Patches</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack patches &lt;stack&gt;
+<span class="prompt">$</span> ownstack stack patches apply &lt;stack&gt;</code></pre>
+
+<h2>Data</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack data databases &lt;stack&gt;
+<span class="prompt">$</span> ownstack stack data volumes &lt;stack&gt; [list|add|remove]</code></pre>
+
+<h2>Backups</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack backup config &lt;stack&gt;
+<span class="prompt">$</span> ownstack stack backup run &lt;stack&gt;
+<span class="prompt">$</span> ownstack stack backup list &lt;stack&gt;</code></pre>
+<p>See <a href="/stacks/backups/">Stack backups</a> for the configuration story.</p>
+
+<h2>Disk</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack disk-usage &lt;stack&gt;</code></pre>
+
+<h2>Local stacks (for development)</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack add-local
+<span class="prompt">$</span> ownstack local stack start
+<span class="prompt">$</span> ownstack local stack stop</code></pre>
+<p>Local stacks run dokku in a Docker container on your machine — same workflow as a cloud stack.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/stacks/">Stacks overview</a></li>
+	<li><a href="/stacks/aws/">AWS</a> · <a href="/stacks/gcp/">GCP</a> · <a href="/stacks/openstack/">OpenStack</a> · <a href="/stacks/ssh/">SSH</a></li>
+</ul>

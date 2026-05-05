@@ -1,0 +1,52 @@
+<!-- meta {"title":"Databases","desc":"Postgres, MySQL, MongoDB, and Redis on OwnStack — how they're provisioned, linked, backed up, and restored.","section":"Databases"} -->
+<p class="lede">OwnStack apps can have one or more linked databases. Each is a dokku service running on the same stack as the app, with its data on the stack's disk. Postgres is first-class; MySQL, MongoDB, and Redis are all supported.</p>
+
+<h2>How databases relate to apps</h2>
+<p>A database is a <strong>service</strong> on the stack — a running container with its own disk. <strong>Linking</strong> a service to an app sets <code>DATABASE_URL</code> (or <code>REDIS_URL</code>, <code>MONGO_URL</code>, etc.) as a config var. Your app reads it from the environment.</p>
+
+<table>
+	<thead><tr><th>Database</th><th>Service prefix</th><th>App env var(s)</th><th>Default version</th></tr></thead>
+	<tbody>
+		<tr><td>Postgres</td><td><code>postgres-…</code></td><td><code>DATABASE_URL</code>, <code>DOKKU_POSTGRES_*_URL</code></td><td>17 (configurable)</td></tr>
+		<tr><td>MySQL</td><td><code>mysql-…</code></td><td><code>DATABASE_URL</code>, <code>DOKKU_MYSQL_*_URL</code></td><td>8</td></tr>
+		<tr><td>MongoDB</td><td><code>mongo-…</code></td><td><code>MONGO_URL</code>, <code>MONGODB_URI</code></td><td>7</td></tr>
+		<tr><td>Redis</td><td><code>redis-…</code></td><td><code>REDIS_URL</code></td><td>7</td></tr>
+	</tbody>
+</table>
+
+<h2>Provisioning</h2>
+<p>For Rails apps with <code>app_type: rails</code>, OwnStack auto-creates a Postgres service named <code>postgres-&lt;app&gt;</code> on first deploy and links it. Same for NestJS apps — gets MongoDB. For other app types, opt in:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db create --app=&lt;app&gt; [--version=17]</code></pre>
+<p>Behind the scenes this runs <code>dokku postgres:create</code> + <code>postgres:link</code>, refreshes <code>DATABASE_URL</code>, and triggers a restart so the app picks up the new env.</p>
+
+<h2>Inspecting</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db check                          <span class="out"># connectivity + auth, surfaces password drift</span>
+<span class="prompt">$</span> ownstack db status                         <span class="out"># running/stopped state</span>
+<span class="prompt">$</span> ownstack db version                        <span class="out"># Postgres version</span>
+<span class="prompt">$</span> ownstack stack data databases &lt;stack&gt;      <span class="out"># every database on the stack</span></code></pre>
+
+<h2>Common operations</h2>
+<table>
+	<thead><tr><th>Task</th><th>Where to read</th></tr></thead>
+	<tbody>
+		<tr><td>Create + link a Postgres</td><td><a href="/databases/postgres/">Postgres overview</a></td></tr>
+		<tr><td>Stream a binary dump down</td><td><a href="/databases/postgres/dumps/">Postgres dumps</a></td></tr>
+		<tr><td>Restore from a dump or backup</td><td><a href="/databases/postgres/restore/">Postgres restore</a></td></tr>
+		<tr><td>Fix <code>password authentication failed</code> after restore</td><td><a href="/databases/postgres/repair/">Repair after import</a></td></tr>
+		<tr><td>MySQL specifics</td><td><a href="/databases/mysql/">MySQL</a></td></tr>
+		<tr><td>Redis specifics</td><td><a href="/databases/redis/">Redis</a></td></tr>
+	</tbody>
+</table>
+
+<h2>External databases (RDS, Cloud SQL, etc.)</h2>
+<p>You don't have to run your DB on the stack. Set <code>needs_postgres: false</code> on the app, point <code>DATABASE_URL</code> at your external DB, and OwnStack stops auto-creating per-stack services:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack config:set --app=&lt;app&gt; \
+    DATABASE_URL='postgresql://user:pass@my-rds-endpoint:5432/dbname'</code></pre>
+<p>Useful for big workloads that benefit from managed Postgres (HA, snapshots, point-in-time recovery) and for apps that deploy to multiple stacks but want one DB.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/databases/postgres/">Postgres</a></li>
+	<li><a href="/cli/db/">CLI: <code>ownstack db</code></a></li>
+	<li><a href="/stacks/backups/">Stack backups</a></li>
+</ul>

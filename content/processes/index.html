@@ -1,0 +1,42 @@
+<!-- meta {"title":"Process types","desc":"Process types declared in your Procfile, how they map to running containers, and what dokku does with them.","section":"Processes"} -->
+<p class="lede">A <strong>process type</strong> is a named command in your <code>Procfile</code>. Dokku runs each type as one or more containers from the same built image, with the type name passed as the command. The most common types are <code>web</code> (HTTP-serving) and <code>worker</code> (background jobs), but you can declare as many as you want.</p>
+
+<h2>How types become containers</h2>
+<p>For each line in your Procfile, dokku creates a container per scaled instance, all running off the same image. The <code>web</code> type is special: <code>$PORT</code> is bound and nginx routes traffic to it.</p>
+<pre><code>web: bundle exec puma -C config/puma.rb
+worker: bundle exec sidekiq
+release: bundle exec rails db:migrate
+inventory_updates: bundle exec sidekiq -q inventory_updates -c 4
+order_processing: bundle exec sidekiq -q order_processing -c 8</code></pre>
+<p>This Procfile would, after scaling, produce something like:</p>
+<table>
+	<thead><tr><th>Container</th><th>Image</th><th>Command</th><th>Routed</th></tr></thead>
+	<tbody>
+		<tr><td>web.1</td><td>my-app:latest</td><td><code>puma -C config/puma.rb</code></td><td>via nginx → 443</td></tr>
+		<tr><td>worker.1, worker.2</td><td>my-app:latest</td><td><code>sidekiq</code></td><td>—</td></tr>
+		<tr><td>inventory_updates.1</td><td>my-app:latest</td><td><code>sidekiq -q inventory_updates -c 4</code></td><td>—</td></tr>
+		<tr><td>order_processing.1, .2, .3</td><td>my-app:latest</td><td><code>sidekiq -q order_processing -c 8</code></td><td>—</td></tr>
+	</tbody>
+</table>
+
+<h2>The <code>release</code> type is not a container</h2>
+<p>Despite living in the Procfile, <code>release</code> is a one-shot task run during deployment, not a long-running container. Dokku spins up a release container, runs the command, captures exit status, then discards the container.</p>
+
+<h2>Default scale</h2>
+<p>By default dokku starts one <code>web</code> container and zero of every other type. You explicitly scale workers with <code>ps:scale</code>.</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:report &lt;app&gt;
+<span class="out">       Status web 1:           running
+       Status worker 1:        running
+       Status worker 2:        running
+       Status order_processing 1: running</span></code></pre>
+
+<h2>Inspecting</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:report &lt;app&gt;
+<span class="prompt">$</span> ownstack remote logs --app=&lt;app&gt; --ps=worker --tail 100</code></pre>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/processes/scaling/">Scaling</a> — change instance counts.</li>
+	<li><a href="/processes/healthchecks/">Healthchecks</a> — how dokku decides a deploy is good.</li>
+	<li><a href="/apps/procfile/">Procfile</a></li>
+</ul>

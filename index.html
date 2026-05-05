@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OwnStack — documentation</title>
+<meta name="description" content="OwnStack is a control plane for deploying apps onto stacks you own. Heroku-style ergonomics; AWS, GCP, or any host. Documentation, CLI reference, and how-to guides.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="OwnStack documentation">
+<meta property="og:description" content="Heroku ergonomics on stacks you own.">
+<meta property="og:url" content="https://ownstack.help/">
+<meta name="twitter:card" content="summary">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/" class="active">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<main class="home">
+	<div class="home-hero">
+		<div class="home-stack" aria-hidden="true">
+			<div class="layer l1">control&nbsp;plane</div>
+			<div class="layer l2">stack</div>
+			<div class="layer l3">app</div>
+		</div>
+		<h1>Your apps. Your <span class="gradient">stacks</span>. No middleman.</h1>
+		<p class="lede">OwnStack gives you Heroku-style ergonomics — <code>git push</code>, scale, add-ons, automatic SSL — on infrastructure you already own. AWS, GCP, OpenStack, or any host with SSH.</p>
+		<div class="cta">
+			<a class="btn primary" href="/getting-started/">Get started</a>
+			<a class="btn" href="/cli/">Browse the CLI</a>
+		</div>
+	</div>
+
+	<section class="home-grid">
+		<a class="home-card" href="/getting-started/">
+			<div class="eyebrow">Start here</div>
+			<h3>Quickstart</h3>
+			<p>Install the CLI, point it at a stack, deploy your first app. Fifteen minutes end-to-end.</p>
+		</a>
+		<a class="home-card" href="/concepts/">
+			<div class="eyebrow">Concepts</div>
+			<h3>How OwnStack works</h3>
+			<p>The mental model: control plane, stacks, apps, processes, deployments. Read these once.</p>
+		</a>
+		<a class="home-card" href="/cli/">
+			<div class="eyebrow">Reference</div>
+			<h3>CLI reference</h3>
+			<p>Every command, every flag, every example. Searchable.</p>
+		</a>
+	</section>
+
+	<section class="home-section">
+		<h2>How-to guides</h2>
+		<div class="section-lede">Task-shaped recipes for the things you actually want to do.</div>
+		<div class="topic-grid">
+			<a class="topic-card" href="/processes/scaling/">
+				<div class="topic-title">Scale processes</div>
+				<div class="topic-desc">Web, worker, sidekiq queues — change counts on the fly.</div>
+			</a>
+			<a class="topic-card" href="/databases/postgres/dumps/">
+				<div class="topic-title">Dump a database</div>
+				<div class="topic-desc">Stream a binary <code>pg_dump</code> down to your machine.</div>
+			</a>
+			<a class="topic-card" href="/databases/postgres/repair/">
+				<div class="topic-title">Repair a DB link</div>
+				<div class="topic-desc">Fix <code>password authentication failed</code> after an import.</div>
+			</a>
+			<a class="topic-card" href="/domains-ssl/custom-domain/">
+				<div class="topic-title">Custom domain + SSL</div>
+				<div class="topic-desc">Point a domain at a stack; Let's Encrypt issues automatically.</div>
+			</a>
+			<a class="topic-card" href="/deployments/multi-stack/">
+				<div class="topic-title">Deploy to multiple stacks</div>
+				<div class="topic-desc">Staging + prod, primary + failover, region by region.</div>
+			</a>
+			<a class="topic-card" href="/getting-started/migrating-from-heroku/">
+				<div class="topic-title">Migrate from Heroku</div>
+				<div class="topic-desc">Apps, config, postgres backups — the move.</div>
+			</a>
+			<a class="topic-card" href="/troubleshooting/deploy-failures/">
+				<div class="topic-title">Deploy failures</div>
+				<div class="topic-desc">Common build and release errors, and what to do.</div>
+			</a>
+			<a class="topic-card" href="/stacks/backups/">
+				<div class="topic-title">Stack backups</div>
+				<div class="topic-desc">Schedule and restore stack-wide backups.</div>
+			</a>
+		</div>
+	</section>
+
+	<section class="home-section">
+		<h2>Reference</h2>
+		<div class="section-lede">Deeper details when you need them.</div>
+		<div class="topic-grid">
+			<a class="topic-card" href="/cli/app/"><div class="topic-title"><code>ownstack app</code></div><div class="topic-desc">App lifecycle, stacks, domains.</div></a>
+			<a class="topic-card" href="/cli/deploy/"><div class="topic-title"><code>ownstack deploy</code></div><div class="topic-desc">Trigger a deploy by git or image.</div></a>
+			<a class="topic-card" href="/cli/db/"><div class="topic-title"><code>ownstack db</code></div><div class="topic-desc">Postgres / MySQL operations.</div></a>
+			<a class="topic-card" href="/cli/stack/"><div class="topic-title"><code>ownstack stack</code></div><div class="topic-desc">Stack-level operations and backups.</div></a>
+			<a class="topic-card" href="/api/"><div class="topic-title">REST API</div><div class="topic-desc">Authentication and endpoints.</div></a>
+			<a class="topic-card" href="/account/"><div class="topic-title">Account &amp; billing</div><div class="topic-desc">Tokens, profiles, invoices.</div></a>
+			<a class="topic-card" href="/troubleshooting/"><div class="topic-title">Troubleshooting</div><div class="topic-desc">Common errors with concrete fixes.</div></a>
+			<a class="topic-card" href="/changelog/"><div class="topic-title">Changelog</div><div class="topic-desc">What shipped recently.</div></a>
+		</div>
+	</section>
+</main>
+
+<footer class="site-footer">
+	<p>OwnStack — © 2026. Documentation source on <a href="https://github.com/ownstack-org/ownstack.help">GitHub</a>.</p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

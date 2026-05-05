@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Process types — OwnStack</title>
+<meta name="description" content="Process types declared in your Procfile, how they map to running containers, and what dokku does with them.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Process types — OwnStack">
+<meta property="og:description" content="Process types declared in your Procfile, how they map to running containers, and what dokku does with them.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a class="active" href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><span>Process types</span></nav>
+			<h1>Process types</h1>
+			<p class="lede">A <strong>process type</strong> is a named command in your <code>Procfile</code>. Dokku runs each type as one or more containers from the same built image, with the type name passed as the command. The most common types are <code>web</code> (HTTP-serving) and <code>worker</code> (background jobs), but you can declare as many as you want.</p>
+
+<h2 id="how-types-become-containers">How types become containers</h2>
+<p>For each line in your Procfile, dokku creates a container per scaled instance, all running off the same image. The <code>web</code> type is special: <code>$PORT</code> is bound and nginx routes traffic to it.</p>
+<pre><code>web: bundle exec puma -C config/puma.rb
+worker: bundle exec sidekiq
+release: bundle exec rails db:migrate
+inventory_updates: bundle exec sidekiq -q inventory_updates -c 4
+order_processing: bundle exec sidekiq -q order_processing -c 8</code></pre>
+<p>This Procfile would, after scaling, produce something like:</p>
+<table>
+	<thead><tr><th>Container</th><th>Image</th><th>Command</th><th>Routed</th></tr></thead>
+	<tbody>
+		<tr><td>web.1</td><td>my-app:latest</td><td><code>puma -C config/puma.rb</code></td><td>via nginx → 443</td></tr>
+		<tr><td>worker.1, worker.2</td><td>my-app:latest</td><td><code>sidekiq</code></td><td>—</td></tr>
+		<tr><td>inventory_updates.1</td><td>my-app:latest</td><td><code>sidekiq -q inventory_updates -c 4</code></td><td>—</td></tr>
+		<tr><td>order_processing.1, .2, .3</td><td>my-app:latest</td><td><code>sidekiq -q order_processing -c 8</code></td><td>—</td></tr>
+	</tbody>
+</table>
+
+<h2 id="the-release-type-is-not-a-container">The <code>release</code> type is not a container</h2>
+<p>Despite living in the Procfile, <code>release</code> is a one-shot task run during deployment, not a long-running container. Dokku spins up a release container, runs the command, captures exit status, then discards the container.</p>
+
+<h2 id="default-scale">Default scale</h2>
+<p>By default dokku starts one <code>web</code> container and zero of every other type. You explicitly scale workers with <code>ps:scale</code>.</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:report &lt;app&gt;
+<span class="out">       Status web 1:           running
+       Status worker 1:        running
+       Status worker 2:        running
+       Status order_processing 1: running</span></code></pre>
+
+<h2 id="inspecting">Inspecting</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:report &lt;app&gt;
+<span class="prompt">$</span> ownstack remote logs --app=&lt;app&gt; --ps=worker --tail 100</code></pre>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/processes/scaling/">Scaling</a> — change instance counts.</li>
+	<li><a href="/processes/healthchecks/">Healthchecks</a> — how dokku decides a deploy is good.</li>
+	<li><a href="/apps/procfile/">Procfile</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#how-types-become-containers">How types become containers</a></li><li class="h2"><a href="#the-release-type-is-not-a-container">The release type is not a container</a></li><li class="h2"><a href="#default-scale">Default scale</a></li><li class="h2"><a href="#inspecting">Inspecting</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

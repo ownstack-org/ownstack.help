@@ -1,0 +1,61 @@
+<!-- meta {"title":"Apps","desc":"How OwnStack models the unit of an app: code, processes, config, databases, and the stacks it deploys to.","section":"Apps"} -->
+<p class="lede">An <strong>app</strong> in OwnStack is what you'd call an app anywhere else: a codebase that runs as one or more processes, with environment variables, optional databases, and at least one URL. Apps deploy to one or more stacks.</p>
+
+<h2>The shape of an app</h2>
+<table>
+	<thead><tr><th>Piece</th><th>What it is</th></tr></thead>
+	<tbody>
+		<tr><td>Repo + branch</td><td>Typically <code>main</code> on a GitHub repo, but any git remote works. Configured via <code>git_repository_url</code> on the app.</td></tr>
+		<tr><td><a href="/apps/procfile/">Procfile</a></td><td>Declares process types (<code>web</code>, <code>worker</code>, etc.). Same shape as Heroku.</td></tr>
+		<tr><td>Build type</td><td><code>buildpacks</code> (herokuish auto-detect) or <code>dockerfile</code>. See <a href="/deployments/build-types/">Build types</a>.</td></tr>
+		<tr><td><a href="/apps/config-vars/">Config vars</a></td><td>Environment variables, set per-app, applied to every stack the app deploys to.</td></tr>
+		<tr><td>Linked services</td><td>Postgres, MySQL, Redis, MongoDB — whichever the app needs.</td></tr>
+		<tr><td><a href="/apps/domains/">Domains &amp; SSL</a></td><td>One or more domains routed to the app via the stack's nginx.</td></tr>
+		<tr><td>Stacks</td><td>Where it deploys. An app can target one stack or many.</td></tr>
+	</tbody>
+</table>
+
+<h2>One app, many stacks</h2>
+<p>Most apps deploy to a single stack. Some deploy to multiple — for example a staging stack and a production stack, or a primary and a regional failover. Add or remove deploy targets in the dashboard's <strong>Deploy targets</strong> tab, or via the CLI:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app stacks &lt;app&gt;
+<span class="prompt">$</span> ownstack app stacks:add &lt;app&gt; &lt;stack-name&gt;
+<span class="prompt">$</span> ownstack app stacks:remove &lt;app&gt; &lt;stack-name&gt;</code></pre>
+<p>When an app has multiple stacks, one <code>ownstack deploy</code> deploys to <em>all</em> of them in parallel. Each stack has its own dokku state — its own scale, running processes, and logs. See <a href="/deployments/multi-stack/">Multi-stack deploys</a>.</p>
+
+<h2>The <code>.ownstack-config</code> file</h2>
+<p>A small file in your repo that links your local checkout to a specific app on a specific control plane. It carries the app token used by <code>ownstack deploy</code>, <code>ownstack run</code>, etc.</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack remote -a &lt;app&gt;
+<span class="out">✓ This repo is now linked to app id 47</span>
+
+<span class="prompt">$</span> ownstack remote
+<span class="out">Linked to: my-app (id 47) on profile 'ownstack'</span></code></pre>
+<p>Add it to <code>.gitignore</code>; it contains your app token. Multiple checkouts of the same repo can each link to different apps without conflicting.</p>
+
+<h2>App roles &amp; types</h2>
+<p>Apps have an <code>app_role</code> (<code>user</code> or <code>system</code>). Most apps you create are <code>user</code>. The <code>app_type</code> classifies how the app should be treated by the build system:</p>
+<table>
+	<thead><tr><th>app_type</th><th>Used for</th></tr></thead>
+	<tbody>
+		<tr><td><code>rails</code></td><td>Rails apps — auto-links Postgres, sets up release tasks.</td></tr>
+		<tr><td><code>nestjs</code></td><td>NestJS apps — auto-links MongoDB, sets <code>MONGO_URI</code>.</td></tr>
+		<tr><td><code>angular</code></td><td>Static Angular builds (front-end only).</td></tr>
+		<tr><td><code>dockerfile</code></td><td>Dockerfile-based, no buildpack.</td></tr>
+		<tr><td><code>raw</code></td><td>Anything else; you supply Procfile + buildpack settings.</td></tr>
+	</tbody>
+</table>
+
+<h2>Inspecting an app</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app list
+<span class="prompt">$</span> ownstack app info &lt;app&gt;
+<span class="prompt">$</span> ownstack config --app=&lt;app&gt;            <span class="out"># config vars</span>
+<span class="prompt">$</span> ownstack remote logs --app=&lt;app&gt; --tail 100
+<span class="prompt">$</span> ownstack app stacks &lt;app&gt;
+<span class="prompt">$</span> ownstack app domains &lt;app&gt;</code></pre>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/apps/procfile/">Procfile</a> — declaring process types.</li>
+	<li><a href="/apps/config-vars/">Config vars</a> — environment variables.</li>
+	<li><a href="/apps/domains/">Domains &amp; SSL</a> — custom domains and certs.</li>
+	<li><a href="/stacks/">Stacks</a> — where apps run.</li>
+</ul>

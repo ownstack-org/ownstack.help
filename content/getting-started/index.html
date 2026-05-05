@@ -1,0 +1,27 @@
+<!-- meta {"title":"Welcome to OwnStack","desc":"What OwnStack is, what problems it solves, and how the pieces fit together.","section":"Getting started"} -->
+<p class="lede">OwnStack is a control plane for deploying apps onto stacks you own. Heroku-style ergonomics — <code>git push</code>, scale, add-ons, automatic SSL — on infrastructure that lives in your AWS account, your GCP project, or any host with SSH access.</p>
+
+<h2>Why OwnStack exists</h2>
+<p>Heroku is wonderful at the feel: deploy by pushing to a remote, scale by typing <code>ps:scale worker=2</code>, add a database with one command. But it bills per dyno and runs on someone else's hardware. The escape route — running <a href="https://dokku.com/">dokku</a> on your own server — gets you the engine, but you also inherit its quirks: app.json formation locks, password drift after dump-restores, multi-stack orchestration you have to script yourself.</p>
+<p>OwnStack is the layer above dokku. It runs on your servers (or on managed hosts you provision through it), and it papers over the rough edges so the day-to-day workflow feels like Heroku again: a CLI, a UI, and one obvious way to do each thing.</p>
+
+<h2>The mental model</h2>
+<p>Five things to know:</p>
+<table>
+	<thead><tr><th>Concept</th><th>What it is</th></tr></thead>
+	<tbody>
+		<tr><td><strong>Control plane</strong></td><td>Central service (hosted at <code>api.ownstack.org</code>, or self-hosted) that holds your account, your stacks, your apps, and runs the deploy worker.</td></tr>
+		<tr><td><strong>Stack</strong></td><td>A server (or cluster) that runs your apps. Lives in your cloud account; OwnStack provisions it via SSH.</td></tr>
+		<tr><td><strong>App</strong></td><td>Code in a repo, a Procfile, environment variables, optional databases. Apps deploy to one or more stacks.</td></tr>
+		<tr><td><strong>Profile</strong></td><td>A saved control-plane endpoint plus an auth token. Switch profiles to talk to different control planes.</td></tr>
+		<tr><td><strong>CLI</strong></td><td><code>ownstack</code> — the everyday driver for deploying, scaling, viewing logs, managing config.</td></tr>
+	</tbody>
+</table>
+
+<h2>What's next</h2>
+<ul>
+	<li><a href="/getting-started/install-cli/">Install the CLI</a> — five minutes.</li>
+	<li><a href="/getting-started/quickstart/">Deploy your first app</a> — about fifteen minutes, end-to-end.</li>
+	<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a> — if you're coming from there.</li>
+</ul>
+<p>If you want a deeper read, jump to <a href="/apps/">Apps</a> or <a href="/stacks/">Stacks</a> next; the rest of the manual fans out from there.</p>

@@ -1,0 +1,40 @@
+<!-- meta {"title":"SSH & one-off shells","desc":"Open an interactive shell inside your running app, run one-off commands, or SSH straight to the stack host.","section":"Apps"} -->
+<p class="lede">Two tiers of access: into the app's container (where your code is running), or onto the stack host (where dokku itself runs). The first is for app-shaped problems; the second is for stack-shaped ones.</p>
+
+<h2>Shell inside the running container</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack ssh app &lt;app&gt; [--stack=&lt;stack&gt;]</code></pre>
+<p>This opens an interactive bash shell inside a running container of the <code>web</code> process. Your code is at <code>/app</code>; <code>$DATABASE_URL</code> and friends are set; you can run <code>rails console</code>, <code>npm run repl</code>, whatever.</p>
+<p>The shell shares the running container with serving traffic. Close it cleanly (<code>exit</code>); a runaway shell pinning CPU affects users.</p>
+
+<h2>One-off command in a fresh container</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack remote run &lt;app&gt; rails db:migrate
+<span class="prompt">$</span> ownstack remote run &lt;app&gt; bin/rake some:task
+<span class="prompt">$</span> ownstack remote run &lt;app&gt; node scripts/clean.js</code></pre>
+<p>Spawns a new container from the latest image, runs the command, prints output, exits, removes the container. Doesn't touch the running web/worker. Good for migrations, ad-hoc data scripts, or anything that shouldn't share state with serving traffic.</p>
+
+<h2>SSH onto the stack host</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack ssh stack &lt;stack&gt;</code></pre>
+<p>Drops you onto the stack's host as the <code>ubuntu</code> user. Use this for stack-shaped operations: dokku plugin installs, looking at <code>/var/log/nginx/*</code>, checking disk usage, doing OS-level things.</p>
+
+<div class="callout warning">
+	<div><strong>Direct dokku commands skip OwnStack's bookkeeping</strong><p>If you SSH to the stack and run <code>dokku ps:scale</code>, <code>dokku config:set</code>, etc. directly, the change happens but the control plane doesn't know. Most things are fine; some are not (multi-stack syncing, audit logs). Prefer the CLI when an equivalent exists.</p></div>
+</div>
+
+<h2>Direct dokku SSH (advanced)</h2>
+<p>Every stack runs a dokku SSH endpoint as user <code>dokku@&lt;stack-ip&gt;</code>. Your account's SSH key is authorized when you provision a stack. You can run any dokku command directly:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; apps:list
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:report &lt;app&gt;
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; logs &lt;app&gt; --tail
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; postgres:list</code></pre>
+
+<h2>Tail logs</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack remote logs --app=&lt;app&gt; --tail 200
+<span class="prompt">$</span> ownstack remote logs --app=&lt;app&gt; --follow</code></pre>
+<p>Follows stdout/stderr from all running processes. Add <code>--ps=worker</code> to filter to one process type.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/cli/ssh/">CLI: <code>ownstack ssh</code></a></li>
+	<li><a href="/logging/">Logging</a> — tail, drains, retention.</li>
+	<li><a href="/processes/">Process types</a></li>
+</ul>

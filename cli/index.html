@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CLI reference — OwnStack</title>
+<meta name="description" content="The ownstack CLI: how it's organized, common flags, where each subcommand lives.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="CLI reference — OwnStack">
+<meta property="og:description" content="The ownstack CLI: how it's organized, common flags, where each subcommand lives.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a class="active" href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><span>CLI reference</span></nav>
+			<h1>CLI reference</h1>
+			<p class="lede">The <code>ownstack</code> CLI is the primary driver. Every dashboard action has a CLI equivalent; many CLI commands have no UI equivalent. Always check the <a href="/account/">active profile</a> before state-changing commands.</p>
+
+<h2 id="anatomy">Anatomy</h2>
+<pre><code>ownstack &lt;command&gt; [&lt;subcommand&gt;] [options]</code></pre>
+<p>Top-level commands group around resources: <code>app</code>, <code>db</code>, <code>stack</code>, <code>deploy</code>, <code>profile</code>, <code>config</code>, <code>ssh</code>, <code>remote</code>, <code>create</code>, <code>destroy</code>. Each may have subcommands.</p>
+
+<h2 id="common-flags">Common flags</h2>
+<table>
+	<thead><tr><th>Flag</th><th>Purpose</th></tr></thead>
+	<tbody>
+		<tr><td><code>--app=NAME</code></td><td>Target a specific app. Defaults to the linked app from <code>.ownstack-config</code>.</td></tr>
+		<tr><td><code>--stack=NAME_OR_ID</code></td><td>Target a specific stack. Required when multiple stacks are deployable.</td></tr>
+		<tr><td><code>--json</code></td><td>Machine-readable output where supported.</td></tr>
+		<tr><td><code>--help</code> / <code>-h</code></td><td>Per-command usage.</td></tr>
+		<tr><td><code>--wait</code></td><td>Stream live output for long-running operations (deploys, restores).</td></tr>
+	</tbody>
+</table>
+
+<h2 id="reference-index">Reference index</h2>
+<ul>
+	<li><a href="/cli/app/"><code>ownstack app</code></a> — list, info, stacks, domains, lifecycle.</li>
+	<li><a href="/cli/deploy/"><code>ownstack deploy</code></a> — git or image deploys.</li>
+	<li><a href="/cli/db/"><code>ownstack db</code></a> — Postgres / MySQL operations.</li>
+	<li><a href="/cli/stack/"><code>ownstack stack</code></a> — stack-level operations and backups.</li>
+	<li><a href="/cli/profile/"><code>ownstack profile</code></a> — control-plane profiles.</li>
+	<li><a href="/cli/config/"><code>ownstack config</code></a> — environment variables.</li>
+	<li><a href="/cli/ssh/"><code>ownstack ssh</code></a> — interactive shells.</li>
+</ul>
+
+<h2 id="other-top-level-commands">Other top-level commands</h2>
+<table>
+	<thead><tr><th>Command</th><th>Purpose</th></tr></thead>
+	<tbody>
+		<tr><td><code>ownstack login</code></td><td>OAuth into a control plane; saves a profile.</td></tr>
+		<tr><td><code>ownstack profile use NAME</code></td><td>Switch active control plane.</td></tr>
+		<tr><td><code>ownstack create [name] [components...]</code></td><td>Create a new app from scratch.</td></tr>
+		<tr><td><code>ownstack import [dir] --name=NAME</code></td><td>Import an existing repo as a buildpack-style app.</td></tr>
+		<tr><td><code>ownstack adopt [dir]</code></td><td>Retroactively add OwnStack infrastructure to a manually-scaffolded app.</td></tr>
+		<tr><td><code>ownstack remote -a NAME</code></td><td>Link the current repo to an app.</td></tr>
+		<tr><td><code>ownstack remote logs ...</code></td><td>Tail runtime logs.</td></tr>
+		<tr><td><code>ownstack remote run APP CMD…</code></td><td>One-off command in a fresh container.</td></tr>
+		<tr><td><code>ownstack remote restart APP</code></td><td>Restart all processes.</td></tr>
+		<tr><td><code>ownstack destroy</code></td><td>Destroy the linked app.</td></tr>
+		<tr><td><code>ownstack preflight</code></td><td>Pre-deploy sanity checks (<code>$PORT</code> usage, Procfile, deps, git state).</td></tr>
+		<tr><td><code>ownstack ai:setup</code></td><td>Generate AI-assistant context files (<code>CLAUDE.md</code>, <code>.cursorrules</code>).</td></tr>
+		<tr><td><code>ownstack status</code></td><td>Inventory of all linked apps and infra status.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="top-level-help">Top-level help</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack help</code></pre>
+<p>Always reflects what's actually available in your installed CLI version.</p>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#anatomy">Anatomy</a></li><li class="h2"><a href="#common-flags">Common flags</a></li><li class="h2"><a href="#reference-index">Reference index</a></li><li class="h2"><a href="#other-top-level-commands">Other top-level commands</a></li><li class="h2"><a href="#top-level-help">Top-level help</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

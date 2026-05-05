@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Database auth: password authentication failed — OwnStack</title>
+<meta name="description" content="Diagnose and fix DATABASE_URL / role password drift on OwnStack Postgres.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Database auth: password authentication failed — OwnStack">
+<meta property="og:description" content="Diagnose and fix DATABASE_URL / role password drift on OwnStack Postgres.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a class="active" href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/troubleshooting/">troubleshooting</a><span class="sep">›</span><span>Database auth: password authentication failed</span></nav>
+			<h1>Database auth: password authentication failed</h1>
+			<p class="lede">Three things have to agree for a deploy to authenticate against Postgres: the app's <code>DATABASE_URL</code>, dokku's stored service DSN, and the actual password of the <code>postgres</code> role inside the container. When one drifts, deploys fail with <code>password authentication failed for user "postgres"</code>.</p>
+
+<h2 id="first-run-the-diagnostic">First, run the diagnostic</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db check --app=&lt;app&gt;</code></pre>
+<p>Look at the JSON it returns. The relevant fields:</p>
+<table>
+	<thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+	<tbody>
+		<tr><td><code>password_match</code></td><td>Whether <code>DATABASE_URL</code>'s password equals the dokku-stored service DSN's password.</td></tr>
+		<tr><td><code>auth_ok</code></td><td>Whether a real connection attempt succeeds (note: this is unreliable due to docker-socket permissions on some hosts; treat as advisory only).</td></tr>
+		<tr><td><code>app_linked_to_service</code></td><td>Whether dokku has the app linked to the postgres service.</td></tr>
+		<tr><td><code>database_url_host</code></td><td>What hostname <code>DATABASE_URL</code> is pointing at.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="pick-the-right-fix-based-on-the-symptom">Pick the right fix based on the symptom</h2>
+
+<h3 id="right-after-a-database-import-pg-dumpall-or-similar">Right after a database import (<code>pg_dumpall</code> or similar)</h3>
+<p><strong>Fix: <a href="/databases/postgres/repair/">Repair after import</a>.</strong> The dump's <code>ALTER ROLE</code> overrode the role's password; <code>DATABASE_URL</code> still has dokku's original. Pipe one <code>ALTER ROLE</code> via <code>postgres:connect</code> to align the role to <code>DATABASE_URL</code>. Don't run <code>ownstack db repair</code> — it aligns to the wrong target.</p>
+
+<h3 id="password-match-false-reported-by-db-check"><code>password_match: false</code> reported by <code>db check</code></h3>
+<p><code>DATABASE_URL</code> has drifted from the service DSN. Two paths:</p>
+<ol>
+	<li><strong>Same password on both sides:</strong> run <code>ownstack db repair</code>. It re-links and refreshes <code>DATABASE_URL</code>.</li>
+	<li><strong>Different password on both sides:</strong> figure out which one's right (check the dashboard's audit log for the most recent change), align via <code>ALTER ROLE</code> if needed.</li>
+</ol>
+
+<h3 id="multiple-dokku-postgres-url-entries-on-config-show">Multiple <code>DOKKU_POSTGRES_*_URL</code> entries on <code>config:show</code></h3>
+<p>Dokku links from <em>all</em> linked services on each rebuild and may pick the wrong one to set <code>DATABASE_URL</code>. Unlink the wrong service:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; config:show &lt;app&gt; | grep DOKKU_POSTGRES
+<span class="out">DOKKU_POSTGRES_AQUA_URL=postgres://…@dokku-postgres-app-db:5432/...
+DOKKU_POSTGRES_BLACK_URL=postgres://…@dokku-postgres-postgres-app:5432/...   # ← wrong service</span>
+
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; postgres:unlink postgres-app &lt;app&gt;
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; config:set --no-restart &lt;app&gt; \
+    DATABASE_URL='postgres://…@dokku-postgres-app-db:5432/...'
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; config:unset --no-restart &lt;app&gt; DOKKU_POSTGRES_BLACK_URL
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:rebuild &lt;app&gt;</code></pre>
+
+<h3 id="suddenly-broken-after-a-control-plane-upgrade">Suddenly broken after a control-plane upgrade</h3>
+<p>Roll back the control-plane deploy if it landed recently. Past incidents have rewritten <code>DATABASE_URL</code> incorrectly when control-plane code changed how the postgres link was managed. See <a href="https://github.com/ownstack-org/control-plane/issues/289">control-plane#289</a>.</p>
+
+<h2 id="how-to-never-see-this-in-the-first-place">How to never see this in the first place</h2>
+<ul>
+	<li>Use <code>pg_dump</code> (per-database) rather than <code>pg_dumpall</code> (cluster-wide) when restoring. <code>pg_dump</code> output doesn't include role globals.</li>
+	<li>Don't manually <code>postgres:reset-password</code> on a service that's already linked to an app — the app won't see the new password.</li>
+	<li>If you have multiple postgres services on one stack, link only one to each app. Multiple links create rebuild-time ambiguity.</li>
+</ul>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/databases/postgres/repair/">Repair after import</a></li>
+	<li><a href="/databases/postgres/restore/">Restore</a></li>
+	<li><a href="/cli/db/"><code>ownstack db</code> reference</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#first-run-the-diagnostic">First, run the diagnostic</a></li><li class="h2"><a href="#pick-the-right-fix-based-on-the-symptom">Pick the right fix based on the symptom</a></li><li class="h3"><a href="#right-after-a-database-import-pg-dumpall-or-similar">Right after a database import (pg_dumpall or similar)</a></li><li class="h3"><a href="#password-match-false-reported-by-db-check">password_match: false reported by db check</a></li><li class="h3"><a href="#multiple-dokku-postgres-url-entries-on-config-show">Multiple DOKKU_POSTGRES_*_URL entries on config:show</a></li><li class="h3"><a href="#suddenly-broken-after-a-control-plane-upgrade">Suddenly broken after a control-plane upgrade</a></li><li class="h2"><a href="#how-to-never-see-this-in-the-first-place">How to never see this in the first place</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

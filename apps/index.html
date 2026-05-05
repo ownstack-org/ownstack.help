@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Apps — OwnStack</title>
+<meta name="description" content="How OwnStack models the unit of an app: code, processes, config, databases, and the stacks it deploys to.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Apps — OwnStack">
+<meta property="og:description" content="How OwnStack models the unit of an app: code, processes, config, databases, and the stacks it deploys to.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a class="active" href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><span>Apps</span></nav>
+			<h1>Apps</h1>
+			<p class="lede">An <strong>app</strong> in OwnStack is what you'd call an app anywhere else: a codebase that runs as one or more processes, with environment variables, optional databases, and at least one URL. Apps deploy to one or more stacks.</p>
+
+<h2 id="the-shape-of-an-app">The shape of an app</h2>
+<table>
+	<thead><tr><th>Piece</th><th>What it is</th></tr></thead>
+	<tbody>
+		<tr><td>Repo + branch</td><td>Typically <code>main</code> on a GitHub repo, but any git remote works. Configured via <code>git_repository_url</code> on the app.</td></tr>
+		<tr><td><a href="/apps/procfile/">Procfile</a></td><td>Declares process types (<code>web</code>, <code>worker</code>, etc.). Same shape as Heroku.</td></tr>
+		<tr><td>Build type</td><td><code>buildpacks</code> (herokuish auto-detect) or <code>dockerfile</code>. See <a href="/deployments/build-types/">Build types</a>.</td></tr>
+		<tr><td><a href="/apps/config-vars/">Config vars</a></td><td>Environment variables, set per-app, applied to every stack the app deploys to.</td></tr>
+		<tr><td>Linked services</td><td>Postgres, MySQL, Redis, MongoDB — whichever the app needs.</td></tr>
+		<tr><td><a href="/apps/domains/">Domains &amp; SSL</a></td><td>One or more domains routed to the app via the stack's nginx.</td></tr>
+		<tr><td>Stacks</td><td>Where it deploys. An app can target one stack or many.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="one-app-many-stacks">One app, many stacks</h2>
+<p>Most apps deploy to a single stack. Some deploy to multiple — for example a staging stack and a production stack, or a primary and a regional failover. Add or remove deploy targets in the dashboard's <strong>Deploy targets</strong> tab, or via the CLI:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app stacks &lt;app&gt;
+<span class="prompt">$</span> ownstack app stacks:add &lt;app&gt; &lt;stack-name&gt;
+<span class="prompt">$</span> ownstack app stacks:remove &lt;app&gt; &lt;stack-name&gt;</code></pre>
+<p>When an app has multiple stacks, one <code>ownstack deploy</code> deploys to <em>all</em> of them in parallel. Each stack has its own dokku state — its own scale, running processes, and logs. See <a href="/deployments/multi-stack/">Multi-stack deploys</a>.</p>
+
+<h2 id="the-ownstack-config-file">The <code>.ownstack-config</code> file</h2>
+<p>A small file in your repo that links your local checkout to a specific app on a specific control plane. It carries the app token used by <code>ownstack deploy</code>, <code>ownstack run</code>, etc.</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack remote -a &lt;app&gt;
+<span class="out">✓ This repo is now linked to app id 47</span>
+
+<span class="prompt">$</span> ownstack remote
+<span class="out">Linked to: my-app (id 47) on profile 'ownstack'</span></code></pre>
+<p>Add it to <code>.gitignore</code>; it contains your app token. Multiple checkouts of the same repo can each link to different apps without conflicting.</p>
+
+<h2 id="app-roles-amp-types">App roles &amp; types</h2>
+<p>Apps have an <code>app_role</code> (<code>user</code> or <code>system</code>). Most apps you create are <code>user</code>. The <code>app_type</code> classifies how the app should be treated by the build system:</p>
+<table>
+	<thead><tr><th>app_type</th><th>Used for</th></tr></thead>
+	<tbody>
+		<tr><td><code>rails</code></td><td>Rails apps — auto-links Postgres, sets up release tasks.</td></tr>
+		<tr><td><code>nestjs</code></td><td>NestJS apps — auto-links MongoDB, sets <code>MONGO_URI</code>.</td></tr>
+		<tr><td><code>angular</code></td><td>Static Angular builds (front-end only).</td></tr>
+		<tr><td><code>dockerfile</code></td><td>Dockerfile-based, no buildpack.</td></tr>
+		<tr><td><code>raw</code></td><td>Anything else; you supply Procfile + buildpack settings.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="inspecting-an-app">Inspecting an app</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app list
+<span class="prompt">$</span> ownstack app info &lt;app&gt;
+<span class="prompt">$</span> ownstack config --app=&lt;app&gt;            <span class="out"># config vars</span>
+<span class="prompt">$</span> ownstack remote logs --app=&lt;app&gt; --tail 100
+<span class="prompt">$</span> ownstack app stacks &lt;app&gt;
+<span class="prompt">$</span> ownstack app domains &lt;app&gt;</code></pre>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/apps/procfile/">Procfile</a> — declaring process types.</li>
+	<li><a href="/apps/config-vars/">Config vars</a> — environment variables.</li>
+	<li><a href="/apps/domains/">Domains &amp; SSL</a> — custom domains and certs.</li>
+	<li><a href="/stacks/">Stacks</a> — where apps run.</li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#the-shape-of-an-app">The shape of an app</a></li><li class="h2"><a href="#one-app-many-stacks">One app, many stacks</a></li><li class="h2"><a href="#the-ownstack-config-file">The .ownstack-config file</a></li><li class="h2"><a href="#app-roles-amp-types">App roles &amp; types</a></li><li class="h2"><a href="#inspecting-an-app">Inspecting an app</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!-- meta {"title":"OpenStack stacks","desc":"Provision a stack on a private OpenStack cloud or any provider with an OpenStack API.","section":"Stacks"} -->
+<p class="lede">OpenStack support lets you run OwnStack on private clouds and the many public clouds that expose an OpenStack API (OVH Public Cloud, IBM Cloud, etc.). Provisioning shape mirrors AWS and GCP: connect credentials, pick a flavor, hit provision.</p>
+
+<h2>Prerequisites</h2>
+<ul>
+	<li>An OpenStack project with quota for one Nova instance, one floating IP, and one security group.</li>
+	<li><strong>Application credentials</strong> — easier to manage and revoke than user passwords. Create under <strong>Identity → Application Credentials</strong> in Horizon.</li>
+	<li>An <code>openrc</code> file or the equivalent values: <code>OS_AUTH_URL</code>, project ID, region, application credential ID + secret.</li>
+</ul>
+
+<h2>Connect</h2>
+<p>In the dashboard, <strong>Cloud accounts → Add → OpenStack</strong>. Paste your auth URL, application credential ID, and secret. The control plane validates the credentials by listing flavors.</p>
+
+<h2>Create the stack</h2>
+<table>
+	<thead><tr><th>Field</th><th>What to set</th></tr></thead>
+	<tbody>
+		<tr><td>Region</td><td>Whichever region the credentials are scoped to.</td></tr>
+		<tr><td>Flavor</td><td>2 vCPU / 2 GiB minimum. Most providers expose Heroku-equivalent sizes (<code>s1-2</code>, <code>b2-7</code>, etc.).</td></tr>
+		<tr><td>Image</td><td>Ubuntu 22.04 LTS — the only image OwnStack provisioning is hardened for. Newer LTS is on the roadmap.</td></tr>
+		<tr><td>Volume size</td><td>30 GiB minimum, 50 GiB comfortable.</td></tr>
+		<tr><td>Floating IP</td><td>Required for external access; OwnStack allocates one and attaches it.</td></tr>
+		<tr><td>Network</td><td>Either an existing tenant network with router → external, or accept the defaults if your project is preconfigured.</td></tr>
+	</tbody>
+</table>
+
+<h2>Security group</h2>
+<p>Same shape as AWS: 22, 80, 443 open from <code>0.0.0.0/0</code>. Restrict 22 to known IPs in production.</p>
+
+<h2>Decommissioning</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack destroy &lt;stack&gt;</code></pre>
+<p>Deletes the instance, releases the floating IP, removes the security group. Volumes are released too unless you flagged the data volume to persist (advanced; ask in the dashboard).</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/stacks/backups/">Stack backups</a></li>
+	<li><a href="/stacks/ssh/">SSH-provider stacks</a> — if your OpenStack provider doesn't expose API access, but you can SSH to the host you provision manually.</li>
+</ul>

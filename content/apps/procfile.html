@@ -1,0 +1,58 @@
+<!-- meta {"title":"Procfile","desc":"Declare the process types your app runs. The Procfile shape mirrors Heroku exactly.","section":"Apps"} -->
+<p class="lede">A <code>Procfile</code> is a plain-text file in your repo's root that declares one process type per line. Same format as Heroku — most projects can copy theirs over unchanged.</p>
+
+<h2>Format</h2>
+<pre><code>&lt;process-type&gt;: &lt;command&gt;</code></pre>
+<p>Each line is one process type. Process types are independent: <code>web</code> serves HTTP, <code>worker</code> consumes background jobs, queue-specific processes drain Sidekiq queues. Each runs in its own container, scales independently.</p>
+
+<h3>Minimal example (Node)</h3>
+<pre><code>web: npm start</code></pre>
+
+<h3>Rails with Sidekiq queues</h3>
+<pre><code>web: bundle exec puma -C config/puma.rb
+worker: bundle exec sidekiq
+release: bundle exec rails ci:release
+inventory_updates: bundle exec sidekiq -q inventory_updates
+order_processing: bundle exec sidekiq -q order_processing -c 4
+reports: bundle exec sidekiq -q reports -c 1</code></pre>
+
+<h2>The <code>web</code> process is special</h2>
+<p>Your <code>web</code> command must bind to <code>$PORT</code>. The stack's nginx routes external HTTP/HTTPS to whatever port that env var supplies.</p>
+<pre><code>web: node server.js                     # server.js: app.listen(process.env.PORT)
+web: bundle exec puma -p $PORT
+web: gunicorn app:app --bind 0.0.0.0:$PORT
+web: serve -s dist -l tcp://0.0.0.0:$PORT</code></pre>
+
+<div class="callout warning">
+	<div><strong>Hardcoded ports break the deploy</strong><p>If your web command binds to a fixed port (e.g. <code>3000</code>) instead of <code>$PORT</code>, healthchecks fail and the deploy is rolled back. The error usually says <code>port listening check: unable to enter the container</code> or similar.</p></div>
+</div>
+
+<h2>The <code>release</code> process</h2>
+<p>If you declare a <code>release:</code> command, dokku runs it once after each successful build, before swapping traffic. Typical use: database migrations.</p>
+<pre><code>release: bundle exec rails db:migrate
+release: ./bin/rails db:migrate
+release: alembic upgrade head</code></pre>
+<p>If <code>release</code> exits non-zero, the deployment fails and the previous container keeps serving traffic. Your code is on the new SHA, but no users see it. See <a href="/troubleshooting/deploy-failures/">Deploy failures</a> when this happens unexpectedly.</p>
+
+<h2>Scaling</h2>
+<p>Procfile only declares the process types — it does not set how many of each run. Counts are managed separately.</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack ps:scale &lt;app&gt; worker=2 web=1   <span class="out"># once shipped — see issue #294</span>
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:scale &lt;app&gt; worker=2   <span class="out"># manual today</span></code></pre>
+<p>See <a href="/processes/scaling/">Scaling</a> for the full story, including why <code>app.json</code>'s <code>formation</code> block can block manual scaling.</p>
+
+<h2>One-off commands</h2>
+<p>To run a one-off command (not declared in Procfile) inside a fresh container of the running image:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack remote run &lt;app&gt; rails console
+<span class="prompt">$</span> ownstack remote run &lt;app&gt; bin/rails db:migrate:status
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; run &lt;app&gt; bash</code></pre>
+
+<div class="callout note">
+	<div><strong>Note</strong><p>Process names are case-sensitive and conventionally lowercase. Dokku passes the type name verbatim to the container as the process command's argv[0].</p></div>
+</div>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/apps/config-vars/">Config vars</a> — env vars all processes share.</li>
+	<li><a href="/processes/scaling/">Scaling processes</a> — change instance counts.</li>
+	<li><a href="/processes/healthchecks/">Healthchecks</a> — how dokku decides a deploy is good.</li>
+</ul>

@@ -1,0 +1,16 @@
+<!-- meta {"title":"Changelog","desc":"What shipped recently in OwnStack — features, fixes, deprecations.","section":"Changelog"} -->
+<p class="lede">Notable changes across the OwnStack control plane, CLI, and docs. Newest first. For the full git history, see the <a href="https://github.com/ownstack-org">GitHub org</a>.</p>
+
+<h2>2026-05</h2>
+<ul>
+	<li><strong>CLI</strong>: <code>ownstack db dump</code> — stream a Postgres/MySQL dump down to a local file. Auto-detects type. <a href="https://github.com/ownstack-org/cli/pull/66">#66</a></li>
+	<li><strong>Docs</strong>: <code>ownstack.help</code> launched as a hand-rolled static site. The site you're reading.</li>
+	<li><strong>Control plane</strong>: <code>repair-db</code> postgres fix attempt was reverted after a prod incident; safer redo tracked in <a href="https://github.com/ownstack-org/control-plane/issues/289">#289</a>.</li>
+	<li><strong>Roadmap</strong>: Heroku-style <code>ownstack ps:scale</code> in CLI/UI tracked in <a href="https://github.com/ownstack-org/control-plane/issues/294">#294</a>.</li>
+</ul>
+
+<h2>Earlier</h2>
+<p>This changelog starts from when we shipped <code>ownstack.help</code>. The earlier history lives in the per-repo CHANGELOG and release notes — see <a href="https://github.com/ownstack-org/cli/blob/main/RELEASE_NOTES.md">cli release notes</a>.</p>
+
+<h2>Subscribing</h2>
+<p>Watch the <a href="https://github.com/ownstack-org">GitHub org</a> for releases, or the <a href="https://github.com/ownstack-org/ownstack.help/commits/main">docs commit feed</a> if you only care about user-facing changes.</p>

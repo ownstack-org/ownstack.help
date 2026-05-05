@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Domains & SSL — OwnStack</title>
+<meta name="description" content="Attach custom domains to an app and let nginx + Let's Encrypt handle TLS automatically.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Domains & SSL — OwnStack">
+<meta property="og:description" content="Attach custom domains to an app and let nginx + Let's Encrypt handle TLS automatically.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a class="active" href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/apps/">apps</a><span class="sep">›</span><span>Domains & SSL</span></nav>
+			<h1>Domains & SSL</h1>
+			<p class="lede">Apps get a default subdomain on their stack at deploy time. Custom domains are added per-app and routed through the stack's nginx layer. Let's Encrypt issues certificates automatically once DNS resolves.</p>
+
+<h2 id="default-subdomain">Default subdomain</h2>
+<p>Every deployed app is reachable on its stack at <code>&lt;app-name&gt;.&lt;stack-domain&gt;</code> — for instance <code>hello.zenith-zone-582.app.ownstack.org</code>. Useful for verifying a deploy before swapping DNS.</p>
+
+<h2 id="add-a-custom-domain">Add a custom domain</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app domains:add &lt;app&gt; example.com
+<span class="prompt">$</span> ownstack app domains:add &lt;app&gt; api.example.com</code></pre>
+<p>This registers the domain with dokku's nginx vhost and (by default) requests a Let's Encrypt cert. The cert is issued once DNS resolves to the stack.</p>
+
+<h2 id="dns-records-you-need">DNS records you need</h2>
+<table>
+	<thead><tr><th>Hostname</th><th>Record</th><th>Target</th></tr></thead>
+	<tbody>
+		<tr><td>Apex (<code>example.com</code>)</td><td>A</td><td>The stack's IP (visible in <code>ownstack stacks</code>).</td></tr>
+		<tr><td>Subdomain (<code>app.example.com</code>)</td><td>A</td><td>The stack's IP.</td></tr>
+		<tr><td>Subdomain via CNAME</td><td>CNAME</td><td><code>&lt;stack&gt;.app.ownstack.org.</code> (note trailing dot).</td></tr>
+		<tr><td>Wildcard (<code>*.example.com</code>)</td><td>A</td><td>The stack's IP. Cert needs DNS-01 — see <a href="/domains-ssl/wildcard/">Wildcard certs</a>.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="ssl-automatic-via-let-s-encrypt">SSL: automatic via Let's Encrypt</h2>
+<p>The dokku letsencrypt plugin issues a cert automatically once DNS resolves. Renewal is automatic. Check status:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; certs:report &lt;app&gt;
+<span class="out">       Ssl enabled:                   true
+       Ssl hostnames:                 example.com api.example.com
+       Ssl expires at:                Aug  1 02:14:27 2026 GMT
+       Ssl issuer:                    Let's Encrypt</span>
+
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; letsencrypt:list</code></pre>
+
+<h2 id="bring-your-own-cert">Bring-your-own cert</h2>
+<p>If you'd rather supply a cert (corp wildcard, EV cert, internal CA), pass it in:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app domains:add &lt;app&gt; example.com \
+    --cert=./fullchain.pem --key=./privkey.pem</code></pre>
+<p>OwnStack stores the cert on the control plane and pushes it to every stack the app deploys to.</p>
+
+<h2 id="multiple-domains-one-app">Multiple domains, one app</h2>
+<p>An app can have any number of domains attached. Each becomes a <code>server_name</code> in nginx. URLs the app generates use the <strong>primary</strong> domain — set it via the order of <code>domains:add</code> or in the dashboard.</p>
+
+<h2 id="multi-stack">Multi-stack</h2>
+<p>If an app deploys to multiple stacks, each stack independently routes the same domain — useful for active-active. The cert is issued separately per stack (each has its own letsencrypt state). DNS-level traffic shaping (split-horizon, geo, weighted) is your responsibility outside OwnStack.</p>
+
+<h2 id="removing-a-domain">Removing a domain</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app domains &lt;app&gt;        <span class="out"># list with IDs</span>
+<span class="prompt">$</span> ownstack app domains:remove &lt;app&gt; &lt;id&gt;</code></pre>
+<p>Removing a domain detaches it from nginx but does not delete the cert from the stack. To free everything, run <code>letsencrypt:revoke</code> on the stack first.</p>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/domains-ssl/custom-domain/">How-to: custom domain</a></li>
+	<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt details</a></li>
+	<li><a href="/domains-ssl/wildcard/">Wildcard certs (DNS-01)</a></li>
+	<li><a href="/troubleshooting/dns/">DNS &amp; routing issues</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#default-subdomain">Default subdomain</a></li><li class="h2"><a href="#add-a-custom-domain">Add a custom domain</a></li><li class="h2"><a href="#dns-records-you-need">DNS records you need</a></li><li class="h2"><a href="#ssl-automatic-via-let-s-encrypt">SSL: automatic via Let's Encrypt</a></li><li class="h2"><a href="#bring-your-own-cert">Bring-your-own cert</a></li><li class="h2"><a href="#multiple-domains-one-app">Multiple domains, one app</a></li><li class="h2"><a href="#multi-stack">Multi-stack</a></li><li class="h2"><a href="#removing-a-domain">Removing a domain</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

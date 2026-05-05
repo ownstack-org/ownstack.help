@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Postgres — OwnStack</title>
+<meta name="description" content="Provision, link, connect, and operate Postgres databases on OwnStack.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Postgres — OwnStack">
+<meta property="og:description" content="Provision, link, connect, and operate Postgres databases on OwnStack.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a class="active" href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/databases/">databases</a><span class="sep">›</span><span>Postgres</span></nav>
+			<h1>Postgres</h1>
+			<p class="lede">Postgres is the default OwnStack database. Provisioning a service creates a running container on the stack and links it to an app, setting <code>DATABASE_URL</code> automatically. Versions 14 through 18 are supported; 17 is the default.</p>
+
+<h2 id="create-amp-link">Create &amp; link</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db create --app=&lt;app&gt; [--version=17]</code></pre>
+<p>This runs (on the stack):</p>
+<ol>
+	<li><code>dokku postgres:create postgres-&lt;app&gt; --image-version 17</code></li>
+	<li><code>dokku postgres:link postgres-&lt;app&gt; &lt;app&gt;</code></li>
+	<li>Refreshes <code>DATABASE_URL</code> on the app config from the link.</li>
+	<li>Restarts the app so the env change takes effect.</li>
+</ol>
+
+<h2 id="the-database-url-shape">The DATABASE_URL shape</h2>
+<pre><code>postgresql://postgres:&lt;password&gt;@dokku-postgres-&lt;service&gt;:5432/&lt;dbname&gt;</code></pre>
+<p>Notes:</p>
+<ul>
+	<li>The user is always <code>postgres</code> by default.</li>
+	<li>The host is dokku's internal docker DNS alias — only routable from inside the stack's docker network.</li>
+	<li>The dbname is the same as the service (sanitized).</li>
+	<li>The password is randomly generated by dokku at <code>postgres:create</code> time.</li>
+</ul>
+
+<h2 id="connect-from-outside-the-stack">Connect from outside the stack</h2>
+<p>Use <code>ownstack ssh app</code> to drop into the app's container, where <code>$DATABASE_URL</code> resolves; or use <code>dokku postgres:connect</code> from the stack:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; postgres:connect postgres-&lt;app&gt;
+<span class="out">psql (17.x)
+Type "help" for help.
+
+postgres-&lt;app&gt;=#</span></code></pre>
+<p>To expose Postgres on a public port (not recommended for prod), use <code>postgres:expose</code> on the stack — but firewall it carefully.</p>
+
+<h2 id="multiple-databases-per-app">Multiple databases per app</h2>
+<p>You can link more than one Postgres service to a single app:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; postgres:create reporting-db --image-version 17
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; postgres:link reporting-db &lt;app&gt; --alias REPORTING_DATABASE</code></pre>
+<p>The <code>--alias</code> creates a <code>REPORTING_DATABASE_URL</code> env var alongside the primary <code>DATABASE_URL</code>. Useful for read-replicas, analytics warehouses, multi-tenant designs.</p>
+
+<h2 id="upgrades">Upgrades</h2>
+<p>Postgres major-version upgrades are not in-place. The dokku-postgres flow is:</p>
+<ol>
+	<li>Take a dump from the running service: <code>dokku postgres:export &lt;old-svc&gt; &gt; data.dump</code></li>
+	<li>Create a new service on the new version: <code>dokku postgres:create &lt;new-svc&gt; --image-version 18</code></li>
+	<li>Import the dump: <code>dokku postgres:import &lt;new-svc&gt; &lt; data.dump</code></li>
+	<li>Unlink the old service, link the new: <code>dokku postgres:unlink &lt;old-svc&gt; &lt;app&gt; && dokku postgres:link &lt;new-svc&gt; &lt;app&gt;</code></li>
+	<li>Verify, then destroy the old service: <code>dokku postgres:destroy &lt;old-svc&gt;</code></li>
+</ol>
+
+<h2 id="operations-cheat-sheet">Operations cheat-sheet</h2>
+<table>
+	<thead><tr><th>Task</th><th>Command</th></tr></thead>
+	<tbody>
+		<tr><td>Open psql</td><td><code>ssh dokku@&lt;stack-ip&gt; postgres:connect &lt;svc&gt;</code></td></tr>
+		<tr><td>Show service info</td><td><code>ssh dokku@&lt;stack-ip&gt; postgres:info &lt;svc&gt;</code></td></tr>
+		<tr><td>List databases</td><td><code>ssh dokku@&lt;stack-ip&gt; postgres:list</code></td></tr>
+		<tr><td>Stream a dump down</td><td><code>ownstack db dump --app=&lt;app&gt;</code></td></tr>
+		<tr><td>Restore from URL</td><td><code>ownstack db restore --app=&lt;app&gt; --url=...</code></td></tr>
+		<tr><td>Re-link service / refresh DATABASE_URL</td><td><code>ownstack db repair --app=&lt;app&gt;</code></td></tr>
+		<tr><td>Destroy service (data loss!)</td><td><code>ssh dokku@&lt;stack-ip&gt; postgres:destroy &lt;svc&gt;</code></td></tr>
+	</tbody>
+</table>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/databases/postgres/dumps/">Dumps</a></li>
+	<li><a href="/databases/postgres/restore/">Restore</a></li>
+	<li><a href="/databases/postgres/repair/">Repair after import</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#create-amp-link">Create &amp; link</a></li><li class="h2"><a href="#the-database-url-shape">The DATABASE_URL shape</a></li><li class="h2"><a href="#connect-from-outside-the-stack">Connect from outside the stack</a></li><li class="h2"><a href="#multiple-databases-per-app">Multiple databases per app</a></li><li class="h2"><a href="#upgrades">Upgrades</a></li><li class="h2"><a href="#operations-cheat-sheet">Operations cheat-sheet</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

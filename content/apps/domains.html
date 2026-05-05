@@ -1,0 +1,56 @@
+<!-- meta {"title":"Domains & SSL","desc":"Attach custom domains to an app and let nginx + Let's Encrypt handle TLS automatically.","section":"Apps"} -->
+<p class="lede">Apps get a default subdomain on their stack at deploy time. Custom domains are added per-app and routed through the stack's nginx layer. Let's Encrypt issues certificates automatically once DNS resolves.</p>
+
+<h2>Default subdomain</h2>
+<p>Every deployed app is reachable on its stack at <code>&lt;app-name&gt;.&lt;stack-domain&gt;</code> — for instance <code>hello.zenith-zone-582.app.ownstack.org</code>. Useful for verifying a deploy before swapping DNS.</p>
+
+<h2>Add a custom domain</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app domains:add &lt;app&gt; example.com
+<span class="prompt">$</span> ownstack app domains:add &lt;app&gt; api.example.com</code></pre>
+<p>This registers the domain with dokku's nginx vhost and (by default) requests a Let's Encrypt cert. The cert is issued once DNS resolves to the stack.</p>
+
+<h2>DNS records you need</h2>
+<table>
+	<thead><tr><th>Hostname</th><th>Record</th><th>Target</th></tr></thead>
+	<tbody>
+		<tr><td>Apex (<code>example.com</code>)</td><td>A</td><td>The stack's IP (visible in <code>ownstack stacks</code>).</td></tr>
+		<tr><td>Subdomain (<code>app.example.com</code>)</td><td>A</td><td>The stack's IP.</td></tr>
+		<tr><td>Subdomain via CNAME</td><td>CNAME</td><td><code>&lt;stack&gt;.app.ownstack.org.</code> (note trailing dot).</td></tr>
+		<tr><td>Wildcard (<code>*.example.com</code>)</td><td>A</td><td>The stack's IP. Cert needs DNS-01 — see <a href="/domains-ssl/wildcard/">Wildcard certs</a>.</td></tr>
+	</tbody>
+</table>
+
+<h2>SSL: automatic via Let's Encrypt</h2>
+<p>The dokku letsencrypt plugin issues a cert automatically once DNS resolves. Renewal is automatic. Check status:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; certs:report &lt;app&gt;
+<span class="out">       Ssl enabled:                   true
+       Ssl hostnames:                 example.com api.example.com
+       Ssl expires at:                Aug  1 02:14:27 2026 GMT
+       Ssl issuer:                    Let's Encrypt</span>
+
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; letsencrypt:list</code></pre>
+
+<h2>Bring-your-own cert</h2>
+<p>If you'd rather supply a cert (corp wildcard, EV cert, internal CA), pass it in:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app domains:add &lt;app&gt; example.com \
+    --cert=./fullchain.pem --key=./privkey.pem</code></pre>
+<p>OwnStack stores the cert on the control plane and pushes it to every stack the app deploys to.</p>
+
+<h2>Multiple domains, one app</h2>
+<p>An app can have any number of domains attached. Each becomes a <code>server_name</code> in nginx. URLs the app generates use the <strong>primary</strong> domain — set it via the order of <code>domains:add</code> or in the dashboard.</p>
+
+<h2>Multi-stack</h2>
+<p>If an app deploys to multiple stacks, each stack independently routes the same domain — useful for active-active. The cert is issued separately per stack (each has its own letsencrypt state). DNS-level traffic shaping (split-horizon, geo, weighted) is your responsibility outside OwnStack.</p>
+
+<h2>Removing a domain</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app domains &lt;app&gt;        <span class="out"># list with IDs</span>
+<span class="prompt">$</span> ownstack app domains:remove &lt;app&gt; &lt;id&gt;</code></pre>
+<p>Removing a domain detaches it from nginx but does not delete the cert from the stack. To free everything, run <code>letsencrypt:revoke</code> on the stack first.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/domains-ssl/custom-domain/">How-to: custom domain</a></li>
+	<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt details</a></li>
+	<li><a href="/domains-ssl/wildcard/">Wildcard certs (DNS-01)</a></li>
+	<li><a href="/troubleshooting/dns/">DNS &amp; routing issues</a></li>
+</ul>

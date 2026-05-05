@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deploy your first app — OwnStack</title>
+<meta name="description" content="From git init to a live URL on a stack you own. Roughly fifteen minutes.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Deploy your first app — OwnStack">
+<meta property="og:description" content="From git init to a live URL on a stack you own. Roughly fifteen minutes.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a class="active" href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/getting-started/">getting started</a><span class="sep">›</span><span>Deploy your first app</span></nav>
+			<h1>Deploy your first app</h1>
+			<p class="lede">This walks through deploying a tiny Node.js app end-to-end. The same shape works for Ruby, Python, Go, PHP, anything dokku-compatible — which is essentially anything that runs on Heroku.</p>
+
+<h2 id="before-you-start">Before you start</h2>
+<ul>
+	<li>The CLI <a href="/getting-started/install-cli/">installed</a> and authenticated against the control plane.</li>
+	<li>At least one <strong>provisioned stack</strong> in your account. Create one in the dashboard (Stacks → New) for AWS, GCP, or OpenStack, or add an SSH stack pointing at a server you already own.</li>
+	<li>A repo to deploy. If you don't have one handy, scaffold this in a fresh directory:</li>
+</ul>
+<pre class="terminal"><code><span class="prompt">$</span> mkdir hello && cd hello
+<span class="prompt">$</span> cat &gt; package.json &lt;&lt;'JSON'
+{ "name": "hello", "private": true, "engines": { "node": "&gt;=20" }, "scripts": { "start": "node index.js" } }
+JSON
+<span class="prompt">$</span> cat &gt; index.js &lt;&lt;'JS'
+require('http').createServer((_, r) =&gt; r.end('hello from ownstack')).listen(process.env.PORT)
+JS
+<span class="prompt">$</span> echo "web: npm start" &gt; Procfile
+<span class="prompt">$</span> git init -b main && git add . && git commit -m initial</code></pre>
+
+<h2 id="1-create-the-app">1. Create the app</h2>
+<p>From inside the repo, register an app on the control plane and link your checkout to it:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack create --no-interview hello buildpack
+<span class="prompt">$</span> ownstack remote -a hello</code></pre>
+<p><code>create</code> registers the app on the control plane and writes a minimal <code>.ownstack-config</code> in your repo. <code>remote -a</code> embeds the app token so subsequent commands know which app to talk to.</p>
+
+<h2 id="2-pick-a-stack">2. Pick a stack</h2>
+<p>Apps deploy to one or more stacks. If you only have one provisioned stack, the deploy will use it automatically. If you have several, attach the one you want explicitly:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stacks
+<span class="out">  ID            NAME                IP                STATUS       PROVIDER
+  jJCsl6B9...   prod-cluster-1      54.x.x.x          provisioned  aws</span>
+
+<span class="prompt">$</span> ownstack app stacks:add hello prod-cluster-1</code></pre>
+
+<h2 id="3-deploy">3. Deploy</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack deploy
+<span class="out">Triggering deploy for app 47…
+✓ Deploy started</span></code></pre>
+<p>The control plane enqueues a deployment job, SSHes to the stack, pushes your repo to dokku, runs the buildpack and the release task, and rotates traffic to the new container. Build logs stream live with <code>--wait</code>:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack deploy --wait</code></pre>
+<p>Or fetch them after with <code>ownstack remote deploy-log</code>.</p>
+
+<h2 id="4-view-it">4. View it</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app info
+<span class="out">hello
+  Status:  deployed
+  Domain:  hello.&lt;stack-domain&gt;
+  Stack:   prod-cluster-1 — deployed abc1234</span></code></pre>
+<p>Hit the URL in a browser. If something looks wrong, <code>ownstack remote logs --tail 100 --follow</code> tails the running container.</p>
+
+<h2 id="what-s-next">What's next</h2>
+<ul>
+	<li><strong>Custom domain</strong> — see <a href="/domains-ssl/custom-domain/">Add a custom domain</a>.</li>
+	<li><strong>Add a database</strong> — <a href="/databases/postgres/">Postgres</a> walks through provisioning and linking.</li>
+	<li><strong>Scale processes</strong> — <a href="/processes/scaling/">Scale processes</a>.</li>
+	<li><strong>Tail logs</strong> — <code>ownstack remote logs --follow</code>.</li>
+</ul>
+
+<div class="related">
+	<h4>Related</h4>
+	<ul>
+		<li><a href="/cli/deploy/">CLI: <code>ownstack deploy</code></a></li>
+		<li><a href="/deployments/">Deployments overview</a></li>
+		<li><a href="/troubleshooting/deploy-failures/">When deploys fail</a></li>
+	</ul>
+</div>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#before-you-start">Before you start</a></li><li class="h2"><a href="#1-create-the-app">1. Create the app</a></li><li class="h2"><a href="#2-pick-a-stack">2. Pick a stack</a></li><li class="h2"><a href="#3-deploy">3. Deploy</a></li><li class="h2"><a href="#4-view-it">4. View it</a></li><li class="h2"><a href="#what-s-next">What's next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

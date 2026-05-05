@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wildcard certs — OwnStack</title>
+<meta name="description" content="Issue *.example.com certificates via DNS-01 challenge.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Wildcard certs — OwnStack">
+<meta property="og:description" content="Issue *.example.com certificates via DNS-01 challenge.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a class="active" href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/domains-ssl/">domains ssl</a><span class="sep">›</span><span>Wildcard certs</span></nav>
+			<h1>Wildcard certs</h1>
+			<p class="lede">Wildcards (<code>*.example.com</code>) require Let's Encrypt's DNS-01 challenge — the prover places a record in your DNS, Let's Encrypt confirms it, and issues. Configure once, then any subdomain matches.</p>
+
+<h2 id="pick-a-dns-plugin">Pick a DNS plugin</h2>
+<p>The dokku-letsencrypt plugin uses <a href="https://go-acme.github.io/lego/dns/">lego</a> under the hood, which supports many DNS providers. Common choices:</p>
+<table>
+	<thead><tr><th>Provider</th><th>Plugin name</th><th>Credentials</th></tr></thead>
+	<tbody>
+		<tr><td>Route 53</td><td><code>route53</code></td><td>AWS access key + secret with <code>route53:ChangeResourceRecordSets</code> and <code>route53:GetChange</code> on your hosted zone.</td></tr>
+		<tr><td>Cloudflare</td><td><code>cloudflare</code></td><td>API token with Zone:DNS:Edit scoped to the zone.</td></tr>
+		<tr><td>DNSimple</td><td><code>dnsimple</code></td><td>OAuth token from DNSimple account settings.</td></tr>
+		<tr><td>DigitalOcean</td><td><code>digitalocean</code></td><td>Personal access token.</td></tr>
+		<tr><td>Google Cloud DNS</td><td><code>gcloud</code></td><td>Service account JSON key.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="configure">Configure</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; letsencrypt:set &lt;app&gt; dns-provider route53
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; letsencrypt:set &lt;app&gt; AWS_ACCESS_KEY_ID '...'
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; letsencrypt:set &lt;app&gt; AWS_SECRET_ACCESS_KEY '...'
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; letsencrypt:set &lt;app&gt; AWS_REGION us-east-1</code></pre>
+<p>Each DNS plugin reads its own env vars; check the lego docs for the exact names.</p>
+
+<h2 id="add-the-wildcard">Add the wildcard</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app domains:add &lt;app&gt; '*.example.com'
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; letsencrypt:enable &lt;app&gt;</code></pre>
+<p>The first command registers the domain with nginx; <code>letsencrypt:enable</code> kicks off the issuance. The plugin will:</p>
+<ol>
+	<li>Request a wildcard cert from Let's Encrypt.</li>
+	<li>Receive a TXT record token to publish.</li>
+	<li>Use your DNS provider credentials to publish the TXT record.</li>
+	<li>Wait for DNS propagation, signal Let's Encrypt to validate.</li>
+	<li>Receive the cert, install it, reload nginx.</li>
+	<li>Clean up the TXT record.</li>
+</ol>
+
+<h2 id="subdomains-under-the-wildcard">Subdomains under the wildcard</h2>
+<p>Once the wildcard cert is in place, subdomains like <code>app1.example.com</code> and <code>app2.example.com</code> are covered by the same cert. You still need DNS A records for each (pointing at the stack IP) for traffic to reach the stack.</p>
+
+<h2 id="renewal">Renewal</h2>
+<p>Same as HTTP-01 — automatic, every 60 days. The DNS-01 flow runs again under the hood.</p>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt details</a></li>
+	<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#pick-a-dns-plugin">Pick a DNS plugin</a></li><li class="h2"><a href="#configure">Configure</a></li><li class="h2"><a href="#add-the-wildcard">Add the wildcard</a></li><li class="h2"><a href="#subdomains-under-the-wildcard">Subdomains under the wildcard</a></li><li class="h2"><a href="#renewal">Renewal</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

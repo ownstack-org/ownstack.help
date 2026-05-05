@@ -1,0 +1,56 @@
+<!-- meta {"title":"Database auth: password authentication failed","desc":"Diagnose and fix DATABASE_URL / role password drift on OwnStack Postgres.","section":"Troubleshooting"} -->
+<p class="lede">Three things have to agree for a deploy to authenticate against Postgres: the app's <code>DATABASE_URL</code>, dokku's stored service DSN, and the actual password of the <code>postgres</code> role inside the container. When one drifts, deploys fail with <code>password authentication failed for user "postgres"</code>.</p>
+
+<h2>First, run the diagnostic</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db check --app=&lt;app&gt;</code></pre>
+<p>Look at the JSON it returns. The relevant fields:</p>
+<table>
+	<thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+	<tbody>
+		<tr><td><code>password_match</code></td><td>Whether <code>DATABASE_URL</code>'s password equals the dokku-stored service DSN's password.</td></tr>
+		<tr><td><code>auth_ok</code></td><td>Whether a real connection attempt succeeds (note: this is unreliable due to docker-socket permissions on some hosts; treat as advisory only).</td></tr>
+		<tr><td><code>app_linked_to_service</code></td><td>Whether dokku has the app linked to the postgres service.</td></tr>
+		<tr><td><code>database_url_host</code></td><td>What hostname <code>DATABASE_URL</code> is pointing at.</td></tr>
+	</tbody>
+</table>
+
+<h2>Pick the right fix based on the symptom</h2>
+
+<h3>Right after a database import (<code>pg_dumpall</code> or similar)</h3>
+<p><strong>Fix: <a href="/databases/postgres/repair/">Repair after import</a>.</strong> The dump's <code>ALTER ROLE</code> overrode the role's password; <code>DATABASE_URL</code> still has dokku's original. Pipe one <code>ALTER ROLE</code> via <code>postgres:connect</code> to align the role to <code>DATABASE_URL</code>. Don't run <code>ownstack db repair</code> — it aligns to the wrong target.</p>
+
+<h3><code>password_match: false</code> reported by <code>db check</code></h3>
+<p><code>DATABASE_URL</code> has drifted from the service DSN. Two paths:</p>
+<ol>
+	<li><strong>Same password on both sides:</strong> run <code>ownstack db repair</code>. It re-links and refreshes <code>DATABASE_URL</code>.</li>
+	<li><strong>Different password on both sides:</strong> figure out which one's right (check the dashboard's audit log for the most recent change), align via <code>ALTER ROLE</code> if needed.</li>
+</ol>
+
+<h3>Multiple <code>DOKKU_POSTGRES_*_URL</code> entries on <code>config:show</code></h3>
+<p>Dokku links from <em>all</em> linked services on each rebuild and may pick the wrong one to set <code>DATABASE_URL</code>. Unlink the wrong service:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; config:show &lt;app&gt; | grep DOKKU_POSTGRES
+<span class="out">DOKKU_POSTGRES_AQUA_URL=postgres://…@dokku-postgres-app-db:5432/...
+DOKKU_POSTGRES_BLACK_URL=postgres://…@dokku-postgres-postgres-app:5432/...   # ← wrong service</span>
+
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; postgres:unlink postgres-app &lt;app&gt;
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; config:set --no-restart &lt;app&gt; \
+    DATABASE_URL='postgres://…@dokku-postgres-app-db:5432/...'
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; config:unset --no-restart &lt;app&gt; DOKKU_POSTGRES_BLACK_URL
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:rebuild &lt;app&gt;</code></pre>
+
+<h3>Suddenly broken after a control-plane upgrade</h3>
+<p>Roll back the control-plane deploy if it landed recently. Past incidents have rewritten <code>DATABASE_URL</code> incorrectly when control-plane code changed how the postgres link was managed. See <a href="https://github.com/ownstack-org/control-plane/issues/289">control-plane#289</a>.</p>
+
+<h2>How to never see this in the first place</h2>
+<ul>
+	<li>Use <code>pg_dump</code> (per-database) rather than <code>pg_dumpall</code> (cluster-wide) when restoring. <code>pg_dump</code> output doesn't include role globals.</li>
+	<li>Don't manually <code>postgres:reset-password</code> on a service that's already linked to an app — the app won't see the new password.</li>
+	<li>If you have multiple postgres services on one stack, link only one to each app. Multiple links create rebuild-time ambiguity.</li>
+</ul>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/databases/postgres/repair/">Repair after import</a></li>
+	<li><a href="/databases/postgres/restore/">Restore</a></li>
+	<li><a href="/cli/db/"><code>ownstack db</code> reference</a></li>
+</ul>

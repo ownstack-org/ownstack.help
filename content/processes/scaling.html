@@ -1,0 +1,62 @@
+<!-- meta {"title":"Scaling processes","desc":"Change the number of running containers per process type. Includes the app.json formation gotcha.","section":"Processes"} -->
+<p class="lede">Scaling means changing how many containers a process type runs. Each container is fully isolated; <code>web</code> traffic is load-balanced across all <code>web.N</code> containers, queue workers all pull from the same queue. Scale changes are immediate — dokku spins up or shuts down containers to match.</p>
+
+<h2>Quick reference</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:scale &lt;app&gt; web=2 worker=4
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:report &lt;app&gt;</code></pre>
+
+<div class="callout note">
+	<div><strong><code>ownstack ps:scale</code> is on the way</strong><p>The first-class CLI command — and matching dashboard controls — are tracked in <a href="https://github.com/ownstack-org/control-plane/issues/294">control-plane#294</a>. Until then, use the <code>ssh dokku@…</code> form above.</p></div>
+</div>
+
+<h2>Per-stack, not per-app</h2>
+<p>Scale is dokku state on each stack. If your app deploys to stacks A and B and you set <code>worker=4</code> on A, B is unaffected. Either scale each stack to taste, or use the same numbers for active-active fairness.</p>
+
+<h2>Reading current scale</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:report &lt;app&gt;
+<span class="out">=====&gt; &lt;app&gt; ps information
+       Deployed:                      true
+       Processes:                     6
+       Running:                       true
+       Status web 1:                  running (CID: abc12345)
+       Status web 2:                  running (CID: def67890)
+       Status worker 1:               running (CID: ghi34567)
+       Status worker 2:               running (CID: jkl89012)
+       Status worker 3:               running (CID: mno45678)
+       Status worker 4:               running (CID: pqr01234)</span></code></pre>
+
+<h2>Scaling and deploys</h2>
+<p>Scaling is independent of deploys — a <code>ps:scale</code> doesn't trigger a build. The new containers spin up from the currently-deployed image. If you scale up <em>during</em> a deploy, the new containers come from the deploying image (which might still be in flight). Practically, just don't scale during a deploy unless you have a reason.</p>
+
+<h2>The <code>app.json</code> formation gotcha</h2>
+<p>If your repo has an <code>app.json</code> with a <code>formation</code> block, dokku treats it as <strong>authoritative</strong> and refuses manual <code>ps:scale</code>:</p>
+<pre><code>!     App &lt;app&gt; contains an app.json file with a formations key
+      and cannot be manually scaled</code></pre>
+<p>This is dokku's behavior; OwnStack passes the error through. Heroku interprets <code>formation</code> as initial defaults for review apps; dokku interprets it as a lock.</p>
+
+<h3>Two ways to unblock</h3>
+<table>
+	<thead><tr><th>Option</th><th>What to do</th></tr></thead>
+	<tbody>
+		<tr><td><strong>Remove <code>formation</code> from <code>app.json</code></strong></td><td>The cleanest if you're not actively using the formation defaults for Heroku review apps. After this lands and the app redeploys, manual scaling works.</td></tr>
+		<tr><td><strong>Point dokku at a different file</strong></td><td>Keep <code>app.json</code> for Heroku; create <code>app.dokku.json</code> without <code>formation</code>. Run <code>ssh dokku@&lt;stack-ip&gt; app-json:set &lt;app&gt; appjson-path app.dokku.json</code>. Dokku reads the formation-less variant; manual scaling works. Heroku is unaffected.</td></tr>
+	</tbody>
+</table>
+
+<div class="callout warning">
+	<div><strong>Don't try to "auto-strip" formation server-side</strong><p>OwnStack used to consider rewriting <code>DATABASE_URL</code> / app.json on the host transparently. We decided against it: silently mutating app metadata that the app author committed is worse than surfacing the dokku error. Keep your repo as the source of truth.</p></div>
+</div>
+
+<h2>Scaling to zero</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:scale &lt;app&gt; web=0</code></pre>
+<p>Sets the count to zero — containers stop, the app returns 502 to anything reaching the stack on its hostname. Useful for maintenance windows. Bring it back with <code>web=1</code>.</p>
+
+<h2>Healthchecks during scale-up</h2>
+<p>New containers must pass healthchecks before serving traffic. By default this is a port-listening check on <code>$PORT</code>. If your app needs a longer warm-up, configure a custom healthcheck in <code>app.json</code> (<code>checks.web</code>) — see <a href="/processes/healthchecks/">Healthchecks</a>.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+	<li><a href="/apps/procfile/">Procfile</a></li>
+	<li><a href="/troubleshooting/deploy-failures/">When deploys fail</a></li>
+</ul>

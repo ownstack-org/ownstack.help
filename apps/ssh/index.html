@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SSH & one-off shells — OwnStack</title>
+<meta name="description" content="Open an interactive shell inside your running app, run one-off commands, or SSH straight to the stack host.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="SSH & one-off shells — OwnStack">
+<meta property="og:description" content="Open an interactive shell inside your running app, run one-off commands, or SSH straight to the stack host.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a class="active" href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/apps/">apps</a><span class="sep">›</span><span>SSH & one-off shells</span></nav>
+			<h1>SSH & one-off shells</h1>
+			<p class="lede">Two tiers of access: into the app's container (where your code is running), or onto the stack host (where dokku itself runs). The first is for app-shaped problems; the second is for stack-shaped ones.</p>
+
+<h2 id="shell-inside-the-running-container">Shell inside the running container</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack ssh app &lt;app&gt; [--stack=&lt;stack&gt;]</code></pre>
+<p>This opens an interactive bash shell inside a running container of the <code>web</code> process. Your code is at <code>/app</code>; <code>$DATABASE_URL</code> and friends are set; you can run <code>rails console</code>, <code>npm run repl</code>, whatever.</p>
+<p>The shell shares the running container with serving traffic. Close it cleanly (<code>exit</code>); a runaway shell pinning CPU affects users.</p>
+
+<h2 id="one-off-command-in-a-fresh-container">One-off command in a fresh container</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack remote run &lt;app&gt; rails db:migrate
+<span class="prompt">$</span> ownstack remote run &lt;app&gt; bin/rake some:task
+<span class="prompt">$</span> ownstack remote run &lt;app&gt; node scripts/clean.js</code></pre>
+<p>Spawns a new container from the latest image, runs the command, prints output, exits, removes the container. Doesn't touch the running web/worker. Good for migrations, ad-hoc data scripts, or anything that shouldn't share state with serving traffic.</p>
+
+<h2 id="ssh-onto-the-stack-host">SSH onto the stack host</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack ssh stack &lt;stack&gt;</code></pre>
+<p>Drops you onto the stack's host as the <code>ubuntu</code> user. Use this for stack-shaped operations: dokku plugin installs, looking at <code>/var/log/nginx/*</code>, checking disk usage, doing OS-level things.</p>
+
+<div class="callout warning">
+	<div><strong>Direct dokku commands skip OwnStack's bookkeeping</strong><p>If you SSH to the stack and run <code>dokku ps:scale</code>, <code>dokku config:set</code>, etc. directly, the change happens but the control plane doesn't know. Most things are fine; some are not (multi-stack syncing, audit logs). Prefer the CLI when an equivalent exists.</p></div>
+</div>
+
+<h2 id="direct-dokku-ssh-advanced">Direct dokku SSH (advanced)</h2>
+<p>Every stack runs a dokku SSH endpoint as user <code>dokku@&lt;stack-ip&gt;</code>. Your account's SSH key is authorized when you provision a stack. You can run any dokku command directly:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; apps:list
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:report &lt;app&gt;
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; logs &lt;app&gt; --tail
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; postgres:list</code></pre>
+
+<h2 id="tail-logs">Tail logs</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack remote logs --app=&lt;app&gt; --tail 200
+<span class="prompt">$</span> ownstack remote logs --app=&lt;app&gt; --follow</code></pre>
+<p>Follows stdout/stderr from all running processes. Add <code>--ps=worker</code> to filter to one process type.</p>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/cli/ssh/">CLI: <code>ownstack ssh</code></a></li>
+	<li><a href="/logging/">Logging</a> — tail, drains, retention.</li>
+	<li><a href="/processes/">Process types</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#shell-inside-the-running-container">Shell inside the running container</a></li><li class="h2"><a href="#one-off-command-in-a-fresh-container">One-off command in a fresh container</a></li><li class="h2"><a href="#ssh-onto-the-stack-host">SSH onto the stack host</a></li><li class="h2"><a href="#direct-dokku-ssh-advanced">Direct dokku SSH (advanced)</a></li><li class="h2"><a href="#tail-logs">Tail logs</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

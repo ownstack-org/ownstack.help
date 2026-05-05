@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Postgres restore — OwnStack</title>
+<meta name="description" content="Restore a Postgres database from a dump URL, a Heroku backup, or a stack-level backup.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Postgres restore — OwnStack">
+<meta property="og:description" content="Restore a Postgres database from a dump URL, a Heroku backup, or a stack-level backup.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a class="active" href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/databases/">databases</a><span class="sep">›</span><a href="/databases/postgres/">postgres</a><span class="sep">›</span><span>Postgres restore</span></nav>
+			<h1>Postgres restore</h1>
+			<p class="lede">Restore an OwnStack Postgres database from one of three sources: a publicly-fetchable dump URL, a Heroku Postgres backup, or a backup taken via <code>ownstack stack backup</code>. Restores happen on the stack — the CLI hands the work off to a worker; you don't transfer the dump through your laptop.</p>
+
+<h2 id="the-three-paths">The three paths</h2>
+<table>
+	<thead><tr><th>Source</th><th>Command</th></tr></thead>
+	<tbody>
+		<tr><td>Public dump URL</td><td><code>ownstack db restore --app=&lt;app&gt; --url=https://…</code></td></tr>
+		<tr><td>Heroku backup</td><td><code>ownstack db restore --heroku-app=NAME [--backup=NUM]</code></td></tr>
+		<tr><td>Stack backup</td><td>Dashboard → <strong>Data → Restore from backup</strong>, or <code>ownstack db restore --backup=&lt;backup-id&gt;</code></td></tr>
+	</tbody>
+</table>
+
+<h2 id="watching-progress">Watching progress</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db restore --app=&lt;app&gt; --url='https://…'
+<span class="out">Restore queued (id 87).</span>
+
+<span class="prompt">$</span> ownstack db restores
+<span class="prompt">$</span> ownstack db restore:info 87 --follow</code></pre>
+<p>The <code>:info --follow</code> form streams the live log: download progress, <code>postgres:import</code> output, target service restart.</p>
+
+<h2 id="what-happens-on-the-stack">What happens on the stack</h2>
+<ol>
+	<li>Worker SSHes to the stack and downloads the dump to a temp location.</li>
+	<li>If the dump is custom format, runs <code>pg_restore</code> against the linked Postgres service. If plain SQL, pipes through <code>psql</code>.</li>
+	<li>Restarts the linked service so connections see fresh data.</li>
+	<li>Cleans up the temp file.</li>
+</ol>
+
+<h2 id="restoration-is-destructive">Restoration is destructive</h2>
+<div class="callout danger">
+	<div><strong>The restore replaces existing data</strong><p>There is no in-place merge. If the target database has rows you want to keep, take a dump first via <a href="/databases/postgres/dumps/"><code>ownstack db dump</code></a>. The CLI does not warn you before overwriting — that's deliberate, the command is supposed to do exactly what you asked.</p></div>
+</div>
+
+<h2 id="cancel-a-running-restore">Cancel a running restore</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db restore:cancel 87</code></pre>
+<p>Cancellation interrupts the running <code>pg_restore</code>; the target database may be in a partial state. Re-run the restore from the start to fix.</p>
+
+<h2 id="the-heroku-importer-flow">The Heroku-importer flow</h2>
+<p>For migrating from Heroku Postgres without manually exporting + re-uploading:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db backups --heroku-app=my-heroku-app    <span class="out"># list available backups</span>
+<span class="prompt">$</span> ownstack db backups:capture --heroku-app=my-heroku-app   <span class="out"># take one now</span>
+<span class="prompt">$</span> ownstack db restore --heroku-app=my-heroku-app --backup=NUM  <span class="out"># restore latest by num</span></code></pre>
+<p>OwnStack handles the Heroku CLI auth + signed URL fetch internally. You need a Heroku API key configured in the dashboard once.</p>
+
+<h2 id="after-a-restore-watch-for-password-drift">After a restore: watch for password drift</h2>
+<p>If the dump was taken with <code>pg_dumpall</code> (or any flow that includes role globals), the restored Postgres role will have the <em>source</em> cluster's password. Your app's <code>DATABASE_URL</code> still has the OwnStack-side password. The next deploy fails authentication.</p>
+<p>This is the single most common post-restore foot-gun. The fix is a one-statement <code>ALTER ROLE</code>. Full instructions: <a href="/databases/postgres/repair/">Repair after import</a>.</p>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/databases/postgres/repair/">Repair after import</a> — fix <code>password authentication failed</code>.</li>
+	<li><a href="/databases/postgres/dumps/">Dumps</a></li>
+	<li><a href="/stacks/backups/">Stack backups</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#the-three-paths">The three paths</a></li><li class="h2"><a href="#watching-progress">Watching progress</a></li><li class="h2"><a href="#what-happens-on-the-stack">What happens on the stack</a></li><li class="h2"><a href="#restoration-is-destructive">Restoration is destructive</a></li><li class="h2"><a href="#cancel-a-running-restore">Cancel a running restore</a></li><li class="h2"><a href="#the-heroku-importer-flow">The Heroku-importer flow</a></li><li class="h2"><a href="#after-a-restore-watch-for-password-drift">After a restore: watch for password drift</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!-- meta {"title":"Rollback","desc":"Roll back to a previous deployment by re-deploying its SHA or image tag.","section":"Deployments"} -->
+<p class="lede">There's no special "rollback" mode in OwnStack — a rollback is just another deployment with an older SHA (for git deploys) or older image tag (for image deploys). The mechanics are the same as a forward deploy: build, release task, restart.</p>
+
+<h2>Find what was running before</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app info &lt;app&gt;
+<span class="out">  Stack:   prod — deployed abc1234</span>
+
+<span class="prompt">$</span> ownstack remote deploy-log --app=&lt;app&gt; --history
+<span class="out">  ID    SHA       STATUS     WHEN
+  1024  abc1234   succeeded  5 minutes ago
+  1023  def5678   succeeded  2 hours ago     ← last known-good
+  1022  9abcdef   failed     3 hours ago</span></code></pre>
+
+<h2>Roll back via git deploys</h2>
+<pre class="terminal"><code><span class="prompt">$</span> git push origin def5678:main --force-with-lease   <span class="out"># reset main to the good SHA</span>
+<span class="prompt">$</span> ownstack deploy</code></pre>
+<p>Or, without rewriting your branch:</p>
+<pre class="terminal"><code><span class="prompt">$</span> git revert abc1234..HEAD
+<span class="prompt">$</span> git push origin main
+<span class="prompt">$</span> ownstack deploy</code></pre>
+<p>Revert keeps history straight; force-push is faster but rewrites <code>main</code> — be deliberate about which.</p>
+
+<h2>Roll back via image deploys</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack deploy --image=ghcr.io/me/my-app:def5678</code></pre>
+<p>Cleaner than git rollbacks because the image is already built and tested. Make sure your CI tags every build with the SHA so old images stay available.</p>
+
+<h2>What about migrations?</h2>
+<p>Migrations are usually <strong>forward-only</strong>. Rolling back the code does not roll back the database schema. If your "bad" deploy ran a migration that the previous code can't handle, you have two options:</p>
+<ul>
+	<li><strong>Hot-fix forward</strong> — write a new migration that reverses the change, deploy that.</li>
+	<li><strong>Restore the DB</strong> — pull a backup from before the bad deploy and restore it. See <a href="/databases/postgres/restore/">Restore</a>.</li>
+</ul>
+
+<div class="callout warning">
+	<div><strong>Practice this</strong><p>The first time you need to roll back is a stressful time to learn the procedure. Ship a deliberately-noop change to staging, roll it back, time how long it takes. Now you know.</p></div>
+</div>
+
+<h2>Multi-stack rollbacks</h2>
+<p>An <code>ownstack deploy</code> with an older SHA / image rolls back <em>all</em> deployable stacks. To roll back just one stack, use <code>--stack=&lt;name&gt;</code> — the others stay on the new SHA. This is occasionally useful for canary-style rollouts where you proved a regression on one stack before flipping the rest.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+	<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+	<li><a href="/databases/postgres/restore/">Postgres restore</a></li>
+</ul>

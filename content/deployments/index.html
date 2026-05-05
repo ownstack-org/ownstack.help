@@ -1,0 +1,45 @@
+<!-- meta {"title":"Deployments","desc":"How code becomes a running app on a stack.","section":"Deployments"} -->
+<p class="lede">A <strong>deployment</strong> is one execution of <code>ownstack deploy</code> for a single app on a single stack. If your app deploys to three stacks, one <code>ownstack deploy</code> produces three deployments — one per stack — and they run in parallel.</p>
+
+<h2>Lifecycle of a deployment</h2>
+<ol>
+	<li><strong>Trigger</strong> — <code>ownstack deploy</code>, the dashboard's <em>Deploy now</em> button, or a webhook from GitHub on push.</li>
+	<li><strong>Enqueue</strong> — the control plane creates one deployment job per target stack and hands them to the deploy worker.</li>
+	<li><strong>Build</strong> — the worker SSHes to the stack and pushes your repo to the stack's dokku endpoint. Dokku runs the buildpack (or Dockerfile) and builds an image. Build logs stream back.</li>
+	<li><strong>Release</strong> — the buildpack's <code>release</code> task runs (e.g. <code>bundle exec rails db:migrate</code>). If it fails, the deployment fails and the previous version keeps serving.</li>
+	<li><strong>Restart</strong> — dokku starts the new container, runs healthchecks, then rotates traffic.</li>
+	<li><strong>Post-deploy</strong> — the <code>postdeploy</code> script in <code>app.json</code> runs (typically a one-time seed task).</li>
+</ol>
+
+<h2>Two ways to deploy</h2>
+<table>
+	<thead><tr><th>Method</th><th>When to use</th></tr></thead>
+	<tbody>
+		<tr><td><a href="/deployments/git-deploys/">Git push</a></td><td>The default. Buildpack or Dockerfile build happens on the stack from your repo. Source of truth: the SHA on your branch.</td></tr>
+		<tr><td><a href="/deployments/image-deploys/">Image deploy</a></td><td>Pre-built Docker image from a registry. Faster, lets you build in CI; the stack just pulls and runs. Source of truth: the image tag.</td></tr>
+	</tbody>
+</table>
+
+<h2>Where to see them</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app info &lt;app&gt;
+<span class="out">  Stack:   prod — deployed abc1234</span>
+
+<span class="prompt">$</span> ownstack remote deploy-log [--deployment=ID]    <span class="out"># build log</span>
+<span class="prompt">$</span> ownstack remote logs --tail 200                  <span class="out"># runtime logs</span></code></pre>
+<p>The dashboard's <strong>Deployments</strong> tab lists everything across all stacks with status, SHA, and links to logs. Failed deployments include the build log so you can debug without retrying.</p>
+
+<h2>Multi-stack</h2>
+<p>An app on multiple stacks runs deploys in parallel. One stack can fail while others succeed — the dashboard shows mixed status. See <a href="/deployments/multi-stack/">Multi-stack deploys</a>.</p>
+
+<h2>Rollback</h2>
+<p>A rollback is just another deployment with an older SHA. See <a href="/deployments/rollback/">Rollback</a>.</p>
+
+<h2>Pipelines</h2>
+<p>For staging → production flows, OwnStack supports <strong>pipelines</strong>: an app can have stages, and a deploy promotes between them. See <a href="/deployments/pipelines/">Pipelines</a>.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+	<li><a href="/deployments/build-types/">Build types</a> — buildpack vs Dockerfile.</li>
+	<li><a href="/troubleshooting/deploy-failures/">When deploys fail</a></li>
+</ul>

@@ -1,36 +1,53 @@
-# OwnStack documentation
+# ownstack.help
 
-Source for the user manual at [ownstack.help](https://ownstack.help).
+Hand-rolled static documentation for OwnStack. No framework. Lives at <https://ownstack.help>.
 
-Built with [Astro Starlight](https://starlight.astro.build/). Deploys to the `ownstack-help` app on the `zenith-zone-582` stack via `ownstack deploy`.
+## Layout
 
-## Local development
-
-```bash
-npm install
-npm run dev      # localhost:4321 with hot reload
-npm run build    # static output in dist/
-npm run start    # serve dist/ locally (matches what runs in prod)
+```
+.
+├── index.html         hand-written homepage (splash hero)
+├── favicon.svg
+├── assets/            CSS, JS, logo
+├── _layout/           shared chrome (header, sidebar, footer, page template)
+├── content/           one HTML fragment per article (with frontmatter comment)
+├── build.js           wraps content/* in chrome → final pages at repo root
+├── package.json       just `serve` for runtime
+└── Procfile           web: serve -l tcp://0.0.0.0:$PORT .
 ```
 
 ## Authoring
 
-Content lives in `src/content/docs/` as Markdown / MDX. The sidebar is configured in `astro.config.mjs`.
+Add a new article:
 
-To add a page:
+1. Create `content/<section>/<slug>.html` with a frontmatter comment at the top:
+   ```html
+   <!-- meta {"title":"…","desc":"…","section":"Apps"} -->
+   <p class="lede">…opening line…</p>
+   <h2>…</h2>
+   <p>…</p>
+   ```
+2. Add the link to `_layout/sidebar.html`.
+3. Run `npm run build`.
+4. Open `index.html` (or any built page) in a browser to preview.
 
-1. Create a `.md` (or `.mdx`) file under the appropriate subdirectory (`getting-started/`, `concepts/`, `how-to/`, `cli/`).
-2. Add a sidebar entry in `astro.config.mjs`.
+## Build
 
-Front-matter shape:
-
-```yaml
----
-title: Page title
-description: One-line description used in metadata and cards.
----
+```bash
+npm install
+npm run build       # walks content/, emits final HTML at the repo root, builds search-index.json
+npm start           # serves the repo root on $PORT (default 3000)
 ```
 
-## Production runtime
+The build script is small and lives at `build.js` — read it before changing it. It does template substitution, scroll-spy ID injection, breadcrumb building, sidebar active-state marking, and a flat search index.
 
-The herokuish nodejs buildpack runs `npm run build`; the `web` process is `serve -s dist -l tcp://0.0.0.0:$PORT` (declared in `Procfile`). Static output, no app server.
+## Deploy
+
+Deploys to the `ownstack-help` app on the `zenith-zone-582` stack via `ownstack deploy`. The dokku herokuish nodejs buildpack runs `npm install` then `npm run build` (via `heroku-postbuild`), then starts `web: serve -l tcp://0.0.0.0:$PORT .`.
+
+## Style
+
+- Dark by default (slate base). Pink (`#ec4899`) is the load-bearing identity color.
+- Type stack: system sans for UI, system serif fallback for headings if needed, JetBrains Mono / SF Mono for code.
+- Code blocks with the `terminal` class get window chrome; the `<span class="prompt">$</span>` marks command lines and is stripped on copy.
+- Callouts: `<div class="callout note|tip|warning|danger"><div><strong>Title</strong><p>Body</p></div></div>`.

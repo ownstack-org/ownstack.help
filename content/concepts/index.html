@@ -1,0 +1,36 @@
+<!-- meta {"title":"Concepts","desc":"The mental model behind OwnStack: control plane, stacks, apps, deployments, processes, databases.","section":"Concepts"} -->
+<p class="lede">Concept pages explain how OwnStack works under the hood — the mental model you load once and consult when something doesn't fit your expectation.</p>
+
+<h2>Pillars</h2>
+<table>
+	<thead><tr><th>Concept</th><th>Read</th></tr></thead>
+	<tbody>
+		<tr><td>Apps</td><td><a href="/apps/">Apps overview</a> · <a href="/apps/procfile/">Procfile</a> · <a href="/apps/config-vars/">Config vars</a></td></tr>
+		<tr><td>Stacks</td><td><a href="/stacks/">Stacks overview</a> · provider pages: <a href="/stacks/aws/">AWS</a>, <a href="/stacks/gcp/">GCP</a>, <a href="/stacks/openstack/">OpenStack</a>, <a href="/stacks/ssh/">SSH</a></td></tr>
+		<tr><td>Deployments</td><td><a href="/deployments/">Deployments overview</a> · <a href="/deployments/build-types/">Build types</a> · <a href="/deployments/multi-stack/">Multi-stack</a></td></tr>
+		<tr><td>Processes</td><td><a href="/processes/">Process types</a> · <a href="/processes/scaling/">Scaling</a> · <a href="/processes/healthchecks/">Healthchecks</a></td></tr>
+		<tr><td>Databases</td><td><a href="/databases/">Databases overview</a> · <a href="/databases/postgres/">Postgres</a> · <a href="/databases/mysql/">MySQL</a> · <a href="/databases/redis/">Redis</a></td></tr>
+		<tr><td>Domains &amp; SSL</td><td><a href="/domains-ssl/">Overview</a></td></tr>
+	</tbody>
+</table>
+
+<h2>How OwnStack relates to dokku</h2>
+<p>Every stack runs <a href="https://dokku.com/">dokku</a>. OwnStack is the layer above: it provides authentication, multi-stack orchestration, the control-plane API, the CLI, the dashboard, and a layer of opinion that papers over dokku's rough edges. Most "OwnStack" features are dokku features OwnStack drives more ergonomically; a few are control-plane-only (multi-stack deploys, audit log, billing).</p>
+
+<h2>The control plane</h2>
+<p>The control plane is a single service (one of the <strong>app</strong>s in your account, in the self-hosted case) that holds:</p>
+<ul>
+	<li>Account, user, and team data.</li>
+	<li>The list of stacks and their credentials.</li>
+	<li>The list of apps and their config.</li>
+	<li>The deployment worker that pushes code/images to stacks.</li>
+	<li>API endpoints the CLI and UI talk to.</li>
+</ul>
+<p>The hosted control plane lives at <code>api.ownstack.org</code>. Self-hosting puts it on a stack you own — eating the dogfood. (Self-hosting introduces a small bootstrap problem on first deploy; see the self-hosting guide.)</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/getting-started/">Getting started</a></li>
+	<li><a href="/apps/">Apps</a></li>
+	<li><a href="/stacks/">Stacks</a></li>
+</ul>

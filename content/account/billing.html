@@ -1,0 +1,42 @@
+<!-- meta {"title":"Billing","desc":"How OwnStack pricing works: control plane, stacks, apps. What's billed by us vs your cloud provider.","section":"Account"} -->
+<p class="lede">OwnStack bills for the control plane and the apps it manages. Stacks themselves are billed by your cloud provider — OwnStack never marks up infrastructure.</p>
+
+<h2>What OwnStack bills</h2>
+<table>
+	<thead><tr><th>Item</th><th>What it covers</th></tr></thead>
+	<tbody>
+		<tr><td>Hosted control plane</td><td>The <code>api.ownstack.org</code> service: the API, the deploy worker, the dashboard. Per-account.</td></tr>
+		<tr><td>Per-app fee</td><td>A small flat fee per active app, regardless of which stack it deploys to.</td></tr>
+		<tr><td>Add-ons</td><td>If you provision OwnStack-side add-ons (logdrain, support, heartbeat), each has its own line.</td></tr>
+	</tbody>
+</table>
+<p>Self-hosting the control plane removes the hosted-control-plane line — you pay for the underlying stack instead.</p>
+
+<h2>What your cloud provider bills</h2>
+<table>
+	<thead><tr><th>Item</th><th>Where</th></tr></thead>
+	<tbody>
+		<tr><td>EC2 / Compute Engine / VPS instance for each stack</td><td>AWS / GCP / your provider</td></tr>
+		<tr><td>EBS / persistent disk</td><td>Your provider</td></tr>
+		<tr><td>Outbound bandwidth</td><td>Your provider</td></tr>
+		<tr><td>Backups (S3 storage)</td><td>Your provider, if you configured stack backups to your bucket</td></tr>
+	</tbody>
+</table>
+
+<h2>Estimating monthly cost</h2>
+<p>For a single small Rails app on a shared <code>t3.small</code>:</p>
+<ul>
+	<li>EC2 <code>t3.small</code> on-demand: ~$15/mo</li>
+	<li>EBS 30 GiB gp3: ~$2.40/mo</li>
+	<li>Bandwidth (light): ~$1/mo</li>
+	<li>OwnStack control plane + per-app: depends on plan</li>
+</ul>
+<p>Reserved instances or savings plans cut the EC2 cost by ~40%.</p>
+
+<h2>Invoices</h2>
+<p>Monthly invoices come from <a href="https://billing.ownstack.org">billing.ownstack.org</a>. Failed payment grace is 7 days; after that, deploys are paused (apps keep running). Update card or pay outstanding to resume.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/account/">Profiles &amp; tokens</a></li>
+</ul>

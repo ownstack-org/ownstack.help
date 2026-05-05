@@ -1,0 +1,37 @@
+<!-- meta {"title":"MySQL","desc":"MySQL on OwnStack: provisioning, linking, dumps, restores. Most things mirror Postgres.","section":"Databases","slug":"databases/mysql"} -->
+<p class="lede">MySQL is supported via the dokku-mysql plugin. Provisioning, linking, dumps, and restores follow the same shape as Postgres — most of the Postgres docs apply directly.</p>
+
+<h2>Provisioning</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; mysql:create mysql-&lt;app&gt;
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; mysql:link mysql-&lt;app&gt; &lt;app&gt;</code></pre>
+<p>Or, on apps with <code>needs_mysql: true</code>, OwnStack auto-creates and links on first deploy. Linking sets <code>DATABASE_URL</code> to a <code>mysql://…</code> connection string.</p>
+
+<h2>The DATABASE_URL shape</h2>
+<pre><code>mysql://mysql:&lt;password&gt;@dokku-mysql-&lt;service&gt;:3306/&lt;dbname&gt;</code></pre>
+
+<h2>Connect</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; mysql:connect mysql-&lt;app&gt;</code></pre>
+
+<h2>Dump &amp; restore</h2>
+<p><code>ownstack db dump</code> auto-detects MySQL apps. The output is gzipped <code>mysqldump</code> SQL:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db dump --app=&lt;app&gt; --output=backup.sql.gz
+<span class="prompt">$</span> gunzip &lt; backup.sql.gz | mysql my_local</code></pre>
+<p>Restore back to a stack with <code>ownstack db restore --url=...</code> — same flow as Postgres restore. See <a href="/databases/postgres/restore/">Postgres restore</a> for details.</p>
+
+<h2>Differences from Postgres</h2>
+<table>
+	<thead><tr><th>Postgres</th><th>MySQL</th></tr></thead>
+	<tbody>
+		<tr><td>Custom-format dump (<code>.dump</code>)</td><td>Plain SQL gzipped (<code>.sql.gz</code>)</td></tr>
+		<tr><td>Default port 5432</td><td>Default port 3306</td></tr>
+		<tr><td>User <code>postgres</code></td><td>User <code>mysql</code></td></tr>
+		<tr><td><code>postgres:connect</code></td><td><code>mysql:connect</code></td></tr>
+		<tr><td><code>db repair</code> for password drift</td><td><code>db repair</code> works the same; root password drift after import is rarer with <code>mysqldump</code> than with <code>pg_dumpall</code></td></tr>
+	</tbody>
+</table>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/databases/postgres/dumps/">Postgres dumps</a> — same flow, mostly applies.</li>
+	<li><a href="/cli/db/"><code>ownstack db</code> reference</a></li>
+</ul>

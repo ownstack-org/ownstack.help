@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deploy failures — OwnStack</title>
+<meta name="description" content="Common build, release-task, and healthcheck errors with concrete fixes.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Deploy failures — OwnStack">
+<meta property="og:description" content="Common build, release-task, and healthcheck errors with concrete fixes.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a class="active" href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/troubleshooting/">troubleshooting</a><span class="sep">›</span><span>Deploy failures</span></nav>
+			<h1>Deploy failures</h1>
+			<p class="lede">Match your symptom to the section below. Almost every deploy failure falls into one of three buckets: the build never produced an image, the release task exited non-zero, or the new container never passed healthchecks.</p>
+
+<h2 id="the-build-never-produced-an-image">The build never produced an image</h2>
+<table>
+	<thead><tr><th>Symptom</th><th>What to do</th></tr></thead>
+	<tbody>
+		<tr><td><code>Failure during app build</code> with no clear cause</td><td>Read the build log carefully — the buildpack always prints a final stack trace before this line. <code>ownstack remote deploy-log</code>.</td></tr>
+		<tr><td><code>Node.js vX.Y.Z is not supported</code> (or similar version refusal)</td><td>The buildpack picked a Node version your dependency rejects. Pin <code>"engines": { "node": "&gt;=22.12.0" }</code> in <code>package.json</code>.</td></tr>
+		<tr><td><code>Could not detect default buildpack</code></td><td>Buildpack auto-detect failed. Add a recognized file (<code>package.json</code>, <code>Gemfile</code>, etc.) or set <code>BUILDPACK_URL</code> explicitly.</td></tr>
+		<tr><td><code>error: failed to push some refs to '...:&lt;app&gt;'</code> with no other context</td><td>Pre-receive hook declined. Look upward in the log — the actual error is on a <code>remote: ...</code> line earlier.</td></tr>
+		<tr><td>Build runs out of memory</td><td>Increase the stack instance size, or pre-build the image in CI and use <a href="/deployments/image-deploys/">image deploys</a>.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="the-release-task-exited-non-zero">The release task exited non-zero</h2>
+<p>The release task is whatever is in <code>release:</code> in your Procfile. Most commonly it's <code>db:migrate</code>. Failures here keep the previous container serving — but no traffic moves to the new code.</p>
+<table>
+	<thead><tr><th>Symptom</th><th>What to do</th></tr></thead>
+	<tbody>
+		<tr><td><code>PG::ConnectionBad: FATAL: password authentication failed for user "postgres"</code></td><td>Almost always password drift after a database import. <a href="/databases/postgres/repair/">Repair after import</a> — one <code>ALTER ROLE</code> fixes it.</td></tr>
+		<tr><td><code>PG::ConnectionBad: connection refused</code></td><td>Postgres service is stopped or unhealthy. <code>ssh dokku@&lt;stack-ip&gt; postgres:status &lt;svc&gt;</code> to check; <code>postgres:start &lt;svc&gt;</code> to revive.</td></tr>
+		<tr><td><code>ActiveRecord::PendingMigrationError</code></td><td>You skipped <code>db:migrate</code> but still need it. Add it to the <code>release</code> Procfile entry.</td></tr>
+		<tr><td><code>migration X failed: ...</code></td><td>Application bug in the migration itself. Fix the migration, redeploy.</td></tr>
+		<tr><td><code>bundle: command not found</code> on dokku-induced restart</td><td>Buildpack PATH not set in the restart context. Often shows up after <code>postgres:unlink</code>. <code>ownstack remote restart</code> via the control plane (which uses <code>ps:rebuild</code>) usually clears it.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="healthcheck-failed">Healthcheck failed</h2>
+<table>
+	<thead><tr><th>Symptom</th><th>What to do</th></tr></thead>
+	<tbody>
+		<tr><td><code>port listening check: unable to enter the container</code></td><td>Web process didn't bind to <code>$PORT</code>. Confirm your start command uses <code>$PORT</code> (not a hardcoded port).</td></tr>
+		<tr><td><code>container has restarted N times</code></td><td>Process crashing on startup. <code>ownstack remote logs --tail 200</code> for the stack trace.</td></tr>
+		<tr><td><code>tini: exec bin/rails failed: No such file or directory</code></td><td>Image is missing the binary the entrypoint expects. Common after a buildpack switch or a partial restart cycle. Trigger a clean rebuild: <code>ssh dokku@&lt;stack-ip&gt; ps:rebuild &lt;app&gt;</code>.</td></tr>
+		<tr><td>Healthcheck times out</td><td>App is slow to start. Add an <code>uptime</code> check with a longer wait in <code>app.json</code>. See <a href="/processes/healthchecks/">Healthchecks</a>.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="push-side-errors">Push-side errors</h2>
+<table>
+	<thead><tr><th>Symptom</th><th>What to do</th></tr></thead>
+	<tbody>
+		<tr><td><code>Name is already taken</code></td><td>Harmless. Dokku is saying the app already exists. Deploy continues.</td></tr>
+		<tr><td><code>Unable to remove deploy lock</code></td><td>A previous deploy crashed mid-flight. <code>ownstack app unlock &lt;app&gt;</code> clears it.</td></tr>
+		<tr><td><code>fatal: could not read Username for 'https://github.com'</code></td><td>Submodule auth on the control plane. Check that the control plane has access to private submodule repos.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="if-you-really-can-t-tell-what-went-wrong">If you really can't tell what went wrong</h2>
+<ol>
+	<li><strong>Read the entire log</strong> from <code>ownstack remote deploy-log --deployment=ID</code>. The cause is in there; CLI summary truncates aggressively.</li>
+	<li><strong>Try a known-good SHA</strong> via <code>ownstack deploy</code> with a previous commit. If that succeeds, the issue is in your changes.</li>
+	<li><strong>Reproduce locally</strong> with <code>ownstack local stack start</code> and a local stack target. Same buildpack, same release task, just on your machine.</li>
+	<li><strong>Open a doc issue</strong> describing the symptom — concrete error messages help us improve this page.</li>
+</ol>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+	<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+	<li><a href="/databases/postgres/repair/">Repair after import</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#the-build-never-produced-an-image">The build never produced an image</a></li><li class="h2"><a href="#the-release-task-exited-non-zero">The release task exited non-zero</a></li><li class="h2"><a href="#healthcheck-failed">Healthcheck failed</a></li><li class="h2"><a href="#push-side-errors">Push-side errors</a></li><li class="h2"><a href="#if-you-really-can-t-tell-what-went-wrong">If you really can't tell what went wrong</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

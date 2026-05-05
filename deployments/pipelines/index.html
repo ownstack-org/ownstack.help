@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pipelines — OwnStack</title>
+<meta name="description" content="Stage your apps: staging → production promotions, review apps, controlled cutovers.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Pipelines — OwnStack">
+<meta property="og:description" content="Stage your apps: staging → production promotions, review apps, controlled cutovers.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a class="active" href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/deployments/">deployments</a><span class="sep">›</span><span>Pipelines</span></nav>
+			<h1>Pipelines</h1>
+			<p class="lede">A pipeline is a chain of related apps — typically <strong>staging</strong> and <strong>production</strong> — where deploys flow forward via promotions. Promotion copies the slug or image from one stage to the next without rebuilding, so what you tested in staging is exactly what runs in prod.</p>
+
+<h2 id="the-mental-model">The mental model</h2>
+<table>
+	<thead><tr><th>Concept</th><th>What it is</th></tr></thead>
+	<tbody>
+		<tr><td>Pipeline</td><td>An ordered list of stages. Belongs to one app codebase across multiple "stage" apps.</td></tr>
+		<tr><td>Stage</td><td>One apps in the chain — e.g. <code>staging</code>, <code>production</code>. Each stage is a real OwnStack app on its own stack(s).</td></tr>
+		<tr><td>Promotion</td><td>Copy a deployment from stage N to stage N+1. The same image gets re-tagged and re-released, no rebuild.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="create-a-pipeline">Create a pipeline</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app pipeline create &lt;production-app&gt;
+<span class="prompt">$</span> ownstack app pipeline add-staging &lt;production-app&gt; &lt;staging-app&gt;</code></pre>
+<p>Or, in the dashboard: open the production app, <strong>Pipeline</strong> tab, <strong>Add staging app</strong>. The two apps must already exist; pipelines link existing apps rather than creating new ones.</p>
+
+<h2 id="promote">Promote</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app pipeline promote &lt;staging-app&gt;</code></pre>
+<p>This re-deploys the production app with the staging app's currently-deployed image (no new build). Migrations defined as the production app's release task still run; the postdeploy script runs once.</p>
+
+<div class="callout note">
+	<div><strong>Promotion isn't atomic across multi-stack production</strong><p>If your production app deploys to N stacks, a promotion enqueues N deployment jobs. They run in parallel. If you need lock-step rollout, use a pipeline stage with explicit per-stack approval.</p></div>
+</div>
+
+<h2 id="per-stage-config">Per-stage config</h2>
+<p>Each stage app has its own config vars, its own database, its own domain. Don't share config across stages — that's the whole point of staging.</p>
+<p>If you have config that <em>should</em> be the same in every stage (a feature flag service URL, a shared logging endpoint), set it on each stage manually, or use <code>ownstack config:push --file=…</code> to apply the same set to multiple apps.</p>
+
+<h2 id="review-apps-when-you-want-them-back">Review apps (when you want them back)</h2>
+<p>Heroku-style review apps — one ephemeral app per pull request — are on the roadmap but not yet first-class. The current workaround:</p>
+<ul>
+	<li>A GitHub Action listens for PR events.</li>
+	<li>On <code>opened</code>, it runs <code>ownstack app clone &lt;production-app&gt; &lt;pr-NNN&gt; --stack=review-stack --deploy</code>.</li>
+	<li>On <code>closed</code>, it runs <code>ownstack app destroy &lt;pr-NNN&gt; --force</code>.</li>
+</ul>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/deployments/multi-stack/">Multi-stack deploys</a></li>
+	<li><a href="/deployments/rollback/">Rollback</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#the-mental-model">The mental model</a></li><li class="h2"><a href="#create-a-pipeline">Create a pipeline</a></li><li class="h2"><a href="#promote">Promote</a></li><li class="h2"><a href="#per-stage-config">Per-stage config</a></li><li class="h2"><a href="#review-apps-when-you-want-them-back">Review apps (when you want them back)</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

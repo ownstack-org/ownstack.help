@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deployments — OwnStack</title>
+<meta name="description" content="How code becomes a running app on a stack.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Deployments — OwnStack">
+<meta property="og:description" content="How code becomes a running app on a stack.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a class="active" href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><span>Deployments</span></nav>
+			<h1>Deployments</h1>
+			<p class="lede">A <strong>deployment</strong> is one execution of <code>ownstack deploy</code> for a single app on a single stack. If your app deploys to three stacks, one <code>ownstack deploy</code> produces three deployments — one per stack — and they run in parallel.</p>
+
+<h2 id="lifecycle-of-a-deployment">Lifecycle of a deployment</h2>
+<ol>
+	<li><strong>Trigger</strong> — <code>ownstack deploy</code>, the dashboard's <em>Deploy now</em> button, or a webhook from GitHub on push.</li>
+	<li><strong>Enqueue</strong> — the control plane creates one deployment job per target stack and hands them to the deploy worker.</li>
+	<li><strong>Build</strong> — the worker SSHes to the stack and pushes your repo to the stack's dokku endpoint. Dokku runs the buildpack (or Dockerfile) and builds an image. Build logs stream back.</li>
+	<li><strong>Release</strong> — the buildpack's <code>release</code> task runs (e.g. <code>bundle exec rails db:migrate</code>). If it fails, the deployment fails and the previous version keeps serving.</li>
+	<li><strong>Restart</strong> — dokku starts the new container, runs healthchecks, then rotates traffic.</li>
+	<li><strong>Post-deploy</strong> — the <code>postdeploy</code> script in <code>app.json</code> runs (typically a one-time seed task).</li>
+</ol>
+
+<h2 id="two-ways-to-deploy">Two ways to deploy</h2>
+<table>
+	<thead><tr><th>Method</th><th>When to use</th></tr></thead>
+	<tbody>
+		<tr><td><a href="/deployments/git-deploys/">Git push</a></td><td>The default. Buildpack or Dockerfile build happens on the stack from your repo. Source of truth: the SHA on your branch.</td></tr>
+		<tr><td><a href="/deployments/image-deploys/">Image deploy</a></td><td>Pre-built Docker image from a registry. Faster, lets you build in CI; the stack just pulls and runs. Source of truth: the image tag.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="where-to-see-them">Where to see them</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app info &lt;app&gt;
+<span class="out">  Stack:   prod — deployed abc1234</span>
+
+<span class="prompt">$</span> ownstack remote deploy-log [--deployment=ID]    <span class="out"># build log</span>
+<span class="prompt">$</span> ownstack remote logs --tail 200                  <span class="out"># runtime logs</span></code></pre>
+<p>The dashboard's <strong>Deployments</strong> tab lists everything across all stacks with status, SHA, and links to logs. Failed deployments include the build log so you can debug without retrying.</p>
+
+<h2 id="multi-stack">Multi-stack</h2>
+<p>An app on multiple stacks runs deploys in parallel. One stack can fail while others succeed — the dashboard shows mixed status. See <a href="/deployments/multi-stack/">Multi-stack deploys</a>.</p>
+
+<h2 id="rollback">Rollback</h2>
+<p>A rollback is just another deployment with an older SHA. See <a href="/deployments/rollback/">Rollback</a>.</p>
+
+<h2 id="pipelines">Pipelines</h2>
+<p>For staging → production flows, OwnStack supports <strong>pipelines</strong>: an app can have stages, and a deploy promotes between them. See <a href="/deployments/pipelines/">Pipelines</a>.</p>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+	<li><a href="/deployments/build-types/">Build types</a> — buildpack vs Dockerfile.</li>
+	<li><a href="/troubleshooting/deploy-failures/">When deploys fail</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#lifecycle-of-a-deployment">Lifecycle of a deployment</a></li><li class="h2"><a href="#two-ways-to-deploy">Two ways to deploy</a></li><li class="h2"><a href="#where-to-see-them">Where to see them</a></li><li class="h2"><a href="#multi-stack">Multi-stack</a></li><li class="h2"><a href="#rollback">Rollback</a></li><li class="h2"><a href="#pipelines">Pipelines</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

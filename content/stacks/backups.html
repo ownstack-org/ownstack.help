@@ -1,0 +1,64 @@
+<!-- meta {"title":"Stack backups","desc":"Schedule and restore stack-wide backups: every database, every persistent volume, on a single schedule.","section":"Stacks"} -->
+<p class="lede">Stack backups capture every database (Postgres, MySQL, MongoDB, Redis snapshots) and every persistent volume on a stack, on whatever schedule you configure. Backups go to S3 or any S3-compatible object store you configure. Restore is point-in-time per database, per volume.</p>
+
+<h2>Configure</h2>
+<p>In the dashboard, <strong>Stack → Backups → Configure</strong>. Set:</p>
+<table>
+	<thead><tr><th>Field</th><th>What to set</th></tr></thead>
+	<tbody>
+		<tr><td>Destination</td><td><code>s3://&lt;bucket&gt;/&lt;prefix&gt;/</code> — bucket should be in the same region as the stack.</td></tr>
+		<tr><td>Endpoint</td><td>For S3-compatible providers (Backblaze B2, Cloudflare R2, MinIO), set the endpoint URL. Skip for AWS S3.</td></tr>
+		<tr><td>Credentials</td><td>Access key + secret key with <code>s3:PutObject</code>, <code>s3:GetObject</code>, <code>s3:DeleteObject</code>, <code>s3:ListBucket</code>.</td></tr>
+		<tr><td>Schedule</td><td>Cron expression. Daily 03:00 UTC (<code>0 3 * * *</code>) is a sensible default.</td></tr>
+		<tr><td>Retention</td><td>How many backups to keep. Older ones are pruned automatically.</td></tr>
+		<tr><td>Encryption</td><td>Optional: server-side via S3, or client-side via a passphrase you supply.</td></tr>
+	</tbody>
+</table>
+<p>Or via CLI:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack backup config &lt;stack&gt;</code></pre>
+
+<h2>Run a manual backup</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack backup run &lt;stack&gt;
+<span class="out">Backup job 412 enqueued for stack &lt;stack&gt;.</span>
+
+<span class="prompt">$</span> ownstack stack backup list &lt;stack&gt;
+<span class="out">  ID    STARTED              STATUS     SIZE     SERVICES
+  412   2026-05-04 03:00:01  completed  4.2 GiB  postgres-app1, postgres-app2, mysql-app3, redis-app1</span></code></pre>
+
+<h2>What a backup contains</h2>
+<table>
+	<thead><tr><th>Service</th><th>Format</th></tr></thead>
+	<tbody>
+		<tr><td>Postgres</td><td><code>pg_dump --format=custom</code> per database, plus globals (<code>pg_dumpall --globals-only</code>).</td></tr>
+		<tr><td>MySQL</td><td><code>mysqldump</code> per database, gzipped.</td></tr>
+		<tr><td>MongoDB</td><td><code>mongodump</code> per database, archived.</td></tr>
+		<tr><td>Redis</td><td>RDB snapshot.</td></tr>
+		<tr><td>Persistent volumes</td><td>tar + gzip per volume.</td></tr>
+	</tbody>
+</table>
+
+<h2>Restore</h2>
+<p>Restoration is <strong>per service</strong>, not stack-wide. Pick the backup, pick the database/volume to restore, and OwnStack writes it back into the running service:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db restore --app=&lt;app&gt; --backup=&lt;backup-id&gt;
+<span class="prompt">$</span> ownstack db restore:info &lt;ID&gt; --follow</code></pre>
+<p>The restore happens on the stack via <code>dokku postgres:import</code> (or the matching MySQL/Mongo equivalent). The target service is restarted; the linked app picks up the restored data on its next request.</p>
+
+<div class="callout warning">
+	<div><strong>Restoring is destructive</strong><p>The restore <em>replaces</em> the current data in the target service. There's no in-place merge. Snapshot the current state first if you might need it.</p></div>
+</div>
+
+<h2>Scheduling notes</h2>
+<ul>
+	<li>Backups run on the stack itself; they consume CPU and disk while running. Schedule for low-traffic windows.</li>
+	<li>Database dumps lock briefly (Postgres uses transaction-level snapshot, no exclusive lock; MySQL with InnoDB uses consistent snapshot via <code>--single-transaction</code>; Redis BGSAVE forks).</li>
+	<li>Volume tar runs <code>fsfreeze</code> if available — quiesces the filesystem for a consistent snapshot. Apps should handle a brief pause.</li>
+</ul>
+
+<h2>Off-site copies</h2>
+<p>If you want backups in a second region or a different provider, configure a second backup destination in the dashboard. OwnStack writes to all configured destinations on each scheduled run.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/databases/postgres/restore/">Postgres restore</a></li>
+	<li><a href="/databases/postgres/repair/">Repair after import</a> — for the <code>password authentication failed</code> case after restoring from a <code>pg_dumpall</code>.</li>
+</ul>

@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Welcome to OwnStack — OwnStack</title>
+<meta name="description" content="What OwnStack is, what problems it solves, and how the pieces fit together.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Welcome to OwnStack — OwnStack">
+<meta property="og:description" content="What OwnStack is, what problems it solves, and how the pieces fit together.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a class="active" href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><span>Welcome to OwnStack</span></nav>
+			<h1>Welcome to OwnStack</h1>
+			<p class="lede">OwnStack is a control plane for deploying apps onto stacks you own. Heroku-style ergonomics — <code>git push</code>, scale, add-ons, automatic SSL — on infrastructure that lives in your AWS account, your GCP project, or any host with SSH access.</p>
+
+<h2 id="why-ownstack-exists">Why OwnStack exists</h2>
+<p>Heroku is wonderful at the feel: deploy by pushing to a remote, scale by typing <code>ps:scale worker=2</code>, add a database with one command. But it bills per dyno and runs on someone else's hardware. The escape route — running <a href="https://dokku.com/">dokku</a> on your own server — gets you the engine, but you also inherit its quirks: app.json formation locks, password drift after dump-restores, multi-stack orchestration you have to script yourself.</p>
+<p>OwnStack is the layer above dokku. It runs on your servers (or on managed hosts you provision through it), and it papers over the rough edges so the day-to-day workflow feels like Heroku again: a CLI, a UI, and one obvious way to do each thing.</p>
+
+<h2 id="the-mental-model">The mental model</h2>
+<p>Five things to know:</p>
+<table>
+	<thead><tr><th>Concept</th><th>What it is</th></tr></thead>
+	<tbody>
+		<tr><td><strong>Control plane</strong></td><td>Central service (hosted at <code>api.ownstack.org</code>, or self-hosted) that holds your account, your stacks, your apps, and runs the deploy worker.</td></tr>
+		<tr><td><strong>Stack</strong></td><td>A server (or cluster) that runs your apps. Lives in your cloud account; OwnStack provisions it via SSH.</td></tr>
+		<tr><td><strong>App</strong></td><td>Code in a repo, a Procfile, environment variables, optional databases. Apps deploy to one or more stacks.</td></tr>
+		<tr><td><strong>Profile</strong></td><td>A saved control-plane endpoint plus an auth token. Switch profiles to talk to different control planes.</td></tr>
+		<tr><td><strong>CLI</strong></td><td><code>ownstack</code> — the everyday driver for deploying, scaling, viewing logs, managing config.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="what-s-next">What's next</h2>
+<ul>
+	<li><a href="/getting-started/install-cli/">Install the CLI</a> — five minutes.</li>
+	<li><a href="/getting-started/quickstart/">Deploy your first app</a> — about fifteen minutes, end-to-end.</li>
+	<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a> — if you're coming from there.</li>
+</ul>
+<p>If you want a deeper read, jump to <a href="/apps/">Apps</a> or <a href="/stacks/">Stacks</a> next; the rest of the manual fans out from there.</p>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#why-ownstack-exists">Why OwnStack exists</a></li><li class="h2"><a href="#the-mental-model">The mental model</a></li><li class="h2"><a href="#what-s-next">What's next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stack backups — OwnStack</title>
+<meta name="description" content="Schedule and restore stack-wide backups: every database, every persistent volume, on a single schedule.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Stack backups — OwnStack">
+<meta property="og:description" content="Schedule and restore stack-wide backups: every database, every persistent volume, on a single schedule.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a class="active" href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/stacks/">stacks</a><span class="sep">›</span><span>Stack backups</span></nav>
+			<h1>Stack backups</h1>
+			<p class="lede">Stack backups capture every database (Postgres, MySQL, MongoDB, Redis snapshots) and every persistent volume on a stack, on whatever schedule you configure. Backups go to S3 or any S3-compatible object store you configure. Restore is point-in-time per database, per volume.</p>
+
+<h2 id="configure">Configure</h2>
+<p>In the dashboard, <strong>Stack → Backups → Configure</strong>. Set:</p>
+<table>
+	<thead><tr><th>Field</th><th>What to set</th></tr></thead>
+	<tbody>
+		<tr><td>Destination</td><td><code>s3://&lt;bucket&gt;/&lt;prefix&gt;/</code> — bucket should be in the same region as the stack.</td></tr>
+		<tr><td>Endpoint</td><td>For S3-compatible providers (Backblaze B2, Cloudflare R2, MinIO), set the endpoint URL. Skip for AWS S3.</td></tr>
+		<tr><td>Credentials</td><td>Access key + secret key with <code>s3:PutObject</code>, <code>s3:GetObject</code>, <code>s3:DeleteObject</code>, <code>s3:ListBucket</code>.</td></tr>
+		<tr><td>Schedule</td><td>Cron expression. Daily 03:00 UTC (<code>0 3 * * *</code>) is a sensible default.</td></tr>
+		<tr><td>Retention</td><td>How many backups to keep. Older ones are pruned automatically.</td></tr>
+		<tr><td>Encryption</td><td>Optional: server-side via S3, or client-side via a passphrase you supply.</td></tr>
+	</tbody>
+</table>
+<p>Or via CLI:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack backup config &lt;stack&gt;</code></pre>
+
+<h2 id="run-a-manual-backup">Run a manual backup</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack backup run &lt;stack&gt;
+<span class="out">Backup job 412 enqueued for stack &lt;stack&gt;.</span>
+
+<span class="prompt">$</span> ownstack stack backup list &lt;stack&gt;
+<span class="out">  ID    STARTED              STATUS     SIZE     SERVICES
+  412   2026-05-04 03:00:01  completed  4.2 GiB  postgres-app1, postgres-app2, mysql-app3, redis-app1</span></code></pre>
+
+<h2 id="what-a-backup-contains">What a backup contains</h2>
+<table>
+	<thead><tr><th>Service</th><th>Format</th></tr></thead>
+	<tbody>
+		<tr><td>Postgres</td><td><code>pg_dump --format=custom</code> per database, plus globals (<code>pg_dumpall --globals-only</code>).</td></tr>
+		<tr><td>MySQL</td><td><code>mysqldump</code> per database, gzipped.</td></tr>
+		<tr><td>MongoDB</td><td><code>mongodump</code> per database, archived.</td></tr>
+		<tr><td>Redis</td><td>RDB snapshot.</td></tr>
+		<tr><td>Persistent volumes</td><td>tar + gzip per volume.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="restore">Restore</h2>
+<p>Restoration is <strong>per service</strong>, not stack-wide. Pick the backup, pick the database/volume to restore, and OwnStack writes it back into the running service:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db restore --app=&lt;app&gt; --backup=&lt;backup-id&gt;
+<span class="prompt">$</span> ownstack db restore:info &lt;ID&gt; --follow</code></pre>
+<p>The restore happens on the stack via <code>dokku postgres:import</code> (or the matching MySQL/Mongo equivalent). The target service is restarted; the linked app picks up the restored data on its next request.</p>
+
+<div class="callout warning">
+	<div><strong>Restoring is destructive</strong><p>The restore <em>replaces</em> the current data in the target service. There's no in-place merge. Snapshot the current state first if you might need it.</p></div>
+</div>
+
+<h2 id="scheduling-notes">Scheduling notes</h2>
+<ul>
+	<li>Backups run on the stack itself; they consume CPU and disk while running. Schedule for low-traffic windows.</li>
+	<li>Database dumps lock briefly (Postgres uses transaction-level snapshot, no exclusive lock; MySQL with InnoDB uses consistent snapshot via <code>--single-transaction</code>; Redis BGSAVE forks).</li>
+	<li>Volume tar runs <code>fsfreeze</code> if available — quiesces the filesystem for a consistent snapshot. Apps should handle a brief pause.</li>
+</ul>
+
+<h2 id="off-site-copies">Off-site copies</h2>
+<p>If you want backups in a second region or a different provider, configure a second backup destination in the dashboard. OwnStack writes to all configured destinations on each scheduled run.</p>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/databases/postgres/restore/">Postgres restore</a></li>
+	<li><a href="/databases/postgres/repair/">Repair after import</a> — for the <code>password authentication failed</code> case after restoring from a <code>pg_dumpall</code>.</li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#configure">Configure</a></li><li class="h2"><a href="#run-a-manual-backup">Run a manual backup</a></li><li class="h2"><a href="#what-a-backup-contains">What a backup contains</a></li><li class="h2"><a href="#restore">Restore</a></li><li class="h2"><a href="#scheduling-notes">Scheduling notes</a></li><li class="h2"><a href="#off-site-copies">Off-site copies</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

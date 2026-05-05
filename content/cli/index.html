@@ -1,0 +1,53 @@
+<!-- meta {"title":"CLI reference","desc":"The ownstack CLI: how it's organized, common flags, where each subcommand lives.","section":"CLI"} -->
+<p class="lede">The <code>ownstack</code> CLI is the primary driver. Every dashboard action has a CLI equivalent; many CLI commands have no UI equivalent. Always check the <a href="/account/">active profile</a> before state-changing commands.</p>
+
+<h2>Anatomy</h2>
+<pre><code>ownstack &lt;command&gt; [&lt;subcommand&gt;] [options]</code></pre>
+<p>Top-level commands group around resources: <code>app</code>, <code>db</code>, <code>stack</code>, <code>deploy</code>, <code>profile</code>, <code>config</code>, <code>ssh</code>, <code>remote</code>, <code>create</code>, <code>destroy</code>. Each may have subcommands.</p>
+
+<h2>Common flags</h2>
+<table>
+	<thead><tr><th>Flag</th><th>Purpose</th></tr></thead>
+	<tbody>
+		<tr><td><code>--app=NAME</code></td><td>Target a specific app. Defaults to the linked app from <code>.ownstack-config</code>.</td></tr>
+		<tr><td><code>--stack=NAME_OR_ID</code></td><td>Target a specific stack. Required when multiple stacks are deployable.</td></tr>
+		<tr><td><code>--json</code></td><td>Machine-readable output where supported.</td></tr>
+		<tr><td><code>--help</code> / <code>-h</code></td><td>Per-command usage.</td></tr>
+		<tr><td><code>--wait</code></td><td>Stream live output for long-running operations (deploys, restores).</td></tr>
+	</tbody>
+</table>
+
+<h2>Reference index</h2>
+<ul>
+	<li><a href="/cli/app/"><code>ownstack app</code></a> — list, info, stacks, domains, lifecycle.</li>
+	<li><a href="/cli/deploy/"><code>ownstack deploy</code></a> — git or image deploys.</li>
+	<li><a href="/cli/db/"><code>ownstack db</code></a> — Postgres / MySQL operations.</li>
+	<li><a href="/cli/stack/"><code>ownstack stack</code></a> — stack-level operations and backups.</li>
+	<li><a href="/cli/profile/"><code>ownstack profile</code></a> — control-plane profiles.</li>
+	<li><a href="/cli/config/"><code>ownstack config</code></a> — environment variables.</li>
+	<li><a href="/cli/ssh/"><code>ownstack ssh</code></a> — interactive shells.</li>
+</ul>
+
+<h2>Other top-level commands</h2>
+<table>
+	<thead><tr><th>Command</th><th>Purpose</th></tr></thead>
+	<tbody>
+		<tr><td><code>ownstack login</code></td><td>OAuth into a control plane; saves a profile.</td></tr>
+		<tr><td><code>ownstack profile use NAME</code></td><td>Switch active control plane.</td></tr>
+		<tr><td><code>ownstack create [name] [components...]</code></td><td>Create a new app from scratch.</td></tr>
+		<tr><td><code>ownstack import [dir] --name=NAME</code></td><td>Import an existing repo as a buildpack-style app.</td></tr>
+		<tr><td><code>ownstack adopt [dir]</code></td><td>Retroactively add OwnStack infrastructure to a manually-scaffolded app.</td></tr>
+		<tr><td><code>ownstack remote -a NAME</code></td><td>Link the current repo to an app.</td></tr>
+		<tr><td><code>ownstack remote logs ...</code></td><td>Tail runtime logs.</td></tr>
+		<tr><td><code>ownstack remote run APP CMD…</code></td><td>One-off command in a fresh container.</td></tr>
+		<tr><td><code>ownstack remote restart APP</code></td><td>Restart all processes.</td></tr>
+		<tr><td><code>ownstack destroy</code></td><td>Destroy the linked app.</td></tr>
+		<tr><td><code>ownstack preflight</code></td><td>Pre-deploy sanity checks (<code>$PORT</code> usage, Procfile, deps, git state).</td></tr>
+		<tr><td><code>ownstack ai:setup</code></td><td>Generate AI-assistant context files (<code>CLAUDE.md</code>, <code>.cursorrules</code>).</td></tr>
+		<tr><td><code>ownstack status</code></td><td>Inventory of all linked apps and infra status.</td></tr>
+	</tbody>
+</table>
+
+<h2>Top-level help</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack help</code></pre>
+<p>Always reflects what's actually available in your installed CLI version.</p>

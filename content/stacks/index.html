@@ -1,0 +1,66 @@
+<!-- meta {"title":"Stacks","desc":"A stack is a server (or cluster) where your apps run. You own the host; OwnStack manages the layer above.","section":"Stacks"} -->
+<p class="lede">A <strong>stack</strong> is a host (or cluster) that runs apps. You own the underlying server — it lives in your AWS account, your GCP project, or any provider where you have SSH access. OwnStack provisions and configures the dokku layer on top.</p>
+
+<h2>Provider types</h2>
+<table>
+	<thead><tr><th>Provider</th><th>Used for</th></tr></thead>
+	<tbody>
+		<tr><td><a href="/stacks/aws/">AWS</a></td><td>EC2 instance(s) provisioned from your AWS credentials.</td></tr>
+		<tr><td><a href="/stacks/gcp/">GCP</a></td><td>GCE instance(s) in your GCP project.</td></tr>
+		<tr><td><a href="/stacks/openstack/">OpenStack</a></td><td>Private clouds with an OpenStack API.</td></tr>
+		<tr><td><a href="/stacks/ssh/">Bring-your-own (SSH)</a></td><td>Any Linux host you can SSH into. Bare metal, DigitalOcean, Hetzner, on-prem, anything.</td></tr>
+		<tr><td>Local</td><td><code>ownstack local stack start</code> runs dokku in a Docker container on your machine for development.</td></tr>
+	</tbody>
+</table>
+
+<h2>What's installed on every stack</h2>
+<p>OwnStack provisioning ensures a working dokku environment — you don't install anything by hand:</p>
+<ul>
+	<li><strong>dokku</strong> — the underlying PaaS engine.</li>
+	<li><strong>Standard plugins</strong> — postgres, mysql, mongo, redis, letsencrypt, http-auth.</li>
+	<li><strong>nginx</strong> — managed by dokku for routing and SSL termination.</li>
+	<li><strong>An SSH endpoint</strong> — the control plane uses this to push deploys, run dokku commands, fetch logs, and configure the app.</li>
+</ul>
+<p>You can install additional dokku plugins as needed:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack plugin-install --stack=&lt;stack&gt; clamav</code></pre>
+
+<h2>Provisioning</h2>
+<p>Most users create stacks in the dashboard (<strong>Stacks → New</strong>): pick a provider, add credentials, choose a region, hit provision. The control plane creates the instance, installs dokku, configures nginx, runs healthchecks, and marks the stack ready.</p>
+<p>Existing dokku hosts can be imported as SSH-provider stacks — see <a href="/stacks/ssh/">Bring-your-own (SSH)</a>.</p>
+
+<h2>What lives on a stack</h2>
+<table>
+	<thead><tr><th>Resource</th><th>Where it lives</th></tr></thead>
+	<tbody>
+		<tr><td>App containers</td><td>Docker on the stack host. <code>dokku ps:report &lt;app&gt;</code> shows the running set.</td></tr>
+		<tr><td>Postgres / MySQL / Mongo / Redis services</td><td>Docker containers on the same host, managed by the matching dokku plugin. Data on the host's disk.</td></tr>
+		<tr><td>nginx vhosts</td><td><code>/home/dokku/&lt;app&gt;/nginx.conf</code></td></tr>
+		<tr><td>SSL certs</td><td><code>/home/dokku/&lt;app&gt;/tls/</code> (or letsencrypt's path).</td></tr>
+		<tr><td>App config vars</td><td><code>/home/dokku/&lt;app&gt;/ENV</code> (don't edit by hand — use <code>ownstack config</code>).</td></tr>
+	</tbody>
+</table>
+
+<h2>Inspecting</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stacks                                        <span class="out"># list all stacks</span>
+<span class="prompt">$</span> ownstack stack data databases &lt;stack&gt;                  <span class="out"># databases on the stack</span>
+<span class="prompt">$</span> ownstack stack data volumes &lt;stack&gt;                    <span class="out"># persistent volumes</span>
+<span class="prompt">$</span> ownstack stack disk-usage &lt;stack&gt;                      <span class="out"># df + dokku disk via SSH</span>
+<span class="prompt">$</span> ownstack stack patches &lt;stack&gt;                         <span class="out"># pending dokku/system patches</span></code></pre>
+
+<h2>Scaling a stack</h2>
+<p>Two paths:</p>
+<ul>
+	<li><strong>Vertical</strong> — bigger instance type. Provisioned in your cloud account; OwnStack respects whatever you set there. Resize is a stack-restart event, so plan a window.</li>
+	<li><strong>Horizontal</strong> — multiple stacks, with apps deploying to several. Combined with a load balancer in front (often the cloud provider's), you get an active-active topology.</li>
+</ul>
+<p>OwnStack itself does not auto-scale stacks. That's a deliberate choice: stack lifecycle should be visible and explicit.</p>
+
+<h2>Backups</h2>
+<p>Stacks support manual and scheduled backups via <code>ownstack stack backup</code>. Backups capture databases and persistent volumes; storage destination (typically S3) is configured per-stack. See <a href="/stacks/backups/">Stack backups</a>.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li>Provider-specific provisioning: <a href="/stacks/aws/">AWS</a>, <a href="/stacks/gcp/">GCP</a>, <a href="/stacks/openstack/">OpenStack</a>, <a href="/stacks/ssh/">SSH</a>.</li>
+	<li><a href="/stacks/backups/">Stack backups</a></li>
+	<li><a href="/deployments/">Deployments</a> — what happens when an app deploys to a stack.</li>
+</ul>

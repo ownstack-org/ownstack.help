@@ -1,0 +1,46 @@
+<!-- meta {"title":"Healthchecks","desc":"How dokku decides a new container is healthy enough to receive traffic.","section":"Processes"} -->
+<p class="lede">Before rotating traffic to a freshly-deployed container, dokku runs healthchecks. The default is a port-listening probe on <code>$PORT</code>; you can override with a richer set of checks via <code>app.json</code>.</p>
+
+<h2>The default check</h2>
+<p>Dokku enters the new container and verifies the web process is listening on <code>$PORT</code>. If the listen-check passes within ~10 seconds, traffic rotates. If it doesn't, the deploy is rolled back and the previous container keeps serving.</p>
+
+<h2>Custom checks via <code>app.json</code></h2>
+<pre><code>{
+  "checks": {
+    "web": {
+      "wait-to-retire": 30,
+      "checks": [
+        { "type": "uptime", "name": "default", "uptime": 5 },
+        { "type": "http",   "name": "ready",   "path": "/healthz", "expected_status": 200 }
+      ]
+    }
+  }
+}</code></pre>
+<p>The <code>uptime</code> check waits for the container to be up for N seconds. The <code>http</code> check hits a path on <code>$PORT</code> and expects a status code. Add as many as you want; all must pass.</p>
+
+<h2>Common health endpoints</h2>
+<table>
+	<thead><tr><th>Path</th><th>What it should return</th></tr></thead>
+	<tbody>
+		<tr><td><code>/healthz</code></td><td>200 OK if the app's basic dependencies (DB, Redis, anything required at startup) are reachable. No auth, no expensive work.</td></tr>
+		<tr><td><code>/readyz</code></td><td>200 OK when the app is ready to serve traffic — distinct from "alive" if your app does long warm-up (preloading caches, JIT warmups).</td></tr>
+		<tr><td><code>/livez</code></td><td>200 OK if the process is responsive at all. Cheaper than readyz; used in some environments to detect deadlocks.</td></tr>
+	</tbody>
+</table>
+
+<h2>Why a check fails</h2>
+<table>
+	<thead><tr><th>Symptom in deploy log</th><th>Likely cause</th></tr></thead>
+	<tbody>
+		<tr><td><code>port listening check: unable to enter the container</code></td><td>Web process never bound to <code>$PORT</code>. Check your start command.</td></tr>
+		<tr><td><code>Failure in name='ready': expected status 200, got 502</code></td><td>App started but the health endpoint returns an error. Often means a downstream dependency (DB) is unreachable.</td></tr>
+		<tr><td><code>container has restarted N times</code></td><td>The process is crashing on startup. Check <code>ownstack remote logs --tail 100</code> for the stack trace.</td></tr>
+		<tr><td>Healthcheck times out</td><td>Slow startup. Increase <code>wait-to-retire</code> or add an explicit <code>uptime</code> check with a longer wait.</td></tr>
+	</tbody>
+</table>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/processes/scaling/">Scaling</a></li>
+	<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+</ul>

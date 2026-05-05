@@ -1,0 +1,54 @@
+<!-- meta {"title":"Config vars","desc":"Environment variables for your app. Set, view, push from a file, sync between stacks.","section":"Apps"} -->
+<p class="lede">Config vars are environment variables — the canonical place to put database URLs, API keys, feature flags, and anything else your app reads from <code>process.env</code> / <code>ENV</code> / <code>os.environ</code>. They're set per-app on the control plane and applied to every stack the app deploys to.</p>
+
+<h2>View config</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack config --app=&lt;app&gt;
+<span class="out">DATABASE_URL=postgresql://…
+RAILS_ENV=production
+RAILS_MASTER_KEY=…
+SUPPORT_API_URL=https://support.example.com</span></code></pre>
+<p>To get one specific var:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack config:get DATABASE_URL --app=&lt;app&gt;</code></pre>
+
+<h2>Set &amp; unset</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack config:set --app=&lt;app&gt; FOO=bar BAZ='multi word'
+<span class="prompt">$</span> ownstack config:unset --app=&lt;app&gt; FOO BAZ</code></pre>
+<p>Setting or unsetting triggers a rebuild + restart of all running containers on every stack the app deploys to. Pass <code>--no-restart</code> to defer; the change is staged and applied on the next deploy.</p>
+
+<div class="callout warning">
+	<div><strong><code>--no-restart</code> means stale env in the running container</strong><p>If you set a var with <code>--no-restart</code>, the running container keeps its old env until you restart or redeploy. Don't assume the change took effect — check with <code>ssh dokku@&lt;stack-ip&gt; config:get &lt;app&gt; FOO</code> if you're debugging.</p></div>
+</div>
+
+<h2>Push from a file</h2>
+<p>If you have a Heroku-formatted env file (<code>FOO='bar'</code> per line, shell-quoted), push it in one go:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack config:push --app=&lt;app&gt; --file=heroku-config.env</code></pre>
+<p>This is the right tool for migration. <code>heroku config -s -a my-app &gt; heroku-config.env</code> emits exactly this format.</p>
+
+<h2>Reserved &amp; auto-managed vars</h2>
+<table>
+	<thead><tr><th>Var</th><th>Source</th></tr></thead>
+	<tbody>
+		<tr><td><code>PORT</code></td><td>Set by dokku at runtime to a different ephemeral port per process. Don't set this yourself.</td></tr>
+		<tr><td><code>DATABASE_URL</code></td><td>Set when you link a Postgres or MySQL service. Don't override directly — see <a href="/databases/postgres/">Postgres</a> for the right way to repoint.</td></tr>
+		<tr><td><code>REDIS_URL</code></td><td>Set when you link Redis.</td></tr>
+		<tr><td><code>MONGO_URL</code> / <code>MONGO_URI</code> / <code>MONGODB_URI</code></td><td>Set when you link MongoDB. NestJS apps get all three.</td></tr>
+		<tr><td><code>DOKKU_*</code></td><td>Internal dokku vars. Don't touch.</td></tr>
+		<tr><td><code>BUILDPACK_URL</code></td><td>Optional override; sets a custom buildpack URL or list.</td></tr>
+		<tr><td><code>NODE_ENV</code> / <code>RAILS_ENV</code> / <code>PYTHON_ENV</code></td><td>Set automatically to <code>production</code> on most app types. Override if you need a different mode.</td></tr>
+	</tbody>
+</table>
+
+<h2>Multi-stack: per-stack overrides</h2>
+<p>Most config is shared across all stacks. For per-stack values (different external API URL in staging vs prod, for example), set them on the stack-specific config:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack config:set --app=&lt;app&gt; --stack=&lt;stack&gt; API_URL=https://staging.example.com</code></pre>
+<p>Stack-level vars take precedence over app-level vars on that stack only.</p>
+
+<h2>Reading at build time vs runtime</h2>
+<p>Buildpack-built apps see config vars during the build (so SPAs can bake them into bundles) <em>and</em> at runtime. Dockerfile apps see them only at runtime — Dockerfile builds happen before dokku has the env. If you need a value baked into a static frontend bundle, use buildpacks or accept a separate build-arg path.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/apps/procfile/">Procfile</a> — process types.</li>
+	<li><a href="/apps/domains/">Domains &amp; SSL</a> — routing.</li>
+	<li><a href="/cli/config/">CLI: <code>ownstack config</code></a></li>
+</ul>

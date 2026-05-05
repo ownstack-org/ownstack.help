@@ -1,0 +1,44 @@
+<!-- meta {"title":"ownstack deploy","desc":"Deploy via git push or pre-built image.","section":"CLI"} -->
+
+<h2>Synopsis</h2>
+<pre><code>ownstack deploy [APP] [--stack=NAME] [--wait] [--image [TAG]]</code></pre>
+
+<h2>Common forms</h2>
+<table>
+	<thead><tr><th>Command</th><th>What it does</th></tr></thead>
+	<tbody>
+		<tr><td><code>ownstack deploy</code></td><td>Deploy the linked app to all its stacks.</td></tr>
+		<tr><td><code>ownstack deploy my-app</code></td><td>Deploy a specific app.</td></tr>
+		<tr><td><code>ownstack deploy --stack=prod-east</code></td><td>Deploy only to one stack.</td></tr>
+		<tr><td><code>ownstack deploy --image</code></td><td>Image deploy (default tag from registry config).</td></tr>
+		<tr><td><code>ownstack deploy --image=ghcr.io/me/app:v1.2.3</code></td><td>Image deploy with explicit tag.</td></tr>
+		<tr><td><code>ownstack deploy --wait</code></td><td>Stream the build log live.</td></tr>
+	</tbody>
+</table>
+
+<h2>Inspecting deployments</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack remote deploy-log [--app=NAME] [--deployment=ID] [--follow]</code></pre>
+
+<h2>How it works</h2>
+<ol>
+	<li>CLI hands the (app, optional stack, optional image) to the control plane API.</li>
+	<li>Control plane enqueues one deployment job per target stack.</li>
+	<li>Each job SSHes to its stack, pushes your repo (or pulls the image), runs build + release + restart.</li>
+</ol>
+
+<h2>Common pitfalls</h2>
+<table>
+	<thead><tr><th>Symptom</th><th>Cause</th></tr></thead>
+	<tbody>
+		<tr><td><code>A deploy is already in progress</code></td><td>An earlier deploy hasn't finished. Wait, or check the dashboard for stuck jobs.</td></tr>
+		<tr><td><code>No git repository</code></td><td>App's <code>git_repository_url</code> is unset. Set it in the dashboard or via API.</td></tr>
+		<tr><td>Build succeeds, healthcheck fails</td><td>Web process not bound to <code>$PORT</code>. See <a href="/processes/healthchecks/">Healthchecks</a>.</td></tr>
+	</tbody>
+</table>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+	<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+	<li><a href="/troubleshooting/deploy-failures/">When deploys fail</a></li>
+</ul>

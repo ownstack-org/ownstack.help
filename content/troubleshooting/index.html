@@ -1,0 +1,41 @@
+<!-- meta {"title":"Troubleshooting","desc":"Common errors with concrete fixes — start here when something goes wrong.","section":"Troubleshooting"} -->
+<p class="lede">Concrete answers for the errors people actually hit. Each linked article has the symptom in the title — match what you're seeing, jump straight there.</p>
+
+<h2>Deploys</h2>
+<ul>
+	<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a> — build errors, release-task errors, healthcheck failures, push-rejected.</li>
+	<li><strong>"A deploy is already in progress"</strong> — there's a stuck or in-flight job. Wait, or check the dashboard's <strong>Deployments</strong> tab. <code>ownstack app unlock &lt;app&gt;</code> releases a stale dokku lock.</li>
+	<li><strong>"App contains an app.json file with a formations key and cannot be manually scaled"</strong> — see <a href="/processes/scaling/">Scaling processes</a>.</li>
+</ul>
+
+<h2>Databases</h2>
+<ul>
+	<li><a href="/troubleshooting/db-auth/">Database auth — <code>password authentication failed</code></a></li>
+	<li><strong><code>could not connect to server: Connection refused</code></strong> — postgres service stopped. <code>ssh dokku@&lt;stack-ip&gt; postgres:status &lt;svc&gt;</code> to check; <code>postgres:start &lt;svc&gt;</code> to revive.</li>
+	<li><strong><code>FATAL: database "X" does not exist</code></strong> — <code>DATABASE_URL</code> is pointing at the wrong dbname. Run <code>ownstack db check</code>; if password_match is true but auth still fails, the dbname is wrong. <code>config:get</code> and look at the path component.</li>
+</ul>
+
+<h2>DNS &amp; routing</h2>
+<ul>
+	<li><a href="/troubleshooting/dns/">DNS &amp; routing</a> — domain attached but not loading; SSL cert not issuing; redirect loops.</li>
+</ul>
+
+<h2>Process &amp; runtime</h2>
+<ul>
+	<li><strong>Container restarts in a loop</strong> — <code>ownstack remote logs --tail 200</code>. The process is crashing on startup. Check stack traces; common causes: missing env var, can't reach DB, bad migration.</li>
+	<li><strong>Worker not draining queue</strong> — confirm worker is scaled (<code>ssh dokku@&lt;stack-ip&gt; ps:report &lt;app&gt;</code>); check Redis is reachable; check <code>REDIS_URL</code> is set.</li>
+	<li><strong>Out of memory</strong> — stack instance too small for the workload, or a runaway process. Check <code>dmesg</code> on the stack via SSH for OOM kills. Either bump the instance or set memory limits per process via <code>dokku resource:limit</code>.</li>
+</ul>
+
+<h2>Auth &amp; access</h2>
+<ul>
+	<li><strong>Wrong profile active</strong> — every <code>ownstack</code> command runs against whatever profile is active. <code>ownstack profile show</code> first; <code>profile use &lt;name&gt;</code> to switch.</li>
+	<li><strong>"Permission denied (publickey)"</strong> on dokku ssh — your account's SSH key isn't on the stack. Re-provision or paste the public key into <code>/home/dokku/.ssh/authorized_keys</code> via <code>ownstack ssh stack</code>.</li>
+</ul>
+
+<h2>If none of these help</h2>
+<ol>
+	<li>Check the dashboard's <strong>Deployments</strong> tab — failure messages are usually richer there than in the CLI output.</li>
+	<li>Tail the live runtime log: <code>ownstack remote logs --tail 200 --follow</code>.</li>
+	<li>Open a doc issue on <a href="https://github.com/ownstack-org/ownstack.help/issues">GitHub</a> describing the symptom — that's how this section grows.</li>
+</ol>

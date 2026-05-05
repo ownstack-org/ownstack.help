@@ -1,0 +1,29 @@
+<!-- meta {"title":"Profiles & tokens","desc":"How OwnStack authentication works: profiles, tokens, app tokens, deploy tokens.","section":"Account"} -->
+<p class="lede">OwnStack authentication has three levels: your <strong>account token</strong> (you, against a control plane); the <strong>app token</strong> (per-app, embedded in <code>.ownstack-config</code>); the <strong>deploy token</strong> (CI-friendly, scoped to a single app for git pushes).</p>
+
+<h2>Account tokens</h2>
+<p>Created when you <code>ownstack login</code>. Stored in <code>~/.ownstack/profiles/&lt;name&gt;</code>. Acts on behalf of your user across every app you have access to.</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack profile list
+<span class="prompt">$</span> ownstack profile show
+<span class="prompt">$</span> ownstack profile use &lt;name&gt;
+<span class="prompt">$</span> ownstack login --token &lt;token&gt;     <span class="out"># non-interactive (CI)</span></code></pre>
+<p>Rotate via the dashboard's <strong>Account → Tokens</strong> page; old tokens revoke immediately.</p>
+
+<h2>App tokens</h2>
+<p>Per-app, generated when you <code>ownstack remote -a &lt;app&gt;</code>. Stored in <code>./.ownstack-config</code> (gitignored). Lets the local checkout deploy and run commands without re-auth.</p>
+<p>App tokens are scoped to the specific app — useful for shared workstations or when you want a token that can't reach your other apps.</p>
+
+<h2>Deploy tokens</h2>
+<p>For CI: a token that can deploy a single app and nothing else. Generate in the dashboard (<strong>App → Settings → Deploy token</strong>) or via:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app deploy-token:show &lt;app&gt;
+<span class="prompt">$</span> ownstack app deploy-token:rotate &lt;app&gt;</code></pre>
+<p>In CI, log in with it: <code>ownstack login --token &lt;deploy-token&gt;</code>. Then <code>ownstack deploy</code>.</p>
+
+<h2>Multiple control planes</h2>
+<p>Each control plane is a separate profile. Hosted (<code>api.ownstack.org</code>) is a profile; your self-hosted instance is another. Switch with <code>ownstack profile use</code>.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/cli/profile/"><code>ownstack profile</code> reference</a></li>
+	<li><a href="/account/billing/">Billing</a></li>
+</ul>

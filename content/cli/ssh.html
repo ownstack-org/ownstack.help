@@ -1,0 +1,30 @@
+<!-- meta {"title":"ownstack ssh","desc":"Open an interactive shell into your app's container or onto the stack host.","section":"CLI"} -->
+
+<h2>Into the running container</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack ssh app &lt;app&gt; [--stack=&lt;stack&gt;]</code></pre>
+<p>Drops you into a bash shell inside a running <code>web</code> container. <code>$DATABASE_URL</code> and friends are set; you can run <code>rails console</code>, <code>node</code>, etc.</p>
+
+<h2>Onto the stack host</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack ssh stack &lt;stack&gt;</code></pre>
+<p>Drops you onto the stack as the <code>ubuntu</code> user. For OS-level operations: dokku plugin installs, log file inspection, disk operations.</p>
+
+<h2>Direct dokku SSH (advanced)</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; apps:list
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:report &lt;app&gt;
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; logs &lt;app&gt; --tail
+<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; postgres:list</code></pre>
+<p>Your account's SSH key is authorized for <code>dokku@&lt;stack-ip&gt;</code> when you provision a stack. Run any dokku subcommand — these bypass the OwnStack control plane.</p>
+
+<div class="callout warning">
+	<div><strong>Direct dokku changes skip control-plane bookkeeping</strong><p>If you SSH and run <code>dokku ps:scale</code>, <code>config:set</code>, etc., the change happens but the control plane doesn't see it. Most things are fine; some aren't (multi-stack syncing, audit logs). Prefer the CLI when an equivalent exists.</p></div>
+</div>
+
+<h2>One-off commands</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack remote run &lt;app&gt; rails db:migrate</code></pre>
+<p>Spawns a fresh container, runs the command, exits. Doesn't share state with the running web/worker.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+	<li><a href="/cli/index/">CLI overview</a></li>
+</ul>

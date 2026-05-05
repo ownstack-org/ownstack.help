@@ -1,0 +1,45 @@
+<!-- meta {"title":"REST API","desc":"OwnStack's HTTP API: authentication, common endpoints, and how the CLI uses it.","section":"API"} -->
+<p class="lede">The OwnStack control plane exposes a REST API that the CLI and dashboard both use. You can hit it directly for automation that doesn't fit either tool.</p>
+
+<h2>Base URL</h2>
+<p>Hosted: <code>https://api.ownstack.org</code>. Self-hosted: whatever you've configured for your control plane (the URL stored in your active CLI profile).</p>
+
+<h2>Authentication</h2>
+<pre><code>Authorization: Bearer &lt;token&gt;</code></pre>
+<p>Use any of:</p>
+<ul>
+	<li>Your account token from <code>~/.ownstack/profiles/&lt;name&gt;</code>.</li>
+	<li>An app token from <code>./.ownstack-config</code> (scoped to one app).</li>
+	<li>A deploy token (CI; scoped to one app's git endpoint).</li>
+</ul>
+
+<h2>Discoverable endpoints</h2>
+<table>
+	<thead><tr><th>Endpoint</th><th>Purpose</th></tr></thead>
+	<tbody>
+		<tr><td><code>GET /api/apps</code></td><td>List apps.</td></tr>
+		<tr><td><code>POST /api/apps</code></td><td>Create an app.</td></tr>
+		<tr><td><code>GET /api/apps/:id</code></td><td>App detail.</td></tr>
+		<tr><td><code>PATCH /api/apps/:id</code></td><td>Update app config (name, build_type, etc.).</td></tr>
+		<tr><td><code>DELETE /api/apps/:id</code></td><td>Destroy app.</td></tr>
+		<tr><td><code>POST /api/apps/:id/deploy</code></td><td>Trigger a deploy.</td></tr>
+		<tr><td><code>GET /api/apps/:id/data/export?stack_id=N</code></td><td>Stream a Postgres/MySQL dump.</td></tr>
+		<tr><td><code>POST /api/apps/:id/repair_postgres_link</code></td><td>Run the postgres link repair flow.</td></tr>
+		<tr><td><code>GET /api/stacks</code></td><td>List stacks.</td></tr>
+		<tr><td><code>POST /api/stacks</code></td><td>Create / provision a stack.</td></tr>
+	</tbody>
+</table>
+
+<h2>Example: dump a database from CI</h2>
+<pre><code>curl -sSL -H "Authorization: Bearer $OWNSTACK_TOKEN" \
+  -o backup-$(date +%Y%m%d).dump \
+  "$OWNSTACK_API_URL/api/apps/$APP_ID/data/export?stack_id=$STACK_ID"</code></pre>
+
+<h2>API stability</h2>
+<p>The API is <strong>not yet versioned</strong>. We add endpoints frequently and try to avoid breaking changes; check the <a href="/changelog/">changelog</a> for the running list of changes. If you depend on the API for production automation, pin to specific endpoints and expect to update when major versions ship.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/cli/">CLI reference</a> — the CLI is the easiest API client.</li>
+	<li><a href="/account/">Profiles &amp; tokens</a></li>
+</ul>

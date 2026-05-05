@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Image deploys — OwnStack</title>
+<meta name="description" content="Skip the build on the stack: deploy a pre-built Docker image from a registry.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Image deploys — OwnStack">
+<meta property="og:description" content="Skip the build on the stack: deploy a pre-built Docker image from a registry.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a class="active" href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/deployments/">deployments</a><span class="sep">›</span><span>Image deploys</span></nav>
+			<h1>Image deploys</h1>
+			<p class="lede">Image deploys hand the stack a pre-built Docker image instead of source code. The stack pulls the image and runs it. Faster deploys, build-once-deploy-many semantics, and your CI gets to build images on bigger machines than your stack.</p>
+
+<h2 id="when-to-pick-image-deploys-over-git-deploys">When to pick image deploys over git deploys</h2>
+<table>
+	<thead><tr><th>Pick image deploys when</th><th>Pick git deploys when</th></tr></thead>
+	<tbody>
+		<tr><td>Builds are slow and you want them off the stack</td><td>You want one obvious source of truth: your branch tip</td></tr>
+		<tr><td>You're already building images in CI</td><td>You don't have a registry yet</td></tr>
+		<tr><td>You want to deploy the same image to multiple stacks atomically</td><td>You're using buildpacks and don't want a Dockerfile</td></tr>
+		<tr><td>You need build secrets (npm tokens, private package registries) you don't want on the stack</td><td>You're prototyping and the build is fast enough on the stack anyway</td></tr>
+	</tbody>
+</table>
+
+<h2 id="trigger">Trigger</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack deploy --image                              <span class="out"># latest tag from registry default</span>
+<span class="prompt">$</span> ownstack deploy --image=ghcr.io/me/my-app:v1.2.3</code></pre>
+<p>The image must be pullable from the stack. For private registries, configure the credential in the dashboard (<strong>Stack → Registry credentials</strong>) once; the stack's docker daemon uses it.</p>
+
+<h2 id="image-requirements">Image requirements</h2>
+<ul>
+	<li><strong>Web process binds to <code>$PORT</code></strong> — the stack tells the container which port to listen on at runtime, just like buildpack apps.</li>
+	<li><strong>One CMD / one ENTRYPOINT</strong> per image — corresponds to the <code>web</code> process. For multi-process apps, declare process types via <code>app.json</code>'s <code>scripts</code> or via Procfile-in-image.</li>
+	<li><strong>No HEALTHCHECK required</strong> — dokku adds its own probe.</li>
+	<li><strong>Linux/amd64</strong> by default. ARM64 support depends on the stack's instance architecture.</li>
+</ul>
+
+<h2 id="multi-arch-images">Multi-arch images</h2>
+<p>If you build with <code>docker buildx</code> for both amd64 and arm64, the registry stores a manifest list and the stack pulls the matching arch automatically. Your CI looks like:</p>
+<pre><code>docker buildx build --platform linux/amd64,linux/arm64 \
+  -t ghcr.io/me/my-app:$SHA \
+  -t ghcr.io/me/my-app:latest \
+  --push .</code></pre>
+
+<h2 id="tagging-strategy">Tagging strategy</h2>
+<p>Two patterns work well:</p>
+<ul>
+	<li><strong>Immutable SHA tags</strong>: tag with <code>$GITHUB_SHA</code> and deploy that tag. Easy rollback — old SHAs are still in the registry.</li>
+	<li><strong>Latest + version</strong>: tag both <code>latest</code> and <code>v1.2.3</code>; deploy <code>v1.2.3</code> for prod, <code>latest</code> for staging.</li>
+</ul>
+<p>Don't deploy <code>latest</code> to prod without a version pin. <code>latest</code> moves; reproducible deploys care which SHA was running.</p>
+
+<h2 id="ci-hookup-github-actions-example">CI hookup (GitHub Actions example)</h2>
+<pre><code>name: Deploy
+on:
+  push: { branches: [main] }
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          docker buildx build --push \
+            --platform linux/amd64 \
+            -t ghcr.io/${{ github.repository }}:${{ github.sha }} \
+            -t ghcr.io/${{ github.repository }}:latest .
+      - run: |
+          curl -sSL https://ownstack.org/cli/install.sh | bash
+          export PATH="$HOME/bin:$PATH"
+          ownstack login --token ${{ secrets.OWNSTACK_TOKEN }}
+          ownstack deploy --app=my-app --image=ghcr.io/${{ github.repository }}:${{ github.sha }}</code></pre>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+	<li><a href="/deployments/build-types/">Build types</a></li>
+	<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#when-to-pick-image-deploys-over-git-deploys">When to pick image deploys over git deploys</a></li><li class="h2"><a href="#trigger">Trigger</a></li><li class="h2"><a href="#image-requirements">Image requirements</a></li><li class="h2"><a href="#multi-arch-images">Multi-arch images</a></li><li class="h2"><a href="#tagging-strategy">Tagging strategy</a></li><li class="h2"><a href="#ci-hookup-github-actions-example">CI hookup (GitHub Actions example)</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

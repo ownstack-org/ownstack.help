@@ -1,0 +1,24 @@
+<!-- meta {"title":"ownstack config","desc":"Get, set, push, and unset config vars (environment variables) on apps.","section":"CLI"} -->
+
+<h2>View</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack config [--app=NAME]                  <span class="out"># dump all vars</span>
+<span class="prompt">$</span> ownstack config:get KEY [--app=NAME]           <span class="out"># one var</span></code></pre>
+
+<h2>Set &amp; unset</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack config:set [--app=NAME] FOO=bar BAZ='multi word'
+<span class="prompt">$</span> ownstack config:unset [--app=NAME] FOO BAZ
+<span class="prompt">$</span> ownstack config:set --no-restart [--app=NAME] FOO=bar    <span class="out"># defer restart</span></code></pre>
+
+<h2>Push from a file</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack config:push --app=NAME --file=heroku-config.env</code></pre>
+<p>Accepts the Heroku-style <code>FOO='bar'</code> shell-quoted format. Useful for migration; <code>heroku config -s -a my-app &gt; heroku-config.env</code> emits exactly this.</p>
+
+<h2>Per-stack overrides</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack config:set --app=NAME --stack=STACK FOO=bar</code></pre>
+<p>Stack-level vars override app-level on that stack only. See <a href="/apps/config-vars/">Config vars</a>.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/apps/config-vars/">Config vars</a></li>
+	<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+</ul>

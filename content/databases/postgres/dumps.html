@@ -1,0 +1,64 @@
+<!-- meta {"title":"Postgres dumps","desc":"Stream a binary pg_dump of an app's linked Postgres database to a local file.","section":"Databases"} -->
+<p class="lede"><code>ownstack db dump</code> streams a <code>pg_dump --format=custom</code> of an app's linked Postgres database straight to your machine. Auto-detects MySQL apps too. No temp files on the control plane.</p>
+
+<h2>Quick start</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack db dump --app=&lt;app&gt;
+<span class="out">Streaming database dump…
+Dump complete: &lt;app&gt;-&lt;stack&gt;-&lt;timestamp&gt;.dump (12345678 bytes)</span></code></pre>
+
+<h2>Options</h2>
+<table>
+	<thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+	<tbody>
+		<tr><td><code>--app=NAME</code></td><td>Target app. Defaults to the linked app in <code>.ownstack-config</code>.</td></tr>
+		<tr><td><code>--stack=ID</code></td><td>Required when the app deploys to multiple stacks; otherwise auto-picks.</td></tr>
+		<tr><td><code>--output=FILE</code></td><td>Output path. Defaults to the server's suggested filename: <code>&lt;app&gt;-&lt;stack&gt;-&lt;UTC-timestamp&gt;.dump</code> (Postgres) or <code>.sql</code> (MySQL).</td></tr>
+	</tbody>
+</table>
+
+<h2>What's in the file</h2>
+<p>The dump is <strong>Postgres custom format</strong> — binary, compressed, restorable with <code>pg_restore</code>. It includes schema, data, indexes, sequences, triggers, and grants. <code>pg_dump --format=custom</code> on the source.</p>
+<p>Verify it's a valid dump:</p>
+<pre class="terminal"><code><span class="prompt">$</span> file my-app.dump
+<span class="out">my-app.dump: PostgreSQL custom database dump - v1.16-0</span>
+
+<span class="prompt">$</span> pg_restore --list my-app.dump | head
+<span class="out">; Archive created at 2026-05-04 06:08:31 UTC
+;     dbname: control_plane_db
+;     TOC Entries: 412
+;     Compression: -1
+;     Dump Version: 1.16-0
+;     Format: CUSTOM
+;     ...</span></code></pre>
+
+<div class="callout warning">
+	<div><strong>Version compatibility</strong><p>Custom-format v1.16 dumps come from Postgres 17+. Older <code>pg_restore</code> rejects them with <code>unsupported version (1.16) in file header</code>. On macOS, install with <code>brew install postgresql@18</code> and use <code>/opt/homebrew/opt/postgresql@18/bin/pg_restore</code>.</p></div>
+</div>
+
+<h2>Restoring locally</h2>
+<pre class="terminal"><code><span class="prompt">$</span> createdb my_local
+<span class="prompt">$</span> pg_restore --no-owner --no-acl --dbname=my_local my-app.dump</code></pre>
+<p><code>--no-owner --no-acl</code> ignores ownership and grants from the source — they'd reference the source's roles which don't exist in your local cluster.</p>
+
+<h2>Restoring back to a stack</h2>
+<p>If your goal is to seed another stack from this dump, see <a href="/databases/postgres/restore/">Restore</a>. Don't <code>scp</code> a multi-GB file across the wire by hand — <code>ownstack db restore --url=...</code> hands the work to the stack.</p>
+
+<h2>Multi-stack apps</h2>
+<p>An app on multiple stacks has independent databases per stack. <code>--stack=ID</code> picks which one to dump. To capture all stacks, run the dump once per <code>--stack</code>.</p>
+
+<h2>What if my app uses MySQL?</h2>
+<p>Same command. The control-plane endpoint detects type from the app's config and runs <code>dokku mysql:export</code> instead. Output is gzipped SQL (<code>.sql.gz</code>); restore with:</p>
+<pre class="terminal"><code><span class="prompt">$</span> gunzip &lt; dump.sql.gz | mysql my_local</code></pre>
+
+<h2>Programmatic / CI use</h2>
+<p>The endpoint is plain HTTP streaming behind your auth token; CI can fetch directly without the CLI:</p>
+<pre><code>curl -sSL -H "Authorization: Bearer $OWNSTACK_TOKEN" \
+  -o backup-$(date +%Y%m%d).dump \
+  "$OWNSTACK_API_URL/api/apps/$APP_ID/data/export?stack_id=$STACK_ID"</code></pre>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/databases/postgres/restore/">Restore</a></li>
+	<li><a href="/databases/postgres/repair/">Repair after import</a></li>
+	<li><a href="/cli/db/"><code>ownstack db</code> reference</a></li>
+</ul>

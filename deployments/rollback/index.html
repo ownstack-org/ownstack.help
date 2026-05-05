@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rollback — OwnStack</title>
+<meta name="description" content="Roll back to a previous deployment by re-deploying its SHA or image tag.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Rollback — OwnStack">
+<meta property="og:description" content="Roll back to a previous deployment by re-deploying its SHA or image tag.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a class="active" href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/deployments/">deployments</a><span class="sep">›</span><span>Rollback</span></nav>
+			<h1>Rollback</h1>
+			<p class="lede">There's no special "rollback" mode in OwnStack — a rollback is just another deployment with an older SHA (for git deploys) or older image tag (for image deploys). The mechanics are the same as a forward deploy: build, release task, restart.</p>
+
+<h2 id="find-what-was-running-before">Find what was running before</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app info &lt;app&gt;
+<span class="out">  Stack:   prod — deployed abc1234</span>
+
+<span class="prompt">$</span> ownstack remote deploy-log --app=&lt;app&gt; --history
+<span class="out">  ID    SHA       STATUS     WHEN
+  1024  abc1234   succeeded  5 minutes ago
+  1023  def5678   succeeded  2 hours ago     ← last known-good
+  1022  9abcdef   failed     3 hours ago</span></code></pre>
+
+<h2 id="roll-back-via-git-deploys">Roll back via git deploys</h2>
+<pre class="terminal"><code><span class="prompt">$</span> git push origin def5678:main --force-with-lease   <span class="out"># reset main to the good SHA</span>
+<span class="prompt">$</span> ownstack deploy</code></pre>
+<p>Or, without rewriting your branch:</p>
+<pre class="terminal"><code><span class="prompt">$</span> git revert abc1234..HEAD
+<span class="prompt">$</span> git push origin main
+<span class="prompt">$</span> ownstack deploy</code></pre>
+<p>Revert keeps history straight; force-push is faster but rewrites <code>main</code> — be deliberate about which.</p>
+
+<h2 id="roll-back-via-image-deploys">Roll back via image deploys</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack deploy --image=ghcr.io/me/my-app:def5678</code></pre>
+<p>Cleaner than git rollbacks because the image is already built and tested. Make sure your CI tags every build with the SHA so old images stay available.</p>
+
+<h2 id="what-about-migrations">What about migrations?</h2>
+<p>Migrations are usually <strong>forward-only</strong>. Rolling back the code does not roll back the database schema. If your "bad" deploy ran a migration that the previous code can't handle, you have two options:</p>
+<ul>
+	<li><strong>Hot-fix forward</strong> — write a new migration that reverses the change, deploy that.</li>
+	<li><strong>Restore the DB</strong> — pull a backup from before the bad deploy and restore it. See <a href="/databases/postgres/restore/">Restore</a>.</li>
+</ul>
+
+<div class="callout warning">
+	<div><strong>Practice this</strong><p>The first time you need to roll back is a stressful time to learn the procedure. Ship a deliberately-noop change to staging, roll it back, time how long it takes. Now you know.</p></div>
+</div>
+
+<h2 id="multi-stack-rollbacks">Multi-stack rollbacks</h2>
+<p>An <code>ownstack deploy</code> with an older SHA / image rolls back <em>all</em> deployable stacks. To roll back just one stack, use <code>--stack=&lt;name&gt;</code> — the others stay on the new SHA. This is occasionally useful for canary-style rollouts where you proved a regression on one stack before flipping the rest.</p>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+	<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+	<li><a href="/databases/postgres/restore/">Postgres restore</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#find-what-was-running-before">Find what was running before</a></li><li class="h2"><a href="#roll-back-via-git-deploys">Roll back via git deploys</a></li><li class="h2"><a href="#roll-back-via-image-deploys">Roll back via image deploys</a></li><li class="h2"><a href="#what-about-migrations">What about migrations?</a></li><li class="h2"><a href="#multi-stack-rollbacks">Multi-stack rollbacks</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

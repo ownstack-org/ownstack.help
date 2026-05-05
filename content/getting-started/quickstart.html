@@ -1,0 +1,65 @@
+<!-- meta {"title":"Deploy your first app","desc":"From git init to a live URL on a stack you own. Roughly fifteen minutes.","section":"Getting started"} -->
+<p class="lede">This walks through deploying a tiny Node.js app end-to-end. The same shape works for Ruby, Python, Go, PHP, anything dokku-compatible — which is essentially anything that runs on Heroku.</p>
+
+<h2>Before you start</h2>
+<ul>
+	<li>The CLI <a href="/getting-started/install-cli/">installed</a> and authenticated against the control plane.</li>
+	<li>At least one <strong>provisioned stack</strong> in your account. Create one in the dashboard (Stacks → New) for AWS, GCP, or OpenStack, or add an SSH stack pointing at a server you already own.</li>
+	<li>A repo to deploy. If you don't have one handy, scaffold this in a fresh directory:</li>
+</ul>
+<pre class="terminal"><code><span class="prompt">$</span> mkdir hello && cd hello
+<span class="prompt">$</span> cat &gt; package.json &lt;&lt;'JSON'
+{ "name": "hello", "private": true, "engines": { "node": "&gt;=20" }, "scripts": { "start": "node index.js" } }
+JSON
+<span class="prompt">$</span> cat &gt; index.js &lt;&lt;'JS'
+require('http').createServer((_, r) =&gt; r.end('hello from ownstack')).listen(process.env.PORT)
+JS
+<span class="prompt">$</span> echo "web: npm start" &gt; Procfile
+<span class="prompt">$</span> git init -b main && git add . && git commit -m initial</code></pre>
+
+<h2>1. Create the app</h2>
+<p>From inside the repo, register an app on the control plane and link your checkout to it:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack create --no-interview hello buildpack
+<span class="prompt">$</span> ownstack remote -a hello</code></pre>
+<p><code>create</code> registers the app on the control plane and writes a minimal <code>.ownstack-config</code> in your repo. <code>remote -a</code> embeds the app token so subsequent commands know which app to talk to.</p>
+
+<h2>2. Pick a stack</h2>
+<p>Apps deploy to one or more stacks. If you only have one provisioned stack, the deploy will use it automatically. If you have several, attach the one you want explicitly:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stacks
+<span class="out">  ID            NAME                IP                STATUS       PROVIDER
+  jJCsl6B9...   prod-cluster-1      54.x.x.x          provisioned  aws</span>
+
+<span class="prompt">$</span> ownstack app stacks:add hello prod-cluster-1</code></pre>
+
+<h2>3. Deploy</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack deploy
+<span class="out">Triggering deploy for app 47…
+✓ Deploy started</span></code></pre>
+<p>The control plane enqueues a deployment job, SSHes to the stack, pushes your repo to dokku, runs the buildpack and the release task, and rotates traffic to the new container. Build logs stream live with <code>--wait</code>:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack deploy --wait</code></pre>
+<p>Or fetch them after with <code>ownstack remote deploy-log</code>.</p>
+
+<h2>4. View it</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app info
+<span class="out">hello
+  Status:  deployed
+  Domain:  hello.&lt;stack-domain&gt;
+  Stack:   prod-cluster-1 — deployed abc1234</span></code></pre>
+<p>Hit the URL in a browser. If something looks wrong, <code>ownstack remote logs --tail 100 --follow</code> tails the running container.</p>
+
+<h2>What's next</h2>
+<ul>
+	<li><strong>Custom domain</strong> — see <a href="/domains-ssl/custom-domain/">Add a custom domain</a>.</li>
+	<li><strong>Add a database</strong> — <a href="/databases/postgres/">Postgres</a> walks through provisioning and linking.</li>
+	<li><strong>Scale processes</strong> — <a href="/processes/scaling/">Scale processes</a>.</li>
+	<li><strong>Tail logs</strong> — <code>ownstack remote logs --follow</code>.</li>
+</ul>
+
+<div class="related">
+	<h4>Related</h4>
+	<ul>
+		<li><a href="/cli/deploy/">CLI: <code>ownstack deploy</code></a></li>
+		<li><a href="/deployments/">Deployments overview</a></li>
+		<li><a href="/troubleshooting/deploy-failures/">When deploys fail</a></li>
+	</ul>
+</div>

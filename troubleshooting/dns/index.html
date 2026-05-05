@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DNS & routing — OwnStack</title>
+<meta name="description" content="Domain attached but not loading; SSL cert not issuing; redirect loops.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="DNS & routing — OwnStack">
+<meta property="og:description" content="Domain attached but not loading; SSL cert not issuing; redirect loops.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a class="active" href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/troubleshooting/">troubleshooting</a><span class="sep">›</span><span>DNS & routing</span></nav>
+			<h1>DNS & routing</h1>
+			<h2 id="domain-attached-but-not-resolving">Domain attached but not resolving</h2>
+<table>
+	<thead><tr><th>Check</th><th>Action</th></tr></thead>
+	<tbody>
+		<tr><td><code>dig +short example.com</code> returns no IP</td><td>DNS A record is missing. Add it at your DNS provider (Route 53, DNSimple, Cloudflare, etc.) → stack IP from <code>ownstack stacks</code>.</td></tr>
+		<tr><td><code>dig +short example.com</code> returns wrong IP</td><td>Old record. Update it; wait for TTL to expire (or flush local resolver).</td></tr>
+		<tr><td>Different resolvers return different answers</td><td>Propagation in flight. Most resolvers update within 5 minutes; cached negative answers can take longer. Check <code>dig +short @1.1.1.1 example.com</code> and <code>@8.8.8.8</code> independently.</td></tr>
+		<tr><td>Domain attached to app, but stack returns 404</td><td>Run <code>ssh dokku@&lt;stack-ip&gt; domains:report &lt;app&gt;</code>. If the domain isn't listed, run <code>ownstack app domains:add</code> again — sometimes the sync fails silently.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="ssl-not-issuing">SSL not issuing</h2>
+<table>
+	<thead><tr><th>Symptom</th><th>Cause</th></tr></thead>
+	<tbody>
+		<tr><td><code>certs:report</code> shows no Let's Encrypt cert</td><td>DNS hasn't propagated yet, or the domain isn't reachable from Let's Encrypt's HTTP-01 prober. Verify the domain resolves <strong>and</strong> port 80 is open from the public internet (some firewalls block it).</td></tr>
+		<tr><td><code>letsencrypt:list</code> shows the app but no expiry</td><td>First-time issuance pending. Run <code>ssh dokku@&lt;stack-ip&gt; letsencrypt:enable &lt;app&gt;</code> to trigger.</td></tr>
+		<tr><td><code>too many failed authorizations</code> from Let's Encrypt</td><td>You've hit Let's Encrypt's rate limit (5 failures per hostname per hour). Fix the underlying issue (DNS, port 80) and wait an hour.</td></tr>
+		<tr><td>Browser shows the stack's default cert (not your domain)</td><td>nginx still has the old vhost cached. <code>ssh dokku@&lt;stack-ip&gt; nginx:build-config &lt;app&gt;</code> + <code>nginx:reload</code>.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="wildcard-certs-dns-01-challenge">Wildcard certs (DNS-01 challenge)</h2>
+<p>HTTP-01 challenge can't issue wildcards — only DNS-01 can. Configure the dokku-letsencrypt plugin with a DNS provider hookup (the plugin supports many: Route 53, Cloudflare, DigitalOcean, etc.). See <a href="/domains-ssl/wildcard/">Wildcard certs</a>.</p>
+
+<h2 id="redirect-loops">Redirect loops</h2>
+<table>
+	<thead><tr><th>Symptom</th><th>Cause</th></tr></thead>
+	<tbody>
+		<tr><td>Browser bounces between <code>http://</code> and <code>https://</code> forever</td><td>App is forcing HTTPS internally and a proxy is forcing HTTPS too. Check <code>X-Forwarded-Proto</code> handling — Rails: <code>config.force_ssl = true</code> + trust the proxy.</td></tr>
+		<tr><td>Browser shows ERR_TOO_MANY_REDIRECTS</td><td>nginx has both an HTTPS redirect <em>and</em> the app issues a 301. Pick one.</td></tr>
+	</tbody>
+</table>
+
+<h2 id="diagnostic-steps">Diagnostic steps</h2>
+<ol>
+	<li><strong>Resolve the domain to the right IP:</strong> <code>dig +short &lt;domain&gt;</code></li>
+	<li><strong>Hit the IP directly with the right Host header:</strong> <code>curl -k -H "Host: &lt;domain&gt;" https://&lt;ip&gt;/</code></li>
+	<li><strong>Check nginx state on the stack:</strong> <code>ssh dokku@&lt;stack-ip&gt; domains:report &lt;app&gt;</code></li>
+	<li><strong>Check cert state:</strong> <code>ssh dokku@&lt;stack-ip&gt; certs:report &lt;app&gt;</code></li>
+	<li><strong>Tail nginx error log:</strong> <code>ownstack ssh stack &lt;stack&gt;</code> then <code>sudo tail /var/log/nginx/error.log</code></li>
+</ol>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+	<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+	<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#domain-attached-but-not-resolving">Domain attached but not resolving</a></li><li class="h2"><a href="#ssl-not-issuing">SSL not issuing</a></li><li class="h2"><a href="#wildcard-certs-dns-01-challenge">Wildcard certs (DNS-01 challenge)</a></li><li class="h2"><a href="#redirect-loops">Redirect loops</a></li><li class="h2"><a href="#diagnostic-steps">Diagnostic steps</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

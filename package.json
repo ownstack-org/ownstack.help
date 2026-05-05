@@ -1,22 +1,14 @@
 {
   "name": "ownstack-help",
-  "type": "module",
-  "version": "0.1.0",
   "private": true,
-  "engines": {
-    "node": ">=22.12.0"
-  },
+  "version": "0.1.0",
+  "engines": { "node": ">=18.0.0" },
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "start": "serve -s dist -l tcp://0.0.0.0:${PORT:-3000}",
+    "build": "node build.js",
     "heroku-postbuild": "npm run build",
-    "preview": "astro preview"
+    "start": "serve -l tcp://0.0.0.0:${PORT:-3000} ."
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.38.4",
-    "astro": "^6.1.9",
-    "serve": "^14.2.4",
-    "sharp": "^0.34.5"
+    "serve": "^14.2.4"
   }
 }

@@ -1,0 +1,51 @@
+<!-- meta {"title":"DNS & routing","desc":"Domain attached but not loading; SSL cert not issuing; redirect loops.","section":"Troubleshooting"} -->
+
+<h2>Domain attached but not resolving</h2>
+<table>
+	<thead><tr><th>Check</th><th>Action</th></tr></thead>
+	<tbody>
+		<tr><td><code>dig +short example.com</code> returns no IP</td><td>DNS A record is missing. Add it at your DNS provider (Route 53, DNSimple, Cloudflare, etc.) → stack IP from <code>ownstack stacks</code>.</td></tr>
+		<tr><td><code>dig +short example.com</code> returns wrong IP</td><td>Old record. Update it; wait for TTL to expire (or flush local resolver).</td></tr>
+		<tr><td>Different resolvers return different answers</td><td>Propagation in flight. Most resolvers update within 5 minutes; cached negative answers can take longer. Check <code>dig +short @1.1.1.1 example.com</code> and <code>@8.8.8.8</code> independently.</td></tr>
+		<tr><td>Domain attached to app, but stack returns 404</td><td>Run <code>ssh dokku@&lt;stack-ip&gt; domains:report &lt;app&gt;</code>. If the domain isn't listed, run <code>ownstack app domains:add</code> again — sometimes the sync fails silently.</td></tr>
+	</tbody>
+</table>
+
+<h2>SSL not issuing</h2>
+<table>
+	<thead><tr><th>Symptom</th><th>Cause</th></tr></thead>
+	<tbody>
+		<tr><td><code>certs:report</code> shows no Let's Encrypt cert</td><td>DNS hasn't propagated yet, or the domain isn't reachable from Let's Encrypt's HTTP-01 prober. Verify the domain resolves <strong>and</strong> port 80 is open from the public internet (some firewalls block it).</td></tr>
+		<tr><td><code>letsencrypt:list</code> shows the app but no expiry</td><td>First-time issuance pending. Run <code>ssh dokku@&lt;stack-ip&gt; letsencrypt:enable &lt;app&gt;</code> to trigger.</td></tr>
+		<tr><td><code>too many failed authorizations</code> from Let's Encrypt</td><td>You've hit Let's Encrypt's rate limit (5 failures per hostname per hour). Fix the underlying issue (DNS, port 80) and wait an hour.</td></tr>
+		<tr><td>Browser shows the stack's default cert (not your domain)</td><td>nginx still has the old vhost cached. <code>ssh dokku@&lt;stack-ip&gt; nginx:build-config &lt;app&gt;</code> + <code>nginx:reload</code>.</td></tr>
+	</tbody>
+</table>
+
+<h2>Wildcard certs (DNS-01 challenge)</h2>
+<p>HTTP-01 challenge can't issue wildcards — only DNS-01 can. Configure the dokku-letsencrypt plugin with a DNS provider hookup (the plugin supports many: Route 53, Cloudflare, DigitalOcean, etc.). See <a href="/domains-ssl/wildcard/">Wildcard certs</a>.</p>
+
+<h2>Redirect loops</h2>
+<table>
+	<thead><tr><th>Symptom</th><th>Cause</th></tr></thead>
+	<tbody>
+		<tr><td>Browser bounces between <code>http://</code> and <code>https://</code> forever</td><td>App is forcing HTTPS internally and a proxy is forcing HTTPS too. Check <code>X-Forwarded-Proto</code> handling — Rails: <code>config.force_ssl = true</code> + trust the proxy.</td></tr>
+		<tr><td>Browser shows ERR_TOO_MANY_REDIRECTS</td><td>nginx has both an HTTPS redirect <em>and</em> the app issues a 301. Pick one.</td></tr>
+	</tbody>
+</table>
+
+<h2>Diagnostic steps</h2>
+<ol>
+	<li><strong>Resolve the domain to the right IP:</strong> <code>dig +short &lt;domain&gt;</code></li>
+	<li><strong>Hit the IP directly with the right Host header:</strong> <code>curl -k -H "Host: &lt;domain&gt;" https://&lt;ip&gt;/</code></li>
+	<li><strong>Check nginx state on the stack:</strong> <code>ssh dokku@&lt;stack-ip&gt; domains:report &lt;app&gt;</code></li>
+	<li><strong>Check cert state:</strong> <code>ssh dokku@&lt;stack-ip&gt; certs:report &lt;app&gt;</code></li>
+	<li><strong>Tail nginx error log:</strong> <code>ownstack ssh stack &lt;stack&gt;</code> then <code>sudo tail /var/log/nginx/error.log</code></li>
+</ol>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+	<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+	<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+</ul>

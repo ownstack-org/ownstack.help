@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bring-your-own (SSH) stacks — OwnStack</title>
+<meta name="description" content="Use any Linux host as an OwnStack stack: bare metal, VPS, on-prem. Just SSH access.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Bring-your-own (SSH) stacks — OwnStack">
+<meta property="og:description" content="Use any Linux host as an OwnStack stack: bare metal, VPS, on-prem. Just SSH access.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a class="active" href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/stacks/">stacks</a><span class="sep">›</span><span>Bring-your-own (SSH) stacks</span></nav>
+			<h1>Bring-your-own (SSH) stacks</h1>
+			<p class="lede">If you already have a host you can SSH into — bare metal, DigitalOcean, Hetzner, Vultr, Linode, your homelab — turn it into an OwnStack stack with one credential and one form. No cloud-provider integration required.</p>
+
+<h2 id="host-requirements">Host requirements</h2>
+<ul>
+	<li>Ubuntu 22.04 LTS (other Debian-derivatives may work; only 22.04 is tested and supported).</li>
+	<li>2 vCPU, 2 GiB RAM minimum. 4 vCPU / 4 GiB for real workloads.</li>
+	<li>30 GiB disk minimum; 50 GiB recommended.</li>
+	<li>A public IP (or anything routable from the control plane).</li>
+	<li>Ports 22, 80, 443 open inbound.</li>
+	<li>SSH access as a user with passwordless <code>sudo</code> (typically <code>root</code> or <code>ubuntu</code>).</li>
+</ul>
+
+<h2 id="create-the-stack">Create the stack</h2>
+<p>In the dashboard, <strong>Stacks → New → SSH</strong>. Paste:</p>
+<ul>
+	<li>Hostname or IP.</li>
+	<li>SSH username (defaults to <code>ubuntu</code>).</li>
+	<li>SSH private key (the corresponding public key must already be in <code>~/.ssh/authorized_keys</code> on the host).</li>
+</ul>
+<p>OwnStack tests the connection, then offers two paths:</p>
+
+<h3 id="path-a-let-ownstack-provision-dokku">Path A — let OwnStack provision dokku</h3>
+<p>If the host is a fresh Ubuntu, OwnStack runs the dokku bootstrap (the same script the AWS/GCP path runs). Takes 3–5 minutes; the stack flips to <strong>provisioned</strong> when done.</p>
+
+<h3 id="path-b-adopt-an-existing-dokku-host">Path B — adopt an existing dokku host</h3>
+<p>If the host already has dokku installed, mark <strong>Already provisioned</strong>. OwnStack registers it as a stack but skips bootstrap. Apps already on the host stay where they are; you can adopt them into OwnStack later via <code>ownstack import</code>.</p>
+
+<div class="callout note">
+	<div><strong>SSH key handling</strong><p>The private key is encrypted at rest in the control plane and used only for control-plane → stack operations (deploys, scales, log fetches). It is not exposed via the API. You can rotate by creating a new pair on the host and updating the stack's credentials.</p></div>
+</div>
+
+<h2 id="what-you-maintain">What you maintain</h2>
+<p>SSH-provider stacks shift some responsibility to you:</p>
+<table>
+	<thead><tr><th>You handle</th><th>OwnStack handles</th></tr></thead>
+	<tbody>
+		<tr><td>Host OS updates (<code>unattended-upgrades</code> recommended)</td><td>Dokku version updates (via <code>ownstack stack patches apply</code>)</td></tr>
+		<tr><td>Disk expansion</td><td>Plugin installs and config</td></tr>
+		<tr><td>Hypervisor / hardware lifecycle</td><td>App deploy + lifecycle</td></tr>
+		<tr><td>Network &amp; firewall (host-side)</td><td>nginx vhost &amp; SSL</td></tr>
+		<tr><td>Backups, if not using <code>ownstack stack backup</code></td><td>Backup orchestration if you opt in to <code>stack backup</code></td></tr>
+	</tbody>
+</table>
+
+<h2 id="when-to-pick-ssh-over-aws-gcp">When to pick SSH over AWS/GCP</h2>
+<ul>
+	<li>You already have a server you want to keep using.</li>
+	<li>You're on a provider OwnStack doesn't integrate with directly (Hetzner, OVH bare metal, DigitalOcean Droplets).</li>
+	<li>You want the control plane to never have IAM access to your cloud account.</li>
+	<li>Homelab / on-prem.</li>
+</ul>
+
+<h2 id="decommissioning">Decommissioning</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack destroy &lt;stack&gt;</code></pre>
+<p>For SSH stacks, this <em>only</em> de-registers the stack from OwnStack — the underlying host is yours, OwnStack doesn't touch it. Run <code>dokku-uninstall</code> manually if you want to remove dokku from the host.</p>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/stacks/backups/">Stack backups</a></li>
+	<li><a href="/cli/stack/">CLI: <code>ownstack stack</code></a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#host-requirements">Host requirements</a></li><li class="h2"><a href="#create-the-stack">Create the stack</a></li><li class="h3"><a href="#path-a-let-ownstack-provision-dokku">Path A — let OwnStack provision dokku</a></li><li class="h3"><a href="#path-b-adopt-an-existing-dokku-host">Path B — adopt an existing dokku host</a></li><li class="h2"><a href="#what-you-maintain">What you maintain</a></li><li class="h2"><a href="#when-to-pick-ssh-over-aws-gcp">When to pick SSH over AWS/GCP</a></li><li class="h2"><a href="#decommissioning">Decommissioning</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Build types: buildpacks vs Dockerfile — OwnStack</title>
+<meta name="description" content="Two ways to turn your repo into a runnable image. Pick one per app; you can switch later.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Build types: buildpacks vs Dockerfile — OwnStack">
+<meta property="og:description" content="Two ways to turn your repo into a runnable image. Pick one per app; you can switch later.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a class="active" href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/deployments/">deployments</a><span class="sep">›</span><span>Build types: buildpacks vs Dockerfile</span></nav>
+			<h1>Build types: buildpacks vs Dockerfile</h1>
+			<p class="lede">Every app has a <strong>build type</strong>. <code>buildpacks</code> (auto-detect via heroku-style buildpacks) is the default and works for almost everything. <code>dockerfile</code> uses a <code>Dockerfile</code> in your repo root.</p>
+
+<h2 id="the-two-options">The two options</h2>
+<table>
+	<thead><tr><th></th><th>buildpacks</th><th>dockerfile</th></tr></thead>
+	<tbody>
+		<tr><td>Auto-detect</td><td>Yes — based on files in your repo (<code>package.json</code>, <code>Gemfile</code>, etc.)</td><td>You supply the Dockerfile</td></tr>
+		<tr><td>Build env</td><td>herokuish — same buildpacks Heroku uses</td><td>Vanilla docker build</td></tr>
+		<tr><td>Procfile</td><td>Required for non-trivial apps</td><td>Optional — CMD/ENTRYPOINT works</td></tr>
+		<tr><td>Build-time env</td><td>App config vars are exposed during build</td><td>Use ARG / build-time secrets explicitly</td></tr>
+		<tr><td>Speed</td><td>Per-deploy build on the stack</td><td>Per-deploy build on the stack OR pre-built image</td></tr>
+		<tr><td>Best for</td><td>Standard apps in standard languages</td><td>Custom toolchains, multi-stage builds, native deps</td></tr>
+	</tbody>
+</table>
+
+<h2 id="setting-it">Setting it</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app build-type &lt;app&gt; buildpacks
+<span class="prompt">$</span> ownstack app build-type &lt;app&gt; dockerfile</code></pre>
+<p>Or set <code>"build_type"</code> when creating the app.</p>
+
+<h2 id="buildpack-auto-detect">Buildpack auto-detect</h2>
+<p>Herokuish picks the first matching buildpack. The standard set covers Ruby, Node, Python, Go, PHP, Java, Clojure, Scala. Order is determined by file presence:</p>
+<ul>
+	<li><code>Gemfile</code> → Ruby</li>
+	<li><code>package.json</code> → Node.js</li>
+	<li><code>requirements.txt</code> / <code>Pipfile</code> / <code>pyproject.toml</code> → Python</li>
+	<li><code>go.mod</code> → Go</li>
+	<li><code>composer.json</code> → PHP</li>
+</ul>
+<p>To override, set <code>BUILDPACK_URL</code> as a config var to a buildpack git URL or comma-separated list.</p>
+
+<h3 id="example-stack-a-node-ruby-app">Example: stack a Node + Ruby app</h3>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack config:set --app=&lt;app&gt; \
+    BUILDPACK_URL='https://github.com/heroku/heroku-buildpack-nodejs.git,https://github.com/heroku/heroku-buildpack-ruby.git'</code></pre>
+<p>Useful for Rails apps that need Node for asset compilation.</p>
+
+<h2 id="dockerfile">Dockerfile</h2>
+<p>Drop a <code>Dockerfile</code> in your repo root. Set <code>build-type</code> to <code>dockerfile</code> on the app. Dokku runs <code>docker build</code> on the stack and serves the resulting image.</p>
+<p>Your Dockerfile must:</p>
+<ul>
+	<li>End with a <code>CMD</code> or <code>ENTRYPOINT</code> that binds to <code>$PORT</code> (for the web process).</li>
+	<li><strong>Not</strong> hardcode a port in <code>EXPOSE</code> — dokku ignores it and assigns dynamically.</li>
+	<li>Be self-contained: no host volumes, no networks the stack doesn't manage.</li>
+</ul>
+
+<h3 id="minimal-dockerfile-node-static-site">Minimal Dockerfile (Node static site)</h3>
+<pre><code>FROM node:20-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+CMD ["nginx", "-g", "daemon off;"]</code></pre>
+<p>Dokku writes a <code>nginx.conf</code> for you that listens on <code>$PORT</code>; if you supply your own, it must too.</p>
+
+<h2 id="switching-mid-life">Switching mid-life</h2>
+<p>You can switch build types on an existing app. The next deploy rebuilds from scratch with the new build type. Watch out for:</p>
+<ul>
+	<li>Persistent volumes — if you mounted any, they're reattached.</li>
+	<li>Linked services (Postgres, etc.) — unchanged.</li>
+	<li>Config vars — unchanged.</li>
+</ul>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+	<li><a href="/deployments/image-deploys/">Image deploys</a> — pre-built Docker images.</li>
+	<li><a href="/apps/procfile/">Procfile</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#the-two-options">The two options</a></li><li class="h2"><a href="#setting-it">Setting it</a></li><li class="h2"><a href="#buildpack-auto-detect">Buildpack auto-detect</a></li><li class="h3"><a href="#example-stack-a-node-ruby-app">Example: stack a Node + Ruby app</a></li><li class="h2"><a href="#dockerfile">Dockerfile</a></li><li class="h3"><a href="#minimal-dockerfile-node-static-site">Minimal Dockerfile (Node static site)</a></li><li class="h2"><a href="#switching-mid-life">Switching mid-life</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

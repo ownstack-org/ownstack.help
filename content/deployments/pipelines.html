@@ -1,0 +1,43 @@
+<!-- meta {"title":"Pipelines","desc":"Stage your apps: staging → production promotions, review apps, controlled cutovers.","section":"Deployments"} -->
+<p class="lede">A pipeline is a chain of related apps — typically <strong>staging</strong> and <strong>production</strong> — where deploys flow forward via promotions. Promotion copies the slug or image from one stage to the next without rebuilding, so what you tested in staging is exactly what runs in prod.</p>
+
+<h2>The mental model</h2>
+<table>
+	<thead><tr><th>Concept</th><th>What it is</th></tr></thead>
+	<tbody>
+		<tr><td>Pipeline</td><td>An ordered list of stages. Belongs to one app codebase across multiple "stage" apps.</td></tr>
+		<tr><td>Stage</td><td>One apps in the chain — e.g. <code>staging</code>, <code>production</code>. Each stage is a real OwnStack app on its own stack(s).</td></tr>
+		<tr><td>Promotion</td><td>Copy a deployment from stage N to stage N+1. The same image gets re-tagged and re-released, no rebuild.</td></tr>
+	</tbody>
+</table>
+
+<h2>Create a pipeline</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app pipeline create &lt;production-app&gt;
+<span class="prompt">$</span> ownstack app pipeline add-staging &lt;production-app&gt; &lt;staging-app&gt;</code></pre>
+<p>Or, in the dashboard: open the production app, <strong>Pipeline</strong> tab, <strong>Add staging app</strong>. The two apps must already exist; pipelines link existing apps rather than creating new ones.</p>
+
+<h2>Promote</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app pipeline promote &lt;staging-app&gt;</code></pre>
+<p>This re-deploys the production app with the staging app's currently-deployed image (no new build). Migrations defined as the production app's release task still run; the postdeploy script runs once.</p>
+
+<div class="callout note">
+	<div><strong>Promotion isn't atomic across multi-stack production</strong><p>If your production app deploys to N stacks, a promotion enqueues N deployment jobs. They run in parallel. If you need lock-step rollout, use a pipeline stage with explicit per-stack approval.</p></div>
+</div>
+
+<h2>Per-stage config</h2>
+<p>Each stage app has its own config vars, its own database, its own domain. Don't share config across stages — that's the whole point of staging.</p>
+<p>If you have config that <em>should</em> be the same in every stage (a feature flag service URL, a shared logging endpoint), set it on each stage manually, or use <code>ownstack config:push --file=…</code> to apply the same set to multiple apps.</p>
+
+<h2>Review apps (when you want them back)</h2>
+<p>Heroku-style review apps — one ephemeral app per pull request — are on the roadmap but not yet first-class. The current workaround:</p>
+<ul>
+	<li>A GitHub Action listens for PR events.</li>
+	<li>On <code>opened</code>, it runs <code>ownstack app clone &lt;production-app&gt; &lt;pr-NNN&gt; --stack=review-stack --deploy</code>.</li>
+	<li>On <code>closed</code>, it runs <code>ownstack app destroy &lt;pr-NNN&gt; --force</code>.</li>
+</ul>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/deployments/multi-stack/">Multi-stack deploys</a></li>
+	<li><a href="/deployments/rollback/">Rollback</a></li>
+</ul>

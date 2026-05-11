@@ -49,6 +49,7 @@
 			<li><a href="/apps/config-vars/">Config vars</a></li>
 			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
 			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+			<li><a href="/apps/resource-limits/">Resource limits</a></li>
 		</ul>
 	</div>
 	<div class="sidebar-section">
@@ -59,6 +60,7 @@
 			<li><a href="/stacks/gcp/">GCP</a></li>
 			<li><a href="/stacks/openstack/">OpenStack</a></li>
 			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/monitoring/">Monitoring &amp; health</a></li>
 			<li><a href="/stacks/backups/">Stack backups</a></li>
 		</ul>
 	</div>
@@ -169,6 +171,19 @@
 <h2 id="disk">Disk</h2>
 <pre class="terminal"><code><span class="prompt">$</span> ownstack stack disk-usage &lt;stack&gt;</code></pre>
 
+<h2 id="health-amp-monitoring">Health &amp; monitoring</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack health &lt;stack&gt;
+<span class="out">=== node-hub-538 ===
+  IP:                44.237.78.27
+  Provider state:    running
+
+  Host reachability: ● Active (port:22, 60s probe)
+  On-box agent:      ○ Not installed
+
+  Active alerts (1):
+    • [critical] host_unreachable — TCP timeout (2026-05-10T18:13:25Z)</span></code></pre>
+<p>Shows the off-box port:22 probe state, the on-box Heartbeat agent state, the cloud provider's view of the instance, and any active alerts. See <a href="/stacks/monitoring/">Stack monitoring</a> for what each layer covers.</p>
+
 <h2 id="local-stacks-for-development">Local stacks (for development)</h2>
 <pre class="terminal"><code><span class="prompt">$</span> ownstack stack add-local
 <span class="prompt">$</span> ownstack local stack start
@@ -183,7 +198,7 @@
 		</article>
 	</main>
 	<aside class="toc" aria-label="On this page">
-		<h4>On this page</h4><ul><li class="h2"><a href="#listing">Listing</a></li><li class="h2"><a href="#plugins">Plugins</a></li><li class="h2"><a href="#patches">Patches</a></li><li class="h2"><a href="#data">Data</a></li><li class="h2"><a href="#backups">Backups</a></li><li class="h2"><a href="#disk">Disk</a></li><li class="h2"><a href="#local-stacks-for-development">Local stacks (for development)</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+		<h4>On this page</h4><ul><li class="h2"><a href="#listing">Listing</a></li><li class="h2"><a href="#plugins">Plugins</a></li><li class="h2"><a href="#patches">Patches</a></li><li class="h2"><a href="#data">Data</a></li><li class="h2"><a href="#backups">Backups</a></li><li class="h2"><a href="#disk">Disk</a></li><li class="h2"><a href="#health-amp-monitoring">Health &amp; monitoring</a></li><li class="h2"><a href="#local-stacks-for-development">Local stacks (for development)</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
 	</aside>
 </div>
 <footer class="site-footer">

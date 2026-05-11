@@ -24,6 +24,19 @@
 <h2>Disk</h2>
 <pre class="terminal"><code><span class="prompt">$</span> ownstack stack disk-usage &lt;stack&gt;</code></pre>
 
+<h2>Health &amp; monitoring</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack health &lt;stack&gt;
+<span class="out">=== node-hub-538 ===
+  IP:                44.237.78.27
+  Provider state:    running
+
+  Host reachability: ● Active (port:22, 60s probe)
+  On-box agent:      ○ Not installed
+
+  Active alerts (1):
+    • [critical] host_unreachable — TCP timeout (2026-05-10T18:13:25Z)</span></code></pre>
+<p>Shows the off-box port:22 probe state, the on-box Heartbeat agent state, the cloud provider's view of the instance, and any active alerts. See <a href="/stacks/monitoring/">Stack monitoring</a> for what each layer covers.</p>
+
 <h2>Local stacks (for development)</h2>
 <pre class="terminal"><code><span class="prompt">$</span> ownstack stack add-local
 <span class="prompt">$</span> ownstack local stack start

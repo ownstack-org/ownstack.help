@@ -1,0 +1,45 @@
+<!-- meta {"title":"Resource limits","desc":"Per-process-type memory caps so a runaway container kills itself instead of the host.","section":"Apps"} -->
+<p class="lede">OwnStack exposes Dokku's per-process-type resource limits in the dashboard and CLI. Set a memory cap on <code>worker</code>, <code>web</code>, or any other Procfile type, and a runaway container is killed by Docker before it can take down the whole host.</p>
+
+<div class="callout">
+	<div><strong>Why this exists.</strong><p>Without a per-container memory limit, a leaking Ruby worker can consume every byte the host has, trigger a system-wide kernel OOM kill, and leave the host hung. With a 2 GB cap, the same leak gets killed at 2 GB and the container restarts. The other apps on the box keep running.</p></div>
+</div>
+
+<h2>Set a cap</h2>
+<p>From the dashboard, open the app and scroll to <strong>Resource limits</strong> on the stack overview tab. Each Procfile process type has a row showing the current memory limit (or <code>—</code> if unset). Enter a size, optionally tick <strong>restart after</strong>, hit Set.</p>
+<p>Or from the CLI:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app limit &lt;app&gt;
+<span class="out">PROCESS              MEMORY          CPU
+default              -               -
+web                  512m            -
+worker               -               -</span>
+
+<span class="prompt">$</span> ownstack app limit &lt;app&gt; --process-type=worker --memory=2g --restart
+<span class="out">Set worker memory=2g
+Restart triggered for worker.</span></code></pre>
+
+<h2>What memory size to pick</h2>
+<table>
+	<thead><tr><th>Process type</th><th>Common range</th><th>Notes</th></tr></thead>
+	<tbody>
+		<tr><td><code>web</code> (Rails)</td><td>256–768 MB</td><td>Puma worker count × per-worker RSS. Match your usual production sizing.</td></tr>
+		<tr><td><code>worker</code> (Sidekiq)</td><td>512 MB – 2 GB</td><td>Sidekiq concurrency × job memory. If jobs handle large records, 2 GB is realistic.</td></tr>
+		<tr><td><code>release</code></td><td>512 MB – 1 GB</td><td>Just enough to run <code>rails db:migrate</code> etc.</td></tr>
+		<tr><td><code>default</code></td><td>—</td><td>Sets the cap for any process type without its own row.</td></tr>
+	</tbody>
+</table>
+<p>Pick the smallest cap that doesn't kill legitimate work. If a process gets OOM'd inside its limit, that's the signal to either raise the cap or fix the leak (often the better answer).</p>
+
+<h2>Clear a cap</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app limit &lt;app&gt; --process-type=worker --clear</code></pre>
+<p>Or hit <strong>Clear</strong> on the row in the dashboard.</p>
+
+<h2>How it applies</h2>
+<p>The limit is a <a href="https://dokku.com/docs/processes/resource-management/" rel="noopener">Dokku resource limit</a>, which becomes a Docker <code>--memory</code> flag on the container at next start. Until you restart the container, the cap is configured but not active — that's what the <strong>restart after</strong> option (or <code>--restart</code> on the CLI) takes care of.</p>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/stacks/monitoring/">Stack monitoring</a> — host-level alerting so you find out before the user does.</li>
+	<li><a href="/apps/procfile/">Procfile</a> — defining process types in the first place.</li>
+	<li><a href="/cli/app/">CLI: ownstack app</a></li>
+</ul>

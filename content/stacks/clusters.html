@@ -1,0 +1,83 @@
+<!-- meta {"title":"Clusters & load balancing","desc":"Pool stacks behind a hostname. Caddy proxies as ordinary apps, drain-driven rolling deploys, and three ways to solve LB-of-LB.","section":"Stacks"} -->
+<p class="lede">A <strong>cluster</strong> pools N stacks behind one hostname and routes traffic across them. The proxy is an ordinary OwnStack app owned by the cluster — same logs / restart / SSH / scale / maintenance as anything else. You pick how the edge solves "LB the LB" when you create the cluster: DNS round-robin, Cloudflare, or AWS ALB.</p>
+
+<h2>The three tiers</h2>
+<table>
+	<thead><tr><th>Tier</th><th>What runs there</th><th>What it does</th></tr></thead>
+	<tbody>
+		<tr><td>Edge</td><td>DNS records, Cloudflare proxy, or AWS ALB</td><td>Solves "LB the LB". One IP/name out, N proxies in.</td></tr>
+		<tr><td>Proxy</td><td>≥2 stacks running a Caddy app owned by the cluster</td><td>TLS termination, member health checks, sub-second failover.</td></tr>
+		<tr><td>Member</td><td>1..N app stacks with your code on them</td><td>The thing being load-balanced.</td></tr>
+	</tbody>
+</table>
+<p>The proxy is a regular OwnStack app — you can see it in the apps list with a "managed by cluster X" badge, tail its logs, restart it, SSH in, scale it. The cluster regenerates its <code>Caddyfile</code> on member changes and dokku-redeploys it; everything you'd do to an ordinary app still works.</p>
+
+<h2>Edge modes</h2>
+<p>You pick one at create time. Default is <code>dns_rr</code>.</p>
+<table>
+	<thead><tr><th>Mode</th><th>How it works</th><th>Cost</th><th>Failover</th></tr></thead>
+	<tbody>
+		<tr><td><code>dns_rr</code></td><td>Multi-A records via the OwnStack DNS provider. Resolvers spread connections; reconciler drops dead IPs within one cron tick.</td><td>Free</td><td>~60 s (DNS TTL)</td></tr>
+		<tr><td><code>cloudflare</code></td><td>Proxied A records via the Cloudflare API. Each proxy IP becomes an origin; Cloudflare's edge does the health check + failover.</td><td>Free (Cloudflare free tier)</td><td>Sub-second</td></tr>
+		<tr><td><code>aws_alb</code></td><td>Register proxy stack instance IDs as targets on a pre-existing ALB you create once.</td><td>~$18/mo</td><td>Seconds</td></tr>
+		<tr><td><code>none</code></td><td>You're managing DNS yourself.</td><td>Free</td><td>—</td></tr>
+	</tbody>
+</table>
+<p>Cloudflare and ALB need credentials in the cluster's <code>edge_config</code>: <code>api_token</code> + <code>zone_id</code> for Cloudflare, <code>target_group_arn</code> + <code>region</code> for ALB. You set them in the cluster form.</p>
+
+<h2>Members and draining</h2>
+<p>A member is an app in the cluster. Members have three states:</p>
+<ul>
+	<li><strong>active</strong> — proxy routes new connections here.</li>
+	<li><strong>draining</strong> — proxy stops sending new traffic; existing connections finish. Used for graceful deploys and host maintenance.</li>
+	<li><strong>removed</strong> — gone from the routing list.</li>
+</ul>
+<p>Drain/undrain is available inline next to each member in the cluster detail page, and on the CLI: <code>ownstack cluster member drain &lt;cluster&gt; &lt;app&gt;</code>.</p>
+
+<h2>Deploys</h2>
+<p>Two strategies:</p>
+<ul>
+	<li><strong>parallel</strong> (default) — deploy every member at once. Fast, but in-flight requests may see a brief restart.</li>
+	<li><strong>rolling</strong> — drain → deploy → wait healthy → undrain, one member at a time. Zero-downtime if you have ≥2 active members.</li>
+</ul>
+<pre><code>ownstack cluster deploy api --strategy=rolling</code></pre>
+<p>The proxy never serves zero healthy members so long as at least one is routable (active or draining).</p>
+
+<h2>Health checks</h2>
+<p>Two independent loops keep the cluster honest:</p>
+<table>
+	<thead><tr><th>Loop</th><th>Where</th><th>Speed</th><th>What it triggers</th></tr></thead>
+	<tbody>
+		<tr><td>Member → proxy</td><td>Caddy on each proxy stack</td><td>Sub-second</td><td>Drop dead member from upstream pool</td></tr>
+		<tr><td>Proxy → edge</td><td>Control-plane cron (1 min)</td><td>≤ 1 min</td><td>Drop dead proxy IP from edge config</td></tr>
+	</tbody>
+</table>
+<p>The member check uses Caddy's built-in <code>health_uri</code> directive — you configure the path / interval / timeout per cluster. Defaults are <code>/</code> every 5 s with a 2 s timeout.</p>
+
+<h2>Creating a cluster</h2>
+<p>From the UI: <strong>Clusters → New</strong>. Fill in the name + hostname, pick edge mode + proxy replicas, optionally point at an existing proxy app (or leave blank to stamp one from the default Caddy template).</p>
+<p>From the CLI:</p>
+<pre><code>ownstack cluster create api \
+  --hostname=api.example.com \
+  --edge=dns_rr \
+  --proxy-count=2</code></pre>
+<p>Then add members:</p>
+<pre><code>ownstack cluster member add api my-rails-app
+ownstack cluster member add api my-rails-app-replica</code></pre>
+<p>And deploy:</p>
+<pre><code>ownstack cluster deploy api --strategy=rolling</code></pre>
+
+<h2>How it composes with the rest of OwnStack</h2>
+<ul>
+	<li><strong>App migration</strong> — adding a target stack to an app's deployable list automatically fires a cluster reconcile, so the new stack joins the proxy's upstream list as soon as deploys land there.</li>
+	<li><strong>OS / AMI upgrade</strong> — the upgrade worker drains every cluster member deployed to the stack first, runs the swap, then undrains. ≥1 routable member is guaranteed during the swap.</li>
+	<li><strong>Maintenance dashboard</strong> — <a href="/stacks/monitoring/">/maintenance</a> shows a Clusters table with hostname, edge mode, member count, and proxy health, plus a Cluster column on the stacks list.</li>
+</ul>
+
+<h2>Bring your own proxy</h2>
+<p>The proxy app is just an app. If you want custom Caddy directives, a HAProxy controller, or some weird Envoy fork, write it as an OwnStack app and point the cluster at it with <code>proxy_app_id</code>. The only contract is:</p>
+<ol>
+	<li>Read upstream IPs from the <code>CLUSTER_UPSTREAMS</code> env var (space-separated).</li>
+	<li>Expose <code>/_cluster/healthz</code> returning 200 when ready.</li>
+</ol>
+<p>The cluster sets <code>CLUSTER_UPSTREAMS</code> via <code>dokku config:set</code> whenever membership changes, then bounces the app.</p>

@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ownstack deploy — OwnStack</title>
-<meta name="description" content="Deploy via git push or pre-built image.">
+<title>Resource limits — OwnStack</title>
+<meta name="description" content="Per-process-type memory caps so a runaway container kills itself instead of the host.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/site.css">
-<meta property="og:title" content="ownstack deploy — OwnStack">
-<meta property="og:description" content="Deploy via git push or pre-built image.">
+<meta property="og:title" content="Resource limits — OwnStack">
+<meta property="og:description" content="Per-process-type memory caps so a runaway container kills itself instead of the host.">
 <meta property="og:site_name" content="OwnStack">
 </head>
 <body>
@@ -49,7 +49,7 @@
 			<li><a href="/apps/config-vars/">Config vars</a></li>
 			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
 			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
-			<li><a href="/apps/resource-limits/">Resource limits</a></li>
+			<li><a class="active" href="/apps/resource-limits/">Resource limits</a></li>
 		</ul>
 	</div>
 	<div class="sidebar-section">
@@ -117,7 +117,7 @@
 		<ul>
 			<li><a href="/cli/">Overview</a></li>
 			<li><a href="/cli/app/">app</a></li>
-			<li><a class="active" href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
 			<li><a href="/cli/db/">db</a></li>
 			<li><a href="/cli/stack/">stack</a></li>
 			<li><a href="/cli/profile/">profile</a></li>
@@ -145,54 +145,56 @@
 
 	<main class="content">
 		<article class="article">
-			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/cli/">cli</a><span class="sep">›</span><span>ownstack deploy</span></nav>
-			<h1>ownstack deploy</h1>
-			<h2 id="synopsis">Synopsis</h2>
-<pre><code>ownstack deploy [APP] [--stack=NAME] [--wait] [--image [TAG]]</code></pre>
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/apps/">apps</a><span class="sep">›</span><span>Resource limits</span></nav>
+			<h1>Resource limits</h1>
+			<p class="lede">OwnStack exposes Dokku's per-process-type resource limits in the dashboard and CLI. Set a memory cap on <code>worker</code>, <code>web</code>, or any other Procfile type, and a runaway container is killed by Docker before it can take down the whole host.</p>
 
-<h2 id="common-forms">Common forms</h2>
+<div class="callout">
+	<div><strong>Why this exists.</strong><p>Without a per-container memory limit, a leaking Ruby worker can consume every byte the host has, trigger a system-wide kernel OOM kill, and leave the host hung. With a 2 GB cap, the same leak gets killed at 2 GB and the container restarts. The other apps on the box keep running.</p></div>
+</div>
+
+<h2 id="set-a-cap">Set a cap</h2>
+<p>From the dashboard, open the app and scroll to <strong>Resource limits</strong> on the stack overview tab. Each Procfile process type has a row showing the current memory limit (or <code>—</code> if unset). Enter a size, optionally tick <strong>restart after</strong>, hit Set.</p>
+<p>Or from the CLI:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app limit &lt;app&gt;
+<span class="out">PROCESS              MEMORY          CPU
+default              -               -
+web                  512m            -
+worker               -               -</span>
+
+<span class="prompt">$</span> ownstack app limit &lt;app&gt; --process-type=worker --memory=2g --restart
+<span class="out">Set worker memory=2g
+Restart triggered for worker.</span></code></pre>
+
+<h2 id="what-memory-size-to-pick">What memory size to pick</h2>
 <table>
-	<thead><tr><th>Command</th><th>What it does</th></tr></thead>
+	<thead><tr><th>Process type</th><th>Common range</th><th>Notes</th></tr></thead>
 	<tbody>
-		<tr><td><code>ownstack deploy</code></td><td>Deploy the linked app to all its stacks.</td></tr>
-		<tr><td><code>ownstack deploy my-app</code></td><td>Deploy a specific app.</td></tr>
-		<tr><td><code>ownstack deploy --stack=prod-east</code></td><td>Deploy only to one stack.</td></tr>
-		<tr><td><code>ownstack deploy --image</code></td><td>Image deploy (default tag from registry config).</td></tr>
-		<tr><td><code>ownstack deploy --image=ghcr.io/me/app:v1.2.3</code></td><td>Image deploy with explicit tag.</td></tr>
-		<tr><td><code>ownstack deploy --wait</code></td><td>Stream the build log live.</td></tr>
+		<tr><td><code>web</code> (Rails)</td><td>256–768 MB</td><td>Puma worker count × per-worker RSS. Match your usual production sizing.</td></tr>
+		<tr><td><code>worker</code> (Sidekiq)</td><td>512 MB – 2 GB</td><td>Sidekiq concurrency × job memory. If jobs handle large records, 2 GB is realistic.</td></tr>
+		<tr><td><code>release</code></td><td>512 MB – 1 GB</td><td>Just enough to run <code>rails db:migrate</code> etc.</td></tr>
+		<tr><td><code>default</code></td><td>—</td><td>Sets the cap for any process type without its own row.</td></tr>
 	</tbody>
 </table>
+<p>Pick the smallest cap that doesn't kill legitimate work. If a process gets OOM'd inside its limit, that's the signal to either raise the cap or fix the leak (often the better answer).</p>
 
-<h2 id="inspecting-deployments">Inspecting deployments</h2>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack remote deploy-log [--app=NAME] [--deployment=ID] [--follow]</code></pre>
+<h2 id="clear-a-cap">Clear a cap</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app limit &lt;app&gt; --process-type=worker --clear</code></pre>
+<p>Or hit <strong>Clear</strong> on the row in the dashboard.</p>
 
-<h2 id="how-it-works">How it works</h2>
-<ol>
-	<li>CLI hands the (app, optional stack, optional image) to the control plane API.</li>
-	<li>Control plane enqueues one deployment job per target stack.</li>
-	<li>Each job SSHes to its stack, pushes your repo (or pulls the image), runs build + release + restart.</li>
-</ol>
-
-<h2 id="common-pitfalls">Common pitfalls</h2>
-<table>
-	<thead><tr><th>Symptom</th><th>Cause</th></tr></thead>
-	<tbody>
-		<tr><td><code>A deploy is already in progress</code></td><td>An earlier deploy hasn't finished. Wait, or check the dashboard for stuck jobs.</td></tr>
-		<tr><td><code>No git repository</code></td><td>App's <code>git_repository_url</code> is unset. Set it in the dashboard or via API.</td></tr>
-		<tr><td>Build succeeds, healthcheck fails</td><td>Web process not bound to <code>$PORT</code>. See <a href="/processes/healthchecks/">Healthchecks</a>.</td></tr>
-	</tbody>
-</table>
+<h2 id="how-it-applies">How it applies</h2>
+<p>The limit is a <a href="https://dokku.com/docs/processes/resource-management/" rel="noopener">Dokku resource limit</a>, which becomes a Docker <code>--memory</code> flag on the container at next start. Until you restart the container, the cap is configured but not active — that's what the <strong>restart after</strong> option (or <code>--restart</code> on the CLI) takes care of.</p>
 
 <h2 id="read-next">Read next</h2>
 <ul>
-	<li><a href="/deployments/git-deploys/">Git deploys</a></li>
-	<li><a href="/deployments/image-deploys/">Image deploys</a></li>
-	<li><a href="/troubleshooting/deploy-failures/">When deploys fail</a></li>
+	<li><a href="/stacks/monitoring/">Stack monitoring</a> — host-level alerting so you find out before the user does.</li>
+	<li><a href="/apps/procfile/">Procfile</a> — defining process types in the first place.</li>
+	<li><a href="/cli/app/">CLI: ownstack app</a></li>
 </ul>
 		</article>
 	</main>
 	<aside class="toc" aria-label="On this page">
-		<h4>On this page</h4><ul><li class="h2"><a href="#synopsis">Synopsis</a></li><li class="h2"><a href="#common-forms">Common forms</a></li><li class="h2"><a href="#inspecting-deployments">Inspecting deployments</a></li><li class="h2"><a href="#how-it-works">How it works</a></li><li class="h2"><a href="#common-pitfalls">Common pitfalls</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+		<h4>On this page</h4><ul><li class="h2"><a href="#set-a-cap">Set a cap</a></li><li class="h2"><a href="#what-memory-size-to-pick">What memory size to pick</a></li><li class="h2"><a href="#clear-a-cap">Clear a cap</a></li><li class="h2"><a href="#how-it-applies">How it applies</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
 	</aside>
 </div>
 <footer class="site-footer">

@@ -30,6 +30,20 @@
 </table>
 <p>Both accept <code>--stack=NAME</code>, <code>--domain=DOMAIN</code>, <code>--deploy</code>.</p>
 
+<h2>Resource limits (memory caps)</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app limit &lt;app&gt;
+<span class="out">PROCESS              MEMORY          CPU
+default              -               -
+web                  512m            -
+worker               2g              -</span>
+
+<span class="prompt">$</span> ownstack app limit &lt;app&gt; --process-type=worker --memory=2g --restart
+<span class="out">Set worker memory=2g
+Restart triggered for worker.</span>
+
+<span class="prompt">$</span> ownstack app limit &lt;app&gt; --process-type=worker --clear</code></pre>
+<p>Sets a per-process-type memory cap so a runaway container only kills itself, not the host. See <a href="/apps/resource-limits/">Resource limits</a> for the why and when.</p>
+
 <h2>Database link repair</h2>
 <pre class="terminal"><code><span class="prompt">$</span> ownstack app repair-db postgres &lt;app&gt; [--check-only]
 <span class="prompt">$</span> ownstack app repair-db mysql &lt;app&gt; [--check-only]</code></pre>

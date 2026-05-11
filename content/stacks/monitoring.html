@@ -1,0 +1,72 @@
+<!-- meta {"title":"Stack monitoring","desc":"Off-box port:22 reachability checks, on-box agent telemetry, host actions, auto-recovery, and the AWS serial console.","section":"Stacks"} -->
+<p class="lede">Every provisioned stack gets two complementary layers of health monitoring out of the box: an <strong>off-box port:22 probe</strong> that detects when the host stops answering, and an opt-in <strong>on-box agent</strong> that reports disk, RAM, and Docker telemetry. Both surface in the stack detail page; the off-box probe is what alerts you when the host is genuinely down.</p>
+
+<h2>The two layers</h2>
+<table>
+	<thead><tr><th></th><th>Off-box port monitor</th><th>On-box Heartbeat agent</th></tr></thead>
+	<tbody>
+		<tr><td>Answers</td><td>Is the host reachable right now?</td><td>What's my disk %, RAM, container count, load?</td></tr>
+		<tr><td>Where it runs</td><td>OwnStack's monitoring service, externally</td><td>On the stack itself</td></tr>
+		<tr><td>Works when the host is dead</td><td><strong>Yes</strong> — that's the point.</td><td>No — the agent dies with the host.</td></tr>
+		<tr><td>Detect time on a crash</td><td>~60–180 s</td><td>Whenever the agent times out (~5 min)</td></tr>
+		<tr><td>Install required</td><td>No (auto-provisioned)</td><td>Yes — install via Stack → Add-ons → Heartbeat</td></tr>
+	</tbody>
+</table>
+<p>They're not competing tools — they're two layers of the same product. The off-box probe is liveness; the on-box agent is telemetry.</p>
+
+<h2>Off-box port monitor</h2>
+<p>When a stack reaches <code>provisioned</code>, OwnStack creates a port-22 monitor in the Heartbeat service. It probes <code>tcp://&lt;instance_ip&gt;:22</code> every 60 seconds. Two consecutive failures (≈ 180 s) marks the host as down; the next success marks it recovered.</p>
+<p>On a down event:</p>
+<ol>
+	<li>Heartbeat POSTs an HMAC-signed webhook to the control plane.</li>
+	<li>The control plane writes a <code>host_unreachable</code> alert against the stack and stamps <code>unreachable_since</code>.</li>
+	<li>Account users with <code>notify_host_unreachable=true</code> get an email.</li>
+	<li>The stack list card switches to a red dot; the stack detail's Host status panel flips to <em>Unreachable for X</em>.</li>
+</ol>
+<p>On recovery the same flow runs in reverse: alert resolved, <code>last_reachable_at</code> stamped, recovery email sent.</p>
+
+<h2>On-box agent (Heartbeat add-on)</h2>
+<p>Opt-in per stack from <strong>Stack → Add-ons → Heartbeat → Install agent</strong>. The agent installs over SSH, runs under systemd, and pushes disk/RAM/docker/load every 60 s. The data drives the Health panel on the stack page (disk-use gauge, container counts, alerts at 80% / 90% disk).</p>
+<p>The agent doesn't replace the off-box probe — when the host dies the agent dies too. Keep both.</p>
+
+<h2>Host actions</h2>
+<p>The Host status panel exposes provider-level controls for AWS stacks:</p>
+<table>
+	<thead><tr><th>Action</th><th>What it runs</th><th>When the button shows</th></tr></thead>
+	<tbody>
+		<tr><td>Start</td><td><code>StartInstances</code></td><td>Provider state is <code>stopped</code> / <code>shutting-down</code></td></tr>
+		<tr><td>Stop</td><td><code>StopInstances</code></td><td>Provider state is <code>running</code> (confirms with EBS-billing warning)</td></tr>
+		<tr><td>Restart</td><td><code>RebootInstances</code></td><td>Provider state is <code>running</code>, or the host is unreachable</td></tr>
+		<tr><td>Console</td><td><code>GetConsoleOutput</code></td><td>Always (for AWS stacks with an instance)</td></tr>
+	</tbody>
+</table>
+<p>Each action is recorded as a <code>StackHostAction</code> row with the before/after provider state, user, and result. The Timeline section on the stack detail lists them alongside alert events.</p>
+
+<h2>Auto-recovery (opt-in)</h2>
+<p>Turn the toggle on in the Host status panel and pick a threshold (default 5 min). If the off-box probe reports the host unreachable for at least that long <em>and</em> AWS still says the instance is <code>running</code>, OwnStack fires a restart on its own, recorded with <code>triggered_by=auto_recovery</code>. It's rate-limited to one auto-recovery per 30 minutes per stack to avoid loops.</p>
+
+<div class="callout warning">
+	<div><strong>Auto-recovery is a sledgehammer.</strong><p>A reboot fixes a hung kernel and a wedged systemd, but it also drops in-flight requests and forces every container to restart. Use it for hosts you'd rather lose 60 s of traffic on than leave dark for hours; leave it off for stacks where a graceful shutdown matters.</p></div>
+</div>
+
+<h2>The serial console</h2>
+<p>For AWS stacks, the Host status panel's "View log" link calls <code>GetConsoleOutput</code> against EC2. That returns the most recent ~64 KB of hypervisor-captured serial output — the boot log, kernel messages, OOM dumps, panic traces. It's what you reach for when the OS is too sick to SSH into. The output is a snapshot, not a stream.</p>
+
+<h2>From the CLI</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack health &lt;stack&gt;
+<span class="out">=== node-hub-538 ===
+  IP:                44.237.78.27
+  Provider state:    running
+
+  Host reachability: ● Active (port:22, 60s probe)
+  On-box agent:      ○ Not installed
+
+  Active alerts (1):
+    • [critical] host_unreachable — TCP timeout (2026-05-10T18:13:25Z)</span></code></pre>
+
+<h2>Read next</h2>
+<ul>
+	<li><a href="/stacks/">Stacks overview</a></li>
+	<li><a href="/apps/resource-limits/">App resource limits</a> — pair host monitoring with per-app memory caps so one runaway can't take the host down.</li>
+	<li><a href="/cli/stack/">CLI: ownstack stack</a></li>
+</ul>

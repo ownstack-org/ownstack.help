@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stack monitoring — OwnStack</title>
+<meta name="description" content="Off-box port:22 reachability checks, on-box agent telemetry, host actions, auto-recovery, and the AWS serial console.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:title" content="Stack monitoring — OwnStack">
+<meta property="og:description" content="Off-box port:22 reachability checks, on-box agent telemetry, host actions, auto-recovery, and the AWS serial console.">
+<meta property="og:site_name" content="OwnStack">
+</head>
+<body>
+<header class="site-header">
+	<button class="menu-toggle" aria-label="Menu">☰</button>
+	<a href="/" class="site-brand">
+		<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="currentColor" opacity=".4"/><rect x="6" y="14" width="20" height="6" rx="2" fill="currentColor" opacity=".7"/><rect x="8" y="22" width="16" height="6" rx="2" fill="currentColor"/></svg>
+		<span class="wordmark">Own<span class="accent">Stack</span></span>
+	</a>
+	<nav class="site-nav">
+		<a href="/">Docs</a>
+		<a href="/cli/">CLI</a>
+		<a href="/api/">API</a>
+		<a href="https://github.com/ownstack-org">GitHub</a>
+	</nav>
+	<div class="search-box">
+		<input type="search" placeholder="Search docs…" aria-label="Search documentation">
+		<div class="search-results" role="listbox"></div>
+	</div>
+</header>
+
+<div class="layout">
+	<aside class="sidebar" aria-label="Documentation navigation">
+	<div class="sidebar-section">
+		<h3>Getting started</h3>
+		<ul>
+			<li><a href="/getting-started/">Welcome</a></li>
+			<li><a href="/getting-started/install-cli/">Install the CLI</a></li>
+			<li><a href="/getting-started/quickstart/">Deploy your first app</a></li>
+			<li><a href="/getting-started/migrating-from-heroku/">Migrate from Heroku</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Apps</h3>
+		<ul>
+			<li><a href="/apps/">Apps overview</a></li>
+			<li><a href="/apps/procfile/">Procfile</a></li>
+			<li><a href="/apps/config-vars/">Config vars</a></li>
+			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
+			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+			<li><a href="/apps/resource-limits/">Resource limits</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Stacks</h3>
+		<ul>
+			<li><a href="/stacks/">Stacks overview</a></li>
+			<li><a href="/stacks/aws/">AWS</a></li>
+			<li><a href="/stacks/gcp/">GCP</a></li>
+			<li><a href="/stacks/openstack/">OpenStack</a></li>
+			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a class="active" href="/stacks/monitoring/">Monitoring &amp; health</a></li>
+			<li><a href="/stacks/backups/">Stack backups</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Deployments</h3>
+		<ul>
+			<li><a href="/deployments/">Overview</a></li>
+			<li><a href="/deployments/git-deploys/">Git deploys</a></li>
+			<li><a href="/deployments/image-deploys/">Image deploys</a></li>
+			<li><a href="/deployments/multi-stack/">Multi-stack</a></li>
+			<li><a href="/deployments/pipelines/">Pipelines</a></li>
+			<li><a href="/deployments/build-types/">Build types</a></li>
+			<li><a href="/deployments/rollback/">Rollback</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Processes</h3>
+		<ul>
+			<li><a href="/processes/">Process types</a></li>
+			<li><a href="/processes/scaling/">Scaling</a></li>
+			<li><a href="/processes/healthchecks/">Healthchecks</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Databases</h3>
+		<ul>
+			<li><a href="/databases/">Overview</a></li>
+			<li><a href="/databases/postgres/">Postgres</a></li>
+			<li><a href="/databases/postgres/dumps/">— Dumps</a></li>
+			<li><a href="/databases/postgres/restore/">— Restore</a></li>
+			<li><a href="/databases/postgres/repair/">— Repair after import</a></li>
+			<li><a href="/databases/mysql/">MySQL</a></li>
+			<li><a href="/databases/redis/">Redis</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Domains &amp; SSL</h3>
+		<ul>
+			<li><a href="/domains-ssl/">Overview</a></li>
+			<li><a href="/domains-ssl/custom-domain/">Custom domain</a></li>
+			<li><a href="/domains-ssl/letsencrypt/">Let's Encrypt</a></li>
+			<li><a href="/domains-ssl/wildcard/">Wildcard certs</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Logging</h3>
+		<ul>
+			<li><a href="/logging/">Overview</a></li>
+			<li><a href="/logging/drains/">Log drains</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>CLI reference</h3>
+		<ul>
+			<li><a href="/cli/">Overview</a></li>
+			<li><a href="/cli/app/">app</a></li>
+			<li><a href="/cli/deploy/">deploy</a></li>
+			<li><a href="/cli/db/">db</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/profile/">profile</a></li>
+			<li><a href="/cli/config/">config</a></li>
+			<li><a href="/cli/ssh/">ssh</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Troubleshooting</h3>
+		<ul>
+			<li><a href="/troubleshooting/">Common issues</a></li>
+			<li><a href="/troubleshooting/deploy-failures/">Deploy failures</a></li>
+			<li><a href="/troubleshooting/db-auth/">Database auth</a></li>
+			<li><a href="/troubleshooting/dns/">DNS &amp; routing</a></li>
+		</ul>
+	</div>
+	<div class="sidebar-section">
+		<h3>Account</h3>
+		<ul>
+			<li><a href="/account/">Profiles &amp; tokens</a></li>
+			<li><a href="/account/billing/">Billing</a></li>
+		</ul>
+	</div>
+</aside>
+
+	<main class="content">
+		<article class="article">
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/stacks/">stacks</a><span class="sep">›</span><span>Stack monitoring</span></nav>
+			<h1>Stack monitoring</h1>
+			<p class="lede">Every provisioned stack gets two complementary layers of health monitoring out of the box: an <strong>off-box port:22 probe</strong> that detects when the host stops answering, and an opt-in <strong>on-box agent</strong> that reports disk, RAM, and Docker telemetry. Both surface in the stack detail page; the off-box probe is what alerts you when the host is genuinely down.</p>
+
+<h2 id="the-two-layers">The two layers</h2>
+<table>
+	<thead><tr><th></th><th>Off-box port monitor</th><th>On-box Heartbeat agent</th></tr></thead>
+	<tbody>
+		<tr><td>Answers</td><td>Is the host reachable right now?</td><td>What's my disk %, RAM, container count, load?</td></tr>
+		<tr><td>Where it runs</td><td>OwnStack's monitoring service, externally</td><td>On the stack itself</td></tr>
+		<tr><td>Works when the host is dead</td><td><strong>Yes</strong> — that's the point.</td><td>No — the agent dies with the host.</td></tr>
+		<tr><td>Detect time on a crash</td><td>~60–180 s</td><td>Whenever the agent times out (~5 min)</td></tr>
+		<tr><td>Install required</td><td>No (auto-provisioned)</td><td>Yes — install via Stack → Add-ons → Heartbeat</td></tr>
+	</tbody>
+</table>
+<p>They're not competing tools — they're two layers of the same product. The off-box probe is liveness; the on-box agent is telemetry.</p>
+
+<h2 id="off-box-port-monitor">Off-box port monitor</h2>
+<p>When a stack reaches <code>provisioned</code>, OwnStack creates a port-22 monitor in the Heartbeat service. It probes <code>tcp://&lt;instance_ip&gt;:22</code> every 60 seconds. Two consecutive failures (≈ 180 s) marks the host as down; the next success marks it recovered.</p>
+<p>On a down event:</p>
+<ol>
+	<li>Heartbeat POSTs an HMAC-signed webhook to the control plane.</li>
+	<li>The control plane writes a <code>host_unreachable</code> alert against the stack and stamps <code>unreachable_since</code>.</li>
+	<li>Account users with <code>notify_host_unreachable=true</code> get an email.</li>
+	<li>The stack list card switches to a red dot; the stack detail's Host status panel flips to <em>Unreachable for X</em>.</li>
+</ol>
+<p>On recovery the same flow runs in reverse: alert resolved, <code>last_reachable_at</code> stamped, recovery email sent.</p>
+
+<h2 id="on-box-agent-heartbeat-add-on">On-box agent (Heartbeat add-on)</h2>
+<p>Opt-in per stack from <strong>Stack → Add-ons → Heartbeat → Install agent</strong>. The agent installs over SSH, runs under systemd, and pushes disk/RAM/docker/load every 60 s. The data drives the Health panel on the stack page (disk-use gauge, container counts, alerts at 80% / 90% disk).</p>
+<p>The agent doesn't replace the off-box probe — when the host dies the agent dies too. Keep both.</p>
+
+<h2 id="host-actions">Host actions</h2>
+<p>The Host status panel exposes provider-level controls for AWS stacks:</p>
+<table>
+	<thead><tr><th>Action</th><th>What it runs</th><th>When the button shows</th></tr></thead>
+	<tbody>
+		<tr><td>Start</td><td><code>StartInstances</code></td><td>Provider state is <code>stopped</code> / <code>shutting-down</code></td></tr>
+		<tr><td>Stop</td><td><code>StopInstances</code></td><td>Provider state is <code>running</code> (confirms with EBS-billing warning)</td></tr>
+		<tr><td>Restart</td><td><code>RebootInstances</code></td><td>Provider state is <code>running</code>, or the host is unreachable</td></tr>
+		<tr><td>Console</td><td><code>GetConsoleOutput</code></td><td>Always (for AWS stacks with an instance)</td></tr>
+	</tbody>
+</table>
+<p>Each action is recorded as a <code>StackHostAction</code> row with the before/after provider state, user, and result. The Timeline section on the stack detail lists them alongside alert events.</p>
+
+<h2 id="auto-recovery-opt-in">Auto-recovery (opt-in)</h2>
+<p>Turn the toggle on in the Host status panel and pick a threshold (default 5 min). If the off-box probe reports the host unreachable for at least that long <em>and</em> AWS still says the instance is <code>running</code>, OwnStack fires a restart on its own, recorded with <code>triggered_by=auto_recovery</code>. It's rate-limited to one auto-recovery per 30 minutes per stack to avoid loops.</p>
+
+<div class="callout warning">
+	<div><strong>Auto-recovery is a sledgehammer.</strong><p>A reboot fixes a hung kernel and a wedged systemd, but it also drops in-flight requests and forces every container to restart. Use it for hosts you'd rather lose 60 s of traffic on than leave dark for hours; leave it off for stacks where a graceful shutdown matters.</p></div>
+</div>
+
+<h2 id="the-serial-console">The serial console</h2>
+<p>For AWS stacks, the Host status panel's "View log" link calls <code>GetConsoleOutput</code> against EC2. That returns the most recent ~64 KB of hypervisor-captured serial output — the boot log, kernel messages, OOM dumps, panic traces. It's what you reach for when the OS is too sick to SSH into. The output is a snapshot, not a stream.</p>
+
+<h2 id="from-the-cli">From the CLI</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack health &lt;stack&gt;
+<span class="out">=== node-hub-538 ===
+  IP:                44.237.78.27
+  Provider state:    running
+
+  Host reachability: ● Active (port:22, 60s probe)
+  On-box agent:      ○ Not installed
+
+  Active alerts (1):
+    • [critical] host_unreachable — TCP timeout (2026-05-10T18:13:25Z)</span></code></pre>
+
+<h2 id="read-next">Read next</h2>
+<ul>
+	<li><a href="/stacks/">Stacks overview</a></li>
+	<li><a href="/apps/resource-limits/">App resource limits</a> — pair host monitoring with per-app memory caps so one runaway can't take the host down.</li>
+	<li><a href="/cli/stack/">CLI: ownstack stack</a></li>
+</ul>
+		</article>
+	</main>
+	<aside class="toc" aria-label="On this page">
+		<h4>On this page</h4><ul><li class="h2"><a href="#the-two-layers">The two layers</a></li><li class="h2"><a href="#off-box-port-monitor">Off-box port monitor</a></li><li class="h2"><a href="#on-box-agent-heartbeat-add-on">On-box agent (Heartbeat add-on)</a></li><li class="h2"><a href="#host-actions">Host actions</a></li><li class="h2"><a href="#auto-recovery-opt-in">Auto-recovery (opt-in)</a></li><li class="h2"><a href="#the-serial-console">The serial console</a></li><li class="h2"><a href="#from-the-cli">From the CLI</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+	</aside>
+</div>
+<footer class="site-footer">
+	<p>OwnStack — © 2026 · <a href="https://github.com/ownstack-org/ownstack.help">Source on GitHub</a> · <a href="https://github.com/ownstack-org/ownstack.help/issues">Report a doc issue</a></p>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

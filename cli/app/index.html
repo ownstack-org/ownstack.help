@@ -49,6 +49,7 @@
 			<li><a href="/apps/config-vars/">Config vars</a></li>
 			<li><a href="/apps/domains/">Domains &amp; SSL</a></li>
 			<li><a href="/apps/ssh/">SSH &amp; one-off shells</a></li>
+			<li><a href="/apps/resource-limits/">Resource limits</a></li>
 		</ul>
 	</div>
 	<div class="sidebar-section">
@@ -59,6 +60,7 @@
 			<li><a href="/stacks/gcp/">GCP</a></li>
 			<li><a href="/stacks/openstack/">OpenStack</a></li>
 			<li><a href="/stacks/ssh/">Bring-your-own (SSH)</a></li>
+			<li><a href="/stacks/monitoring/">Monitoring &amp; health</a></li>
 			<li><a href="/stacks/backups/">Stack backups</a></li>
 		</ul>
 	</div>
@@ -175,6 +177,20 @@
 </table>
 <p>Both accept <code>--stack=NAME</code>, <code>--domain=DOMAIN</code>, <code>--deploy</code>.</p>
 
+<h2 id="resource-limits-memory-caps">Resource limits (memory caps)</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app limit &lt;app&gt;
+<span class="out">PROCESS              MEMORY          CPU
+default              -               -
+web                  512m            -
+worker               2g              -</span>
+
+<span class="prompt">$</span> ownstack app limit &lt;app&gt; --process-type=worker --memory=2g --restart
+<span class="out">Set worker memory=2g
+Restart triggered for worker.</span>
+
+<span class="prompt">$</span> ownstack app limit &lt;app&gt; --process-type=worker --clear</code></pre>
+<p>Sets a per-process-type memory cap so a runaway container only kills itself, not the host. See <a href="/apps/resource-limits/">Resource limits</a> for the why and when.</p>
+
 <h2 id="database-link-repair">Database link repair</h2>
 <pre class="terminal"><code><span class="prompt">$</span> ownstack app repair-db postgres &lt;app&gt; [--check-only]
 <span class="prompt">$</span> ownstack app repair-db mysql &lt;app&gt; [--check-only]</code></pre>
@@ -192,7 +208,7 @@
 		</article>
 	</main>
 	<aside class="toc" aria-label="On this page">
-		<h4>On this page</h4><ul><li class="h2"><a href="#list-amp-info">List &amp; info</a></li><li class="h2"><a href="#deploy-targets-multi-stack">Deploy targets (multi-stack)</a></li><li class="h2"><a href="#domains">Domains</a></li><li class="h2"><a href="#build-amp-type">Build &amp; type</a></li><li class="h2"><a href="#cloning-amp-replicating">Cloning &amp; replicating</a></li><li class="h2"><a href="#database-link-repair">Database link repair</a></li><li class="h2"><a href="#local-linking">Local linking</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+		<h4>On this page</h4><ul><li class="h2"><a href="#list-amp-info">List &amp; info</a></li><li class="h2"><a href="#deploy-targets-multi-stack">Deploy targets (multi-stack)</a></li><li class="h2"><a href="#domains">Domains</a></li><li class="h2"><a href="#build-amp-type">Build &amp; type</a></li><li class="h2"><a href="#cloning-amp-replicating">Cloning &amp; replicating</a></li><li class="h2"><a href="#resource-limits-memory-caps">Resource limits (memory caps)</a></li><li class="h2"><a href="#database-link-repair">Database link repair</a></li><li class="h2"><a href="#local-linking">Local linking</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
 	</aside>
 </div>
 <footer class="site-footer">

@@ -185,6 +185,12 @@
     • [critical] host_unreachable — TCP timeout (2026-05-10T18:13:25Z)</span></code></pre>
 <p>Shows the off-box port:22 probe state, the on-box Heartbeat agent state, the cloud provider's view of the instance, and any active alerts. See <a href="/stacks/monitoring/">Stack monitoring</a> for what each layer covers.</p>
 
+<h2 id="direct-ssh-access">Direct SSH access</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack add-key &lt;stack&gt; [--key=PATH]
+<span class="out">Key added. You can now connect directly:
+  ssh ubuntu@203.0.113.10</span></code></pre>
+<p>Appends your local public key (<code>~/.ssh/id_ed25519.pub</code> by default) to the stack's <code>authorized_keys</code>. After that you can <code>ssh ubuntu@&lt;ip&gt;</code> directly without going through the control-plane proxy. Idempotent. See <a href="/cli/ssh/">ownstack ssh</a> for the proxy-based alternative.</p>
+
 <h2 id="local-stacks-for-development">Local stacks (for development)</h2>
 <pre class="terminal"><code><span class="prompt">$</span> ownstack stack add-local
 <span class="prompt">$</span> ownstack local stack start
@@ -199,7 +205,7 @@
 		</article>
 	</main>
 	<aside class="toc" aria-label="On this page">
-		<h4>On this page</h4><ul><li class="h2"><a href="#listing">Listing</a></li><li class="h2"><a href="#plugins">Plugins</a></li><li class="h2"><a href="#patches">Patches</a></li><li class="h2"><a href="#data">Data</a></li><li class="h2"><a href="#backups">Backups</a></li><li class="h2"><a href="#disk">Disk</a></li><li class="h2"><a href="#health-amp-monitoring">Health &amp; monitoring</a></li><li class="h2"><a href="#local-stacks-for-development">Local stacks (for development)</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+		<h4>On this page</h4><ul><li class="h2"><a href="#listing">Listing</a></li><li class="h2"><a href="#plugins">Plugins</a></li><li class="h2"><a href="#patches">Patches</a></li><li class="h2"><a href="#data">Data</a></li><li class="h2"><a href="#backups">Backups</a></li><li class="h2"><a href="#disk">Disk</a></li><li class="h2"><a href="#health-amp-monitoring">Health &amp; monitoring</a></li><li class="h2"><a href="#direct-ssh-access">Direct SSH access</a></li><li class="h2"><a href="#local-stacks-for-development">Local stacks (for development)</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
 	</aside>
 </div>
 <footer class="site-footer">

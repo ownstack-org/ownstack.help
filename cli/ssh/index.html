@@ -154,7 +154,16 @@
 
 <h2 id="onto-the-stack-host">Onto the stack host</h2>
 <pre class="terminal"><code><span class="prompt">$</span> ownstack ssh stack &lt;stack&gt;</code></pre>
-<p>Drops you onto the stack as the <code>ubuntu</code> user. For OS-level operations: dokku plugin installs, log file inspection, disk operations.</p>
+<p>Drops you onto the stack as the <code>ubuntu</code> user via the control-plane proxy. For OS-level operations: dokku plugin installs, log file inspection, disk operations.</p>
+
+<h2 id="direct-ssh-bypass-the-proxy">Direct SSH (bypass the proxy)</h2>
+<p>Add your local public key to the stack once:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack stack add-key &lt;stack&gt;
+<span class="out">Key added. You can now connect directly:
+  ssh ubuntu@203.0.113.10</span></code></pre>
+<p>Then connect directly — no control plane involved:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ssh ubuntu@&lt;stack-ip&gt;</code></pre>
+<p>Auto-detects <code>~/.ssh/id_ed25519.pub</code>, <code>id_rsa.pub</code>, or <code>id_ecdsa.pub</code>. Use <code>--key=PATH</code> for a different key. Idempotent — safe to run again.</p>
 
 <h2 id="direct-dokku-ssh-advanced">Direct dokku SSH (advanced)</h2>
 <pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; apps:list
@@ -179,7 +188,7 @@
 		</article>
 	</main>
 	<aside class="toc" aria-label="On this page">
-		<h4>On this page</h4><ul><li class="h2"><a href="#into-the-running-container">Into the running container</a></li><li class="h2"><a href="#onto-the-stack-host">Onto the stack host</a></li><li class="h2"><a href="#direct-dokku-ssh-advanced">Direct dokku SSH (advanced)</a></li><li class="h2"><a href="#one-off-commands">One-off commands</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+		<h4>On this page</h4><ul><li class="h2"><a href="#into-the-running-container">Into the running container</a></li><li class="h2"><a href="#onto-the-stack-host">Onto the stack host</a></li><li class="h2"><a href="#direct-ssh-bypass-the-proxy">Direct SSH (bypass the proxy)</a></li><li class="h2"><a href="#direct-dokku-ssh-advanced">Direct dokku SSH (advanced)</a></li><li class="h2"><a href="#one-off-commands">One-off commands</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
 	</aside>
 </div>
 <footer class="site-footer">

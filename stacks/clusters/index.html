@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Clusters & load balancing — OwnStack</title>
-<meta name="description" content="Pool stacks behind a hostname. Caddy proxies as ordinary apps, drain-driven rolling deploys, and three ways to solve LB-of-LB.">
+<meta name="description" content="Pool stacks behind one or more hostnames. Named variants for atomic backend switching, app-stack or external URL upstreams, drain-driven rolling deploys, and three ways to solve LB-of-LB.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/site.css">
 <meta property="og:title" content="Clusters & load balancing — OwnStack">
-<meta property="og:description" content="Pool stacks behind a hostname. Caddy proxies as ordinary apps, drain-driven rolling deploys, and three ways to solve LB-of-LB.">
+<meta property="og:description" content="Pool stacks behind one or more hostnames. Named variants for atomic backend switching, app-stack or external URL upstreams, drain-driven rolling deploys, and three ways to solve LB-of-LB.">
 <meta property="og:site_name" content="OwnStack">
 </head>
 <body>
@@ -148,18 +148,18 @@
 		<article class="article">
 			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/stacks/">stacks</a><span class="sep">›</span><span>Clusters & load balancing</span></nav>
 			<h1>Clusters & load balancing</h1>
-			<p class="lede">A <strong>cluster</strong> pools N stacks behind one hostname and routes traffic across them. The proxy is an ordinary OwnStack app owned by the cluster — same logs / restart / SSH / scale / maintenance as anything else. You pick how the edge solves "LB the LB" when you create the cluster: DNS round-robin, Cloudflare, or AWS ALB.</p>
+			<p class="lede">A <strong>cluster</strong> fronts one or more <strong>hostnames</strong> and routes traffic to a set of <strong>upstreams</strong> grouped under named <strong>variants</strong>. The proxy is an ordinary OwnStack app owned by the cluster — same logs / restart / SSH / scale / maintenance as anything else. You pick how the edge solves "LB the LB" when you create the cluster: DNS round-robin, Cloudflare, or AWS ALB. Cutover between variants is one API call (or <code>ownstack cluster switch &lt;c&gt; --to=&lt;v&gt;</code>) and reweights every hostname atomically.</p>
 
 <h2 id="the-three-tiers">The three tiers</h2>
 <table>
 	<thead><tr><th>Tier</th><th>What runs there</th><th>What it does</th></tr></thead>
 	<tbody>
 		<tr><td>Edge</td><td>DNS records, Cloudflare proxy, or AWS ALB</td><td>Solves "LB the LB". One IP/name out, N proxies in.</td></tr>
-		<tr><td>Proxy</td><td>≥2 stacks running a Caddy app owned by the cluster</td><td>TLS termination, member health checks, sub-second failover.</td></tr>
-		<tr><td>Member</td><td>1..N app stacks with your code on them</td><td>The thing being load-balanced.</td></tr>
+		<tr><td>Proxy</td><td>≥1 stack running a Caddy app owned by the cluster</td><td>One <code>reverse_proxy</code> block per hostname, sub-second member health checks.</td></tr>
+		<tr><td>Upstream</td><td>An OwnStack app's stack IPs, or an external HTTPS URL</td><td>The thing being load-balanced. Grouped under named variants.</td></tr>
 	</tbody>
 </table>
-<p>The proxy is a regular OwnStack app — you can see it in the apps list with a "managed by cluster X" badge, tail its logs, restart it, SSH in, scale it. The cluster regenerates its <code>Caddyfile</code> on member changes and dokku-redeploys it; everything you'd do to an ordinary app still works.</p>
+<p>The proxy is a regular OwnStack app — you can see it in the apps list, tail its logs, restart it, SSH in, scale it. The cluster regenerates its <code>Caddyfile</code> when domains change and pushes per-host <code>CLUSTER_UPSTREAMS_&lt;HOST&gt;</code> env vars (then <code>dokku ps:rebuild</code>) when variants or upstreams change. Everything you'd do to an ordinary app still works.</p>
 
 <h2 id="edge-modes">Edge modes</h2>
 <p>You pick one at create time. Default is <code>dns_rr</code>.</p>
@@ -173,6 +173,37 @@
 	</tbody>
 </table>
 <p>Cloudflare and ALB need credentials in the cluster's <code>edge_config</code>: <code>api_token</code> + <code>zone_id</code> for Cloudflare, <code>target_group_arn</code> + <code>region</code> for ALB. You set them in the cluster form.</p>
+
+<h2 id="domains">Domains</h2>
+<p>A cluster fronts <strong>one or more hostnames</strong>. If your product spans multiple subdomains (e.g. <code>myhavenbot.com</code> for the marketing site and <code>app.myhavenbot.com</code> for the application), they all belong to the same cluster so cutover stays atomic across them.</p>
+<pre><code>ownstack cluster domain add api myhavenbot.com
+ownstack cluster domain add api app.myhavenbot.com
+ownstack cluster domain list api
+ownstack cluster domain remove api app.myhavenbot.com</code></pre>
+<p>Each hostname becomes a separate <code>reverse_proxy</code> block in the proxy's Caddyfile. The control plane manages the edge records (DNS-RR, Cloudflare, ALB) per hostname under the edge mode you chose.</p>
+
+<h2 id="variants-and-switching">Variants and switching</h2>
+<p>A <strong>variant</strong> is a named group of upstreams (e.g. <code>heroku</code>, <code>havenhelix</code>, <code>blue</code>, <code>green</code>). The cluster routes to whichever variant currently has non-zero weight. Switching is one atomic reweight across <em>all</em> hostnames — useful for blue/green cutover, migrating off an external platform, or rolling back a bad deploy in seconds.</p>
+<pre><code>ownstack cluster variant add api heroku     --weight=100
+ownstack cluster variant add api havenhelix --weight=0
+ownstack cluster switch api --to=havenhelix     # all hostnames flip atomically
+ownstack cluster switch api --to=heroku         # roll back in seconds</code></pre>
+<p>Each variant has its own set of <strong>upstreams</strong>, one per hostname it serves. An upstream is either:</p>
+<ul>
+	<li>An <strong>OwnStack app</strong> — resolves to the app's stack IPs (this is the v1 cluster member behavior).</li>
+	<li>An <strong>external HTTPS URL</strong> (<code>scheme://host[:port]</code>, no path) — forwards to anything reachable on the public internet: a Heroku app, another OwnStack deployment, a third-party SaaS.</li>
+</ul>
+<pre><code># Wire a variant's hostnames to external URLs:
+ownstack cluster upstream add api \
+  --variant=heroku --hostname=myhavenbot.com \
+  --url=https://myhavenbot.herokuapp.com
+ownstack cluster upstream add api \
+  --variant=heroku --hostname=app.myhavenbot.com \
+  --url=https://app-myhavenbot.herokuapp.com
+
+# Or to an OwnStack app you've deployed:
+ownstack cluster upstream add api --variant=havenhelix --app=myhavenbot-api</code></pre>
+<p>URL upstreams must be <code>scheme://host[:port]</code> only — Caddy's <code>reverse_proxy</code> directive doesn't accept paths, query strings, or fragments. The API rejects URLs with any of those at save time so you don't end up with a broken Caddyfile on the next rebuild.</p>
 
 <h2 id="members-and-draining">Members and draining</h2>
 <p>A member is an app in the cluster. Members have three states:</p>
@@ -204,17 +235,37 @@
 <p>The member check uses Caddy's built-in <code>health_uri</code> directive — you configure the path / interval / timeout per cluster. Defaults are <code>/</code> every 5 s with a 2 s timeout.</p>
 
 <h2 id="creating-a-cluster">Creating a cluster</h2>
-<p>From the UI: <strong>Clusters → New</strong>. Fill in the name + hostname, pick edge mode + proxy replicas, optionally point at an existing proxy app (or leave blank to stamp one from the default Caddy template).</p>
-<p>From the CLI:</p>
-<pre><code>ownstack cluster create api \
-  --hostname=api.example.com \
+<p>From the UI: <strong>Clusters → New</strong>. Fill in the name, pick edge mode + proxy replicas, optionally point at an existing proxy app (or leave blank to stamp one from the default Caddy template). Add domains, variants, and upstreams after creation.</p>
+<p>From the CLI, end-to-end:</p>
+<pre><code># 1. Create the cluster
+ownstack cluster create api \
   --edge=dns_rr \
-  --proxy-count=2</code></pre>
-<p>Then add members:</p>
-<pre><code>ownstack cluster member add api my-rails-app
-ownstack cluster member add api my-rails-app-replica</code></pre>
-<p>And deploy:</p>
-<pre><code>ownstack cluster deploy api --strategy=rolling</code></pre>
+  --proxy-count=2
+
+# 2. Add the hostnames it fronts
+ownstack cluster domain add api api.example.com
+ownstack cluster domain add api app.example.com   # optional second hostname
+
+# 3. Define the variants (named backend groups)
+ownstack cluster variant add api blue  --weight=100
+ownstack cluster variant add api green --weight=0
+
+# 4. Wire upstreams: either an OwnStack app or an external URL
+ownstack cluster upstream add api --variant=blue \
+  --hostname=api.example.com --app=my-rails-app
+ownstack cluster upstream add api --variant=green \
+  --hostname=api.example.com --url=https://my-rails-app.herokuapp.com
+
+# 5. Inspect topology
+ownstack cluster status api
+
+# 6. Cutover (atomic across all hostnames)
+ownstack cluster switch api --to=green
+ownstack cluster switch api --to=blue   # roll back
+
+# 7. Deploy across app-based upstreams when ready
+ownstack cluster deploy api --strategy=rolling</code></pre>
+<p>The legacy <code>ownstack cluster member add|drain|undrain|remove</code> subcommands are kept as a single-variant convenience for clusters that don't need the variant model.</p>
 
 <h2 id="how-it-composes-with-the-rest-of-ownstack">How it composes with the rest of OwnStack</h2>
 <ul>
@@ -224,16 +275,17 @@ ownstack cluster member add api my-rails-app-replica</code></pre>
 </ul>
 
 <h2 id="bring-your-own-proxy">Bring your own proxy</h2>
-<p>The proxy app is just an app. If you want custom Caddy directives, a HAProxy controller, or some weird Envoy fork, write it as an OwnStack app and point the cluster at it with <code>proxy_app_id</code>. The only contract is:</p>
+<p>The proxy app is just an app. If you want custom Caddy directives, a HAProxy controller, or some weird Envoy fork, write it as an OwnStack app and point the cluster at it with <code>proxy_app_id</code>. The contract is:</p>
 <ol>
-	<li>Read upstream IPs from the <code>CLUSTER_UPSTREAMS</code> env var (space-separated).</li>
+	<li>Read upstreams from per-hostname env vars: <code>CLUSTER_UPSTREAMS_&lt;HOST&gt;</code>, where <code>&lt;HOST&gt;</code> is the hostname uppercased with non-alphanumeric chars replaced by <code>_</code>. Example: <code>myhavenbot.com</code> → <code>CLUSTER_UPSTREAMS_MYHAVENBOT_COM</code>. Each var is a space-separated list of stack IPs and/or <code>https://...</code> URLs.</li>
+	<li>A union <code>CLUSTER_UPSTREAMS</code> env var is also set, containing every upstream across every hostname. Useful for legacy single-host proxies.</li>
 	<li>Expose <code>/_cluster/healthz</code> returning 200 when ready.</li>
 </ol>
-<p>The cluster sets <code>CLUSTER_UPSTREAMS</code> via <code>dokku config:set</code> whenever membership changes, then bounces the app.</p>
+<p>The cluster sets these env vars via <code>dokku config:set --no-restart</code> whenever variants or upstreams change, then runs <code>dokku ps:rebuild</code> so the container picks up the new values. (Earlier versions used <code>ps:restart</code> which silently failed for Dockerfile-based proxies.)</p>
 		</article>
 	</main>
 	<aside class="toc" aria-label="On this page">
-		<h4>On this page</h4><ul><li class="h2"><a href="#the-three-tiers">The three tiers</a></li><li class="h2"><a href="#edge-modes">Edge modes</a></li><li class="h2"><a href="#members-and-draining">Members and draining</a></li><li class="h2"><a href="#deploys">Deploys</a></li><li class="h2"><a href="#health-checks">Health checks</a></li><li class="h2"><a href="#creating-a-cluster">Creating a cluster</a></li><li class="h2"><a href="#how-it-composes-with-the-rest-of-ownstack">How it composes with the rest of OwnStack</a></li><li class="h2"><a href="#bring-your-own-proxy">Bring your own proxy</a></li></ul>
+		<h4>On this page</h4><ul><li class="h2"><a href="#the-three-tiers">The three tiers</a></li><li class="h2"><a href="#edge-modes">Edge modes</a></li><li class="h2"><a href="#domains">Domains</a></li><li class="h2"><a href="#variants-and-switching">Variants and switching</a></li><li class="h2"><a href="#members-and-draining">Members and draining</a></li><li class="h2"><a href="#deploys">Deploys</a></li><li class="h2"><a href="#health-checks">Health checks</a></li><li class="h2"><a href="#creating-a-cluster">Creating a cluster</a></li><li class="h2"><a href="#how-it-composes-with-the-rest-of-ownstack">How it composes with the rest of OwnStack</a></li><li class="h2"><a href="#bring-your-own-proxy">Bring your own proxy</a></li></ul>
 	</aside>
 </div>
 <footer class="site-footer">

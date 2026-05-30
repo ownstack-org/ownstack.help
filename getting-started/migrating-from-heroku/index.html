@@ -174,8 +174,8 @@
 <span class="out">https://xfer.heroku.com/...</span></code></pre>
 <p>OwnStack can restore directly from a Heroku backup URL — see <a href="/databases/postgres/restore/">Restore</a>.</p>
 
-<h2 id="step-3-create-the-app-on-ownstack">Step 3 — Create the app on OwnStack</h2>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack create --no-interview my-app buildpack
+<h2 id="step-3-generate-the-app-on-ownstack">Step 3 — Generate the app on OwnStack</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack generate --no-interview my-app buildpack
 <span class="prompt">$</span> ownstack remote -a my-app
 <span class="prompt">$</span> ownstack app stacks:add my-app &lt;your-stack&gt;</code></pre>
 
@@ -215,7 +215,7 @@
 		</article>
 	</main>
 	<aside class="toc" aria-label="On this page">
-		<h4>On this page</h4><ul><li class="h2"><a href="#what-changes-what-doesn-t">What changes, what doesn't</a></li><li class="h2"><a href="#step-1-inventory-the-heroku-app">Step 1 — Inventory the Heroku app</a></li><li class="h2"><a href="#step-2-capture-a-postgres-dump">Step 2 — Capture a Postgres dump</a></li><li class="h2"><a href="#step-3-create-the-app-on-ownstack">Step 3 — Create the app on OwnStack</a></li><li class="h2"><a href="#step-4-push-config-vars">Step 4 — Push config vars</a></li><li class="h2"><a href="#step-5-provision-the-database-then-restore">Step 5 — Provision the database, then restore</a></li><li class="h2"><a href="#step-6-deploy">Step 6 — Deploy</a></li><li class="h2"><a href="#step-7-swap-dns">Step 7 — Swap DNS</a></li><li class="h2"><a href="#step-8-cut-over">Step 8 — Cut over</a></li></ul>
+		<h4>On this page</h4><ul><li class="h2"><a href="#what-changes-what-doesn-t">What changes, what doesn't</a></li><li class="h2"><a href="#step-1-inventory-the-heroku-app">Step 1 — Inventory the Heroku app</a></li><li class="h2"><a href="#step-2-capture-a-postgres-dump">Step 2 — Capture a Postgres dump</a></li><li class="h2"><a href="#step-3-generate-the-app-on-ownstack">Step 3 — Generate the app on OwnStack</a></li><li class="h2"><a href="#step-4-push-config-vars">Step 4 — Push config vars</a></li><li class="h2"><a href="#step-5-provision-the-database-then-restore">Step 5 — Provision the database, then restore</a></li><li class="h2"><a href="#step-6-deploy">Step 6 — Deploy</a></li><li class="h2"><a href="#step-7-swap-dns">Step 7 — Swap DNS</a></li><li class="h2"><a href="#step-8-cut-over">Step 8 — Cut over</a></li></ul>
 	</aside>
 </div>
 <footer class="site-footer">

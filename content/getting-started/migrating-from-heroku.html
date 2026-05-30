@@ -25,8 +25,8 @@
 <span class="out">https://xfer.heroku.com/...</span></code></pre>
 <p>OwnStack can restore directly from a Heroku backup URL — see <a href="/databases/postgres/restore/">Restore</a>.</p>
 
-<h2>Step 3 — Create the app on OwnStack</h2>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack create --no-interview my-app buildpack
+<h2>Step 3 — Generate the app on OwnStack</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack generate --no-interview my-app buildpack
 <span class="prompt">$</span> ownstack remote -a my-app
 <span class="prompt">$</span> ownstack app stacks:add my-app &lt;your-stack&gt;</code></pre>
 

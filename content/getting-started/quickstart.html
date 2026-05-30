@@ -17,11 +17,11 @@ JS
 <span class="prompt">$</span> echo "web: npm start" &gt; Procfile
 <span class="prompt">$</span> git init -b main && git add . && git commit -m initial</code></pre>
 
-<h2>1. Create the app</h2>
-<p>From inside the repo, register an app on the control plane and link your checkout to it:</p>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack create --no-interview hello buildpack
+<h2>1. Generate the app</h2>
+<p>From inside the repo, scaffold an app and link your checkout to it:</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack generate --no-interview hello buildpack
 <span class="prompt">$</span> ownstack remote -a hello</code></pre>
-<p><code>create</code> registers the app on the control plane and writes a minimal <code>.ownstack-config</code> in your repo. <code>remote -a</code> embeds the app token so subsequent commands know which app to talk to.</p>
+<p><code>generate</code> scaffolds the app and writes a minimal <code>.ownstack-config</code> in your repo. <code>remote -a</code> embeds the app token so subsequent commands know which app to talk to.</p>
 
 <h2>2. Pick a stack</h2>
 <p>Apps deploy to one or more stacks. If you only have one provisioned stack, the deploy will use it automatically. If you have several, attach the one you want explicitly:</p>

@@ -1,0 +1,3563 @@
+{
+  "overview": {
+    "name": "OwnStack CLI",
+    "tagline": "Heroku-style ergonomics on infrastructure you own.",
+    "description": "OwnStack is a control plane for deploying apps onto stacks you own.\nThe CLI scaffolds composable apps, drives local development, and talks\nto the control-plane API for deploys, logs, SSH, and more.\n\nTwo big ideas:\n  - Apps are composed from atomic components (rails, nestjs, react, angular, docs, wordpress).\n  - Stacks are infrastructure you own (AWS, GCP, OpenStack, bare metal). One control plane drives many stacks.\n\nConfiguration:\n  - Global:  ~/.ownstack/config   (OWNSTACK_API_URL, OWNSTACK_API_TOKEN)\n  - Project: .ownstack-config     (OWNSTACK_APP_ID or APP_NAME, OWNSTACK_APP_TOKEN)\n  - Linked: .ownstack-app         (app id; created by `ownstack remote -a`)\n",
+    "install": "macOS / Linux:\n  curl -fsSL https://ownstack.org/install.sh | bash\n\nFrom a local clone:\n  cd /path/to/ownstack/cli && ./install.sh\n\nVerify:\n  ownstack --help\n",
+    "auth": "Most control-plane and deploy commands need auth.\n  ownstack login                       # browser device-code flow\n  ownstack login --token YOUR_TOKEN    # direct (from Settings → API token)\nTokens live in ~/.ownstack/config. Override the API URL with OWNSTACK_API_URL.\n"
+  },
+  "groups": [
+    {
+      "id": "app-generation",
+      "title": "App generation",
+      "body": "Scaffold apps locally from atomic components. No control plane required.",
+      "commands": [
+        {
+          "name": "generate",
+          "summary": "Generate a composable app from atomic components.",
+          "flags": [
+            {
+              "flag": "--push",
+              "desc": "Push to ownstack Git after generating (requires login)."
+            },
+            {
+              "flag": "--no-interview",
+              "desc": "Skip interactive prompts (fully non-interactive)."
+            },
+            {
+              "flag": "--app-number=N",
+              "desc": "Numeric suffix when multiple apps share one base."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack generate",
+              "desc": "Interactive — prompts for name and components."
+            },
+            {
+              "cmd": "ownstack generate myapp",
+              "desc": "Named app, interactive component picker."
+            },
+            {
+              "cmd": "ownstack generate myapp rails react docs",
+              "desc": "Full stack — Rails API + React frontend + docs site."
+            },
+            {
+              "cmd": "ownstack generate myapi rails",
+              "desc": "Backend only."
+            },
+            {
+              "cmd": "ownstack generate myapp nestjs angular",
+              "desc": "NestJS + Angular."
+            },
+            {
+              "cmd": "ownstack generate --no-interview myapp rails react --app-number=1",
+              "desc": "Fully non-interactive."
+            },
+            {
+              "cmd": "ownstack generate --push myapp rails react",
+              "desc": "Generate and push to ownstack Git."
+            }
+          ],
+          "notes": "Available components: rails, nestjs, react, angular, docs, wordpress.\n"
+        },
+        {
+          "name": "regenerate",
+          "aliases": [
+            "regen"
+          ],
+          "summary": "Regenerate an existing app from its saved config.",
+          "examples": [
+            {
+              "cmd": "ownstack regenerate myapp",
+              "desc": "Regenerate by app name."
+            },
+            {
+              "cmd": "ownstack regen",
+              "desc": "Run from inside an app dir to refresh templates."
+            },
+            {
+              "cmd": "ownstack regen rails",
+              "desc": "Regenerate only the Rails component."
+            },
+            {
+              "cmd": "ownstack regen ssl",
+              "desc": "Regenerate only SSL certificates."
+            }
+          ]
+        },
+        {
+          "name": "list",
+          "summary": "List available components.",
+          "examples": [
+            {
+              "cmd": "ownstack list"
+            }
+          ]
+        },
+        {
+          "name": "info",
+          "summary": "Show details about a component.",
+          "examples": [
+            {
+              "cmd": "ownstack info rails"
+            },
+            {
+              "cmd": "ownstack info react"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "local-development",
+      "title": "Local development",
+      "body": "Run apps locally with Docker Compose or directly. Most commands run from inside the app directory.",
+      "commands": [
+        {
+          "name": "local start",
+          "aliases": [
+            "local stop",
+            "local restart",
+            "local down"
+          ],
+          "summary": "Start, stop, restart, or tear down local services.",
+          "flags": [
+            {
+              "flag": "-d",
+              "desc": "Detached mode."
+            },
+            {
+              "flag": "--build",
+              "desc": "Rebuild images before starting."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack local start",
+              "desc": "Start backend in foreground."
+            },
+            {
+              "cmd": "ownstack local start -d",
+              "desc": "Detached."
+            },
+            {
+              "cmd": "ownstack local start --build",
+              "desc": "Rebuild then start."
+            },
+            {
+              "cmd": "ownstack local start rails",
+              "desc": "Start a specific service."
+            },
+            {
+              "cmd": "ownstack local restart"
+            },
+            {
+              "cmd": "ownstack local stop"
+            },
+            {
+              "cmd": "ownstack local down",
+              "desc": "Stop and remove containers."
+            }
+          ]
+        },
+        {
+          "name": "local open",
+          "summary": "Open the local app URL in a browser.",
+          "examples": [
+            {
+              "cmd": "ownstack local open"
+            },
+            {
+              "cmd": "ownstack local open frontend"
+            }
+          ]
+        },
+        {
+          "name": "local run",
+          "summary": "Run a command inside a local service container.",
+          "examples": [
+            {
+              "cmd": "ownstack local run rails db:migrate"
+            },
+            {
+              "cmd": "ownstack local run rails console"
+            },
+            {
+              "cmd": "ownstack local run rails db:seed"
+            }
+          ]
+        },
+        {
+          "name": "local stack",
+          "summary": "Manage a local Dokku stack (Docker container) for dev/testing.",
+          "examples": [
+            {
+              "cmd": "ownstack local stack",
+              "desc": "Show status."
+            },
+            {
+              "cmd": "ownstack local stack start"
+            },
+            {
+              "cmd": "ownstack local stack start --no-build"
+            },
+            {
+              "cmd": "ownstack local stack stop",
+              "desc": "Stop and remove."
+            }
+          ]
+        },
+        {
+          "name": "connect",
+          "summary": "Open the control plane web UI to link a local app.",
+          "flags": [
+            {
+              "flag": "--dev",
+              "desc": "Use the local control plane URL."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack connect"
+            },
+            {
+              "cmd": "ownstack connect --dev"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "control-plane",
+      "title": "Control-plane commands",
+      "body": "Talk to the control-plane API. Most require `ownstack login` first.",
+      "commands": [
+        {
+          "name": "remote",
+          "summary": "Show or set the control-plane app linked to this repo.",
+          "flags": [
+            {
+              "flag": "-a APP",
+              "desc": "Link to the given app (by name or id)."
+            },
+            {
+              "flag": "--relink",
+              "aliases": [
+                "--force-link"
+              ],
+              "desc": "Replace an existing link in this directory (overwrites .ownstack-app / .ownstack-config)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack remote",
+              "desc": "Show the currently linked app."
+            },
+            {
+              "cmd": "ownstack remote -a my-app",
+              "desc": "Link this repo to an app."
+            },
+            {
+              "cmd": "ownstack remote -a my-app --relink",
+              "desc": "Re-link a directory that already points to a different app."
+            }
+          ],
+          "notes": "Creates `.ownstack-app` and stores the deploy token in `.ownstack-config`.\nIf the directory is already linked to a *different* app, linking is refused so you\ndon't clobber another app's link by standing in the wrong repo (a common footgun with\n`ownstack app create`, which auto-links the current directory). Pass `--relink` to\noverride, or `cd` to the intended app's directory first. Re-linking to the same app is\nalways allowed (it just refreshes the deploy token).\n"
+        },
+        {
+          "name": "remote logs",
+          "summary": "Fetch app logs via the control plane (no SSH needed).",
+          "flags": [
+            {
+              "flag": "--tail N",
+              "desc": "Last N lines (default 100)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack remote logs"
+            },
+            {
+              "cmd": "ownstack remote logs --tail 200"
+            },
+            {
+              "cmd": "OWNSTACK_LOGS_FOLLOW=1 ownstack remote logs",
+              "desc": "Stream."
+            }
+          ]
+        },
+        {
+          "name": "remote deploy-log",
+          "summary": "View deployment (build + release) logs — same as the UI's \"View log\".",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "Target app explicitly."
+            },
+            {
+              "flag": "--deployment=ID",
+              "desc": "Specific deployment id."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack remote deploy-log"
+            },
+            {
+              "cmd": "ownstack remote deploy-log --app=heartbeat"
+            },
+            {
+              "cmd": "ownstack remote deploy-log --deployment=123"
+            }
+          ]
+        },
+        {
+          "name": "remote agent",
+          "summary": "Claude Code on the stack — status, sessions, headless runs, interactive console.",
+          "flags": [
+            {
+              "flag": "--app=NAME_OR_ID",
+              "desc": "Target app (or link via `ownstack remote -a`)."
+            },
+            {
+              "flag": "--json",
+              "desc": "JSON output for status/sessions/show."
+            },
+            {
+              "flag": "--wait",
+              "desc": "Stream output until the run completes."
+            },
+            {
+              "flag": "--session=ID",
+              "desc": "Specific session."
+            },
+            {
+              "flag": "-m, --message",
+              "desc": "Inline rollout message."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack remote agent status [--json] [--app=my-app]"
+            },
+            {
+              "cmd": "ownstack remote agent setup [--app=my-app]"
+            },
+            {
+              "cmd": "ownstack remote agent sessions [--json] [--app=my-app]"
+            },
+            {
+              "cmd": "ownstack remote agent show SESSION_ID [--json] [--app=my-app]"
+            },
+            {
+              "cmd": "ownstack remote agent run \"your prompt\" [--wait] [--app=my-app]"
+            },
+            {
+              "cmd": "ownstack remote agent run --wait - < instructions.md",
+              "desc": "Stdin prompt, then stream."
+            },
+            {
+              "cmd": "ownstack remote agent stream SESSION_ID [--app=my-app]"
+            },
+            {
+              "cmd": "ownstack remote agent rollout [--app=my-app] [--session=ID] [-m \"msg\"]"
+            },
+            {
+              "cmd": "ownstack remote agent console [--app=my-app]",
+              "desc": "Interactive Claude; full repo on stack host (needs jq)."
+            }
+          ],
+          "notes": "Requires jq for `run`, `rollout`, `console`, and human-readable `status` / `sessions` / `show`.\n`console` calls GET …/claude_code/bootstrap on each open; cap defaults to 90/hour per app,\ntunable with CLAUDE_CODE_MAX_BOOTSTRAP_PER_HOUR. Over the cap returns 429 (claude_bootstrap_rate_limited).\nThe \"dangerously skip permissions\" mode defaults on; respect features.claude_code_dangerously_skip_permissions.\n"
+        }
+      ]
+    },
+    {
+      "id": "invitations",
+      "title": "Signup invitations",
+      "body": "Superuser commands for signup-access invitations, mirroring the\n/admin/signup-access web UI. An invitation is a one-time access key\nthat lets someone sign up (for a new account) or join an existing\naccount. Give it an email and the invitee is emailed the signup link;\nomit the email to get a raw token you share yourself.\n",
+      "commands": [
+        {
+          "name": "invites list",
+          "summary": "List invitations, most recent first.",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Emit raw API JSON instead of the formatted table."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack invites list",
+              "desc": "Show id, kind, status, account, email lock, and created date."
+            }
+          ]
+        },
+        {
+          "name": "invites create",
+          "summary": "Create an invitation and print the one-time access key.",
+          "flags": [
+            {
+              "flag": "--account NAME|SLUG|ID",
+              "desc": "Existing account to join (implies --kind join_account)."
+            },
+            {
+              "flag": "--email ADDR",
+              "desc": "Restrict redemption to this address and email them the signup link."
+            },
+            {
+              "flag": "--note TEXT",
+              "desc": "Internal note shown in the list."
+            },
+            {
+              "flag": "--kind new_account|join_account",
+              "desc": "Override the kind (default join_account if --account is given, else new_account)."
+            },
+            {
+              "flag": "--json",
+              "desc": "Emit raw API JSON instead of formatted output."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack invites create --email new@example.com",
+              "desc": "New-account invite, emailed to the invitee."
+            },
+            {
+              "cmd": "ownstack invites create --account acme --email teammate@acme.com",
+              "desc": "Invite someone to join the acme account."
+            },
+            {
+              "cmd": "ownstack invites create",
+              "desc": "Raw new-account token you share out of band (no email)."
+            }
+          ]
+        },
+        {
+          "name": "invites revoke",
+          "summary": "Revoke a pending invitation.",
+          "examples": [
+            {
+              "cmd": "ownstack invites revoke 42",
+              "desc": "Revoke invitation id 42."
+            }
+          ]
+        }
+      ],
+      "notes": "Requires a superuser token (the backend returns 403 otherwise) and jq for\nformatted output and account-name/slug resolution. The access key is shown\nonly once at creation; it is stored hashed and cannot be retrieved later.\n"
+    },
+    {
+      "id": "deployment",
+      "title": "Deployment",
+      "body": "Push code through the control plane. The control plane clones your repo and pushes to Dokku on the stack.",
+      "commands": [
+        {
+          "name": "deploy",
+          "summary": "Trigger a git-based deploy via the control plane.",
+          "flags": [
+            {
+              "flag": "--wait",
+              "desc": "Stream deployment output until complete. If a deploy is already in progress, attaches to it instead of erroring."
+            },
+            {
+              "flag": "--stack=NAME",
+              "desc": "Target a specific stack (for multi-stack apps)."
+            },
+            {
+              "flag": "--image",
+              "desc": "Deploy from a local Docker image instead of git."
+            },
+            {
+              "flag": "--clear-stuck",
+              "desc": "Clear stuck deployments before deploying."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack deploy",
+              "desc": "Deploy the linked app."
+            },
+            {
+              "cmd": "ownstack deploy my-app",
+              "desc": "Deploy by name."
+            },
+            {
+              "cmd": "ownstack deploy --wait"
+            },
+            {
+              "cmd": "ownstack deploy --stack=prod"
+            },
+            {
+              "cmd": "ownstack deploy --image"
+            },
+            {
+              "cmd": "ownstack deploy --image myapp:latest"
+            },
+            {
+              "cmd": "ownstack deploy --clear-stuck"
+            }
+          ],
+          "notes": "`--wait` attaches to an in-progress deploy rather than failing with \"a deploy is\nalready in progress\", so re-running `deploy --wait` always ends up streaming the live\ndeployment. Use `deploy:status` for a one-shot, non-interactive status read.\n"
+        },
+        {
+          "name": "deploy:status",
+          "summary": "Print the latest deployment status per stack (non-interactive; for agents/CI).",
+          "flags": [
+            {
+              "flag": "--stack=NAME",
+              "desc": "Only show the given stack."
+            },
+            {
+              "flag": "--json",
+              "desc": "Emit the latest-per-stack deployments as JSON."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack deploy:status",
+              "desc": "Latest status per stack for the linked app."
+            },
+            {
+              "cmd": "ownstack deploy:status my-app"
+            },
+            {
+              "cmd": "ownstack deploy:status --stack=prod --json"
+            }
+          ],
+          "notes": "Reads /api/apps/:id/deployments so you do not have to scrape `ownstack app info`.\nExit code reflects the most recent deployment: 0 deployed/idle, 1 failed, 2 in-progress.\n"
+        },
+        {
+          "name": "run",
+          "summary": "Run a one-off command in the app's container via the control plane (like heroku run).",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "Target app (otherwise the first argument, or the linked repo)."
+            },
+            {
+              "flag": "--stack=NAME",
+              "desc": "Run on a specific stack (for multi-stack apps)."
+            },
+            {
+              "flag": "--no-stream",
+              "desc": "Use the buffered endpoint instead of streaming (returns all output at the end)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack run -- rails db:migrate",
+              "desc": "Run in the linked app."
+            },
+            {
+              "cmd": "ownstack run myapp -- rails runner 'puts User.count'"
+            },
+            {
+              "cmd": "ownstack run --app=myapp --stack=prod -- rails db:migrate:status"
+            },
+            {
+              "cmd": "ownstack run myapp --no-stream -- echo hi"
+            }
+          ],
+          "notes": "The control plane SSHes to the stack with its stored key, so no local SSH access is\nneeded (unlike `ownstack remote run`, which shells out from your machine). Output streams\nlive by default so long tasks (e.g. a data backfill) do not hit the proxy timeout; the\ncommand's remote exit code becomes the exit code of `ownstack run`. Use `--` before the\ncommand so its own flags are not parsed by ownstack. App resolution: `--app`, else the\nlinked repo, else the first positional argument.\n"
+        },
+        {
+          "name": "git push",
+          "summary": "Push current directory to OwnStack Git (Gitea). Creates repo, optionally links to an app.",
+          "flags": [
+            {
+              "flag": "--name=REPO",
+              "desc": "New repo name."
+            },
+            {
+              "flag": "--app=NAME",
+              "desc": "Link the new repo to an existing app."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack git push",
+              "desc": "From a linked app dir."
+            },
+            {
+              "cmd": "ownstack git push --name=my-app"
+            },
+            {
+              "cmd": "ownstack git push --app=my-app"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stacks",
+      "title": "Stack management",
+      "body": "Operations on stack infrastructure — plugins, data, backups, patches, maintenance.",
+      "commands": [
+        {
+          "name": "stack create",
+          "summary": "Provision a new managed stack (AWS, GCP, Azure, OpenStack, DigitalOcean, or SSH-managed). Mirrors the dashboard \"New Stack\" form.",
+          "flags": [
+            {
+              "flag": "--provider=aws|gcp|azure|openstack|digitalocean|ssh",
+              "desc": "Cloud provider (required)."
+            },
+            {
+              "flag": "--credential=NAME_OR_ID",
+              "desc": "Stored stack credential (required for managed providers). Resolves by name via /api/stack_credentials."
+            },
+            {
+              "flag": "--region=NAME",
+              "desc": "Cloud region (required for aws/azure/openstack/digitalocean; e.g. DigitalOcean nyc3, sfo3)."
+            },
+            {
+              "flag": "--gcp-project=PROJECT_ID",
+              "desc": "GCP project to deploy into."
+            },
+            {
+              "flag": "--ram=GB",
+              "desc": "Desired RAM in GiB (2..128)."
+            },
+            {
+              "flag": "--disk=GB",
+              "desc": "Root disk in GB (10..1000)."
+            },
+            {
+              "flag": "--ssh-host=HOST",
+              "desc": "For provider=ssh; remote SSH host."
+            },
+            {
+              "flag": "--ssh-port=PORT",
+              "desc": "For provider=ssh; SSH port (default 22)."
+            },
+            {
+              "flag": "--ssh-username=USER",
+              "desc": "For provider=ssh; SSH username."
+            },
+            {
+              "flag": "--ssh-private-key=PATH",
+              "desc": "For provider=ssh; path to a private-key file."
+            },
+            {
+              "flag": "--ssh-password=PASS",
+              "desc": "For provider=ssh; password (use instead of --ssh-private-key)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack stack create stage-gcp --provider=gcp --credential='Google Cloud' --gcp-project=my-gcp-proj --ram=64 --disk=200",
+              "desc": "GCP n2-highmem-8 sized stack (8 vCPU, 64 GiB)."
+            },
+            {
+              "cmd": "ownstack stack create stage-east --provider=aws --credential='AWS prod' --region=us-west-2 --ram=64 --disk=200",
+              "desc": "AWS r6i.2xlarge sized stack."
+            },
+            {
+              "cmd": "ownstack stack create do-test --provider=digitalocean --credential='DigitalOcean' --region=nyc3 --ram=2",
+              "desc": "DigitalOcean droplet (s-1vcpu-2gb) for OSS-app dogfooding."
+            },
+            {
+              "cmd": "ownstack stack create my-server --provider=ssh --ssh-host=1.2.3.4 --ssh-username=ubuntu --ssh-private-key=~/.ssh/id_ed25519",
+              "desc": "Adopt an existing host you SSH into."
+            }
+          ]
+        },
+        {
+          "name": "stack destroy",
+          "summary": "Tear down a stack and deprovision its cloud resources. Symmetric with `stack create`. Interactive confirmation by default; use `--yes` for scripts.",
+          "flags": [
+            {
+              "flag": "--yes, -y",
+              "desc": "Skip the interactive confirmation prompt (required for non-interactive callers)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack stack destroy stage-gcp",
+              "desc": "Interactive — prompts you to retype the stack name."
+            },
+            {
+              "cmd": "ownstack stack destroy 50 --yes",
+              "desc": "Non-interactive, by id."
+            }
+          ]
+        },
+        {
+          "name": "stack unmanaged",
+          "summary": "List orphan cloud instances — instances that exist under the account's AWS/GCP credentials but are tracked by no managed stack (e.g. left behind by a deleted stack or a crashed provision, still billing). CLI parity with the web Stacks page and `GET /api/stacks/unmanaged`. GCP credentials with no associated stack have no derivable project and are reported as a scan notice rather than scanned.",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Emit the raw API payload (count, instances, errors, scanned, timed_out) instead of the table."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack stack unmanaged",
+              "desc": "List orphan instances for the current profile's account."
+            },
+            {
+              "cmd": "OWNSTACK_PROFILE=ownstack ownstack stack unmanaged --json",
+              "desc": "Raw JSON for a specific account, e.g. for scripting."
+            }
+          ]
+        },
+        {
+          "name": "stack unmanaged destroy",
+          "summary": "Terminate an orphan instance by its instance id. Looks the instance up in the live scan to find the provider-specific parameters, then calls `DELETE /api/stacks/unmanaged`, which refuses anything that backs a managed stack. Not reversible. Interactive confirmation by default.",
+          "flags": [
+            {
+              "flag": "--yes, -y",
+              "desc": "Skip the confirmation prompt (required for non-interactive callers)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack stack unmanaged destroy i-06ba7d4af55693aa7",
+              "desc": "Interactive — prompts before terminating the cloud instance."
+            },
+            {
+              "cmd": "ownstack stack unmanaged destroy i-080eb746afdaa1022 --yes",
+              "desc": "Non-interactive teardown of a known orphan."
+            }
+          ]
+        },
+        {
+          "name": "stack containers",
+          "summary": "List docker containers on a stack with state classification (running, exited, unhealthy, orphan, stale). Stale containers are running but not in their app's current ps:scale — the usual cause of \"missing\" memory after repeated ps:rebuild or OOM-restart cycles.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "Only list containers belonging to this Dokku app."
+            },
+            {
+              "flag": "--state=running|exited|unhealthy|orphan|stale",
+              "desc": "Filter to one state. Stale = running but outside ps:scale."
+            },
+            {
+              "flag": "--json",
+              "desc": "Emit raw JSON instead of the table view."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack stack containers node-hub-538",
+              "desc": "All containers across all apps on the stack."
+            },
+            {
+              "cmd": "ownstack stack containers node-hub-538 --app=myhavenbot --state=stale",
+              "desc": "Just the stale Sidekiq survivors for one app."
+            }
+          ]
+        },
+        {
+          "name": "stack reconcile-ps",
+          "summary": "Reap containers not in `dokku ps:scale`. Use this to clean up OOM-restart survivors that Dokku stopped tracking. Default is live reap; use --dry-run to preview.",
+          "flags": [
+            {
+              "flag": "--stack=NAME",
+              "desc": "Target stack (otherwise uses the linked app's stack)."
+            },
+            {
+              "flag": "--dry-run",
+              "desc": "Identify what would be removed without invoking `docker rm`."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack stack reconcile-ps myhavenbot --stack=node-hub-538 --dry-run",
+              "desc": "Preview the reap."
+            },
+            {
+              "cmd": "ownstack stack reconcile-ps myhavenbot --stack=node-hub-538",
+              "desc": "Actually reap."
+            }
+          ]
+        },
+        {
+          "name": "stack resize-disk",
+          "summary": "Grow the stack's root volume. AWS extends the volume online (instance stays up); OpenStack stops the server, extends, then restarts.",
+          "notes": "New size must be greater than the current size and between 10 and 1000 GB.\nThe filesystem is grown automatically after the volume extends. Watch\nprogress with `ownstack stack disk-usage <STACK>`.\n",
+          "examples": [
+            {
+              "cmd": "ownstack stack resize-disk staging-hub 500",
+              "desc": "Grow staging-hub's root volume to 500 GB (AWS, online)."
+            }
+          ]
+        },
+        {
+          "name": "stack resize-ram",
+          "summary": "Change the instance RAM. Stops and restarts the instance to apply the new machine type.",
+          "notes": "Supported sizes (GB): 2, 4, 8, 16, 32, 64, 128. The instance is stopped,\nresized, and restarted, so expect brief downtime.\n",
+          "examples": [
+            {
+              "cmd": "ownstack stack resize-ram node-hub-538 16",
+              "desc": "Resize to 16 GB RAM (causes a restart)."
+            }
+          ]
+        },
+        {
+          "name": "stack add-local",
+          "summary": "Create a local stack (dev only).",
+          "examples": [
+            {
+              "cmd": "ownstack stack add-local [NAME]"
+            }
+          ]
+        },
+        {
+          "name": "stack plugin-install",
+          "summary": "Install a Dokku plugin on a stack.",
+          "flags": [
+            {
+              "flag": "--stack=NAME",
+              "desc": "Target stack (otherwise prompts/uses default)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack stack plugin-install letsencrypt"
+            },
+            {
+              "cmd": "ownstack stack plugin-install --stack=prod letsencrypt"
+            }
+          ]
+        },
+        {
+          "name": "stack data",
+          "summary": "List databases and manage volumes on a stack.",
+          "examples": [
+            {
+              "cmd": "ownstack stack data databases <STACK>"
+            },
+            {
+              "cmd": "ownstack stack data volumes <STACK>"
+            },
+            {
+              "cmd": "ownstack stack data volumes <STACK> add <app> <host_path> <container_path>"
+            },
+            {
+              "cmd": "ownstack stack data volumes <STACK> remove <app> <mount_spec>"
+            }
+          ]
+        },
+        {
+          "name": "stack backup",
+          "summary": "Run, list, enable, and inspect stack backups.",
+          "flags": [
+            {
+              "flag": "--mode=application|native|both",
+              "desc": "For `enable`. application = per-database dumps (restorable via `app data restore`); native = provider disk snapshot + AMI (whole-server restore); both = one nightly job produces both. Default native."
+            },
+            {
+              "flag": "--cron=EXPR",
+              "desc": "For `enable`. Schedule, default 0 3 * * *."
+            },
+            {
+              "flag": "--retention=N",
+              "desc": "For `enable`. Completed backups to keep, default 7."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack stack backup run <STACK>"
+            },
+            {
+              "cmd": "ownstack stack backup list <STACK>",
+              "desc": "Lists job id, status, type, and timestamp. Use the job id with `app data restore --backup=ID`."
+            },
+            {
+              "cmd": "ownstack stack backup enable <STACK> --mode=both",
+              "desc": "Nightly disk snapshot AND database dumps in one job."
+            },
+            {
+              "cmd": "ownstack stack backup config <STACK>"
+            }
+          ]
+        },
+        {
+          "name": "app data restore",
+          "summary": "Restore an app's database from a stack backup job (dokku postgres:import / mysql:import).",
+          "flags": [
+            {
+              "flag": "--backup=JOB_ID",
+              "desc": "Stack backup job id (required, from `stack backup list`)."
+            },
+            {
+              "flag": "--stack=NAME",
+              "desc": "Stack the backup lives on. Defaults to the app's stack."
+            },
+            {
+              "flag": "--source-service=SVC",
+              "desc": "Service dump inside the backup to import. Enables cross-app restores, e.g. restore postgres-myapp into postgres-myapp-staging. Without it, only an exact match on the app's own linked service is accepted; on mismatch the error lists available services."
+            },
+            {
+              "flag": "--source=s3|host",
+              "desc": "Where to read the dump from. Default prefers the on-host dump and falls back to S3 if the host file is gone. Pass s3 to restore from the object-storage copy (works cross-stack, e.g. restore prod's S3 dump onto staging); host to force the on-host file."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app data restore my-app --backup=42",
+              "desc": "Restore the app's own dump from backup job 42."
+            },
+            {
+              "cmd": "ownstack app data restore my-app-staging --backup=42 --source-service=postgres-my-app",
+              "desc": "Seed staging from the production dump in the same backup."
+            },
+            {
+              "cmd": "ownstack app data restore my-app-staging --backup=42 --source-service=postgres-my-app --source=s3",
+              "desc": "Stream the production dump straight from S3 into staging (no host copy needed)."
+            }
+          ]
+        },
+        {
+          "name": "stack patches",
+          "summary": "List or apply stack patches (severity, deadlines, auto-on-deploy).",
+          "body": "Patches are small fixes / installs the control plane manages per stack\n(Dokku tweaks, ownstackd install, etc.). Mandatory patches with a\nrequired_by date and auto_apply_on_deploy: true (currently: ownstackd)\nrun automatically before each deploy to the stack. Manual apply is\nstill available for backfilling dormant stacks.\n\nThe listing shows severity (mandatory/recommended/optional), an\n[OVERDUE] tag past required_by, and an [auto on deploy] tag for\npatches that will self-apply on the next deploy.\n",
+          "examples": [
+            {
+              "cmd": "ownstack stack patches <STACK>",
+              "desc": "Show patches with status, severity, overdue, and auto-on-deploy flags."
+            },
+            {
+              "cmd": "ownstack stack patches apply <STACK>",
+              "desc": "Apply all pending patches now (or wait for the next deploy if they're auto-apply)."
+            },
+            {
+              "cmd": "ownstack stack patches overdue",
+              "desc": "Fleet view, stacks with overdue mandatory patches."
+            },
+            {
+              "cmd": "ownstack stack patches overdue --json",
+              "desc": "Same, JSON output (pipe to jq for scripting)."
+            }
+          ]
+        },
+        {
+          "name": "stack disk-usage",
+          "summary": "Show disk usage on a stack (via SSH).",
+          "examples": [
+            {
+              "cmd": "ownstack stack disk-usage <STACK>"
+            }
+          ]
+        },
+        {
+          "name": "stack info",
+          "summary": "Host/container facts read live over SSH (cores, RAM, container memory limit, disk type).",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Emit the facts as JSON."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack stack info <STACK>"
+            },
+            {
+              "cmd": "ownstack stack info <STACK> --json"
+            }
+          ],
+          "notes": "Surfaces CPU cores, total host RAM, the container memory limit (cgroup; \"unlimited\" means\nbounded by host RAM), and whether the root disk is SSD or rotational, plus the provisioned\nsizes. Makes correct DB/app tuning a read instead of an SSH expedition (free -h,\n/sys/fs/cgroup/memory.max, lsblk -d -o NAME,ROTA by hand).\n"
+        },
+        {
+          "name": "stack memory",
+          "summary": "Host memory + per-container breakdown from the on-box heartbeat agent.",
+          "body": "Reads the latest stack_health_snapshot and prints host RAM usage plus a\nper-container table sorted by memory consumption. UI parity with the\nMemory tab on the stack detail page.\n\nRequires the heartbeat agent to be installed on the stack (it pushes\nper-container Docker memory every 60s). If \"No memory metrics yet\" is\nshown, run `ownstack add-on heartbeat <STACK>` to install.\n",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Emit the latest_snapshot + recent_memory shape as JSON."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack stack memory <STACK>"
+            },
+            {
+              "cmd": "ownstack stack memory <STACK> --json"
+            }
+          ]
+        },
+        {
+          "name": "stack reboot",
+          "summary": "Graceful reboot of the stack's host VM via the provider SDK.",
+          "body": "Triggers a host-level reboot through the provider (EC2 reboot_instances,\nGCP instances.reset, OpenStack server.reboot). Returns immediately\nwith a StackHostAction id; poll progress with `stack host-actions`.\n\nUse when sshd has wedged but the hypervisor still reports the\ninstance as running (the classic \"ssh banner timeout while AWS says\nok ok\" failure mode). Volumes persist across the reboot.\n",
+          "examples": [
+            {
+              "cmd": "ownstack stack reboot <STACK>"
+            }
+          ]
+        },
+        {
+          "name": "stack start",
+          "summary": "Power on a stopped host.",
+          "examples": [
+            {
+              "cmd": "ownstack stack start <STACK>"
+            }
+          ]
+        },
+        {
+          "name": "stack stop",
+          "summary": "Power off the host (volumes persist).",
+          "body": "Stops the underlying VM. Same effect as the cloud console's \"stop\"\nbutton. Storage is preserved; the instance keeps its EBS volume(s)\nand can be restarted with `stack start`.\n",
+          "examples": [
+            {
+              "cmd": "ownstack stack stop <STACK>"
+            }
+          ]
+        },
+        {
+          "name": "stack host-actions",
+          "summary": "Recent host start/stop/reboot history (last 25 entries).",
+          "examples": [
+            {
+              "cmd": "ownstack stack host-actions <STACK>"
+            }
+          ]
+        },
+        {
+          "name": "stack ownstackd",
+          "summary": "Manage the on-stack ownstackd daemon (replaces SSH-from-control-plane for routine ops).",
+          "body": "ownstackd is a small Rust daemon that runs on a stack and executes\njobs sent from the control plane. Opt-in per stack: when enabled,\npaths like `ownstack app status` skip the inline SSH and route work\nthrough the daemon instead. When disabled, the stack keeps working\nexactly as before, the daemon idles, and an SSH login MOTD tells the\noperator how to reconnect or fully uninstall.\n\nSource (private): github.com/ownstack-org/ownstackd\n",
+          "examples": [
+            {
+              "cmd": "ownstack stack ownstackd status <STACK>",
+              "desc": "Show enabled / alive / last-seen / version."
+            },
+            {
+              "cmd": "ownstack stack ownstackd enable <STACK>",
+              "desc": "Generate a stack-scoped token, flip the flag, print install one-liner."
+            },
+            {
+              "cmd": "ownstack stack ownstackd disable <STACK>",
+              "desc": "Flip the flag off. Token kept so re-enable is one command. Daemon idles."
+            },
+            {
+              "cmd": "ownstack stack ownstackd rotate <STACK>",
+              "desc": "Invalidate the existing token and issue a new one. Reinstall daemon with the new token."
+            }
+          ]
+        },
+        {
+          "name": "stack maintenance",
+          "summary": "Prune images, schedule jobs, forecast disk, scan CVEs.",
+          "examples": [
+            {
+              "cmd": "ownstack stack maintenance prune-images <STACK>"
+            },
+            {
+              "cmd": "ownstack stack maintenance prune-build-cache <STACK>"
+            },
+            {
+              "cmd": "ownstack stack maintenance schedules <STACK>"
+            },
+            {
+              "cmd": "ownstack stack maintenance schedule add <STACK> --action=prune_images --cadence=weekly"
+            },
+            {
+              "cmd": "ownstack stack maintenance forecast <STACK>",
+              "desc": "Days until 80% / 90% full."
+            },
+            {
+              "cmd": "ownstack stack maintenance cve <STACK>",
+              "desc": "Trivy scan of dokku/* images."
+            }
+          ]
+        },
+        {
+          "name": "stack share",
+          "summary": "Share a stack with another OwnStack account by email.",
+          "body": "Shared stacks are full n:n access: the invited account deploys apps,\nmanages services, and sees everything on the stack, exactly like the\nowner. The owner keeps two things: deleting the stack and managing\nwho it's shared with. No per-seat gating, no artificial restrictions.\nIt's your hardware; share it freely.\n\nThe invitee gets an email link (clicking it accepts), and the stack\nalso appears dimmed in their dashboard stack list with accept/reject\nbuttons. Any user of the invited account can accept on its behalf.\nIf the email has no OwnStack account yet, the invitation binds when\nthey sign up with that address.\n",
+          "examples": [
+            {
+              "cmd": "ownstack stack share <STACK> <EMAIL>",
+              "desc": "Invite an account by email. Shows as pending until accepted."
+            },
+            {
+              "cmd": "ownstack stack shares <STACK>",
+              "desc": "List shares with status (pending / accepted) and who accepted."
+            },
+            {
+              "cmd": "ownstack stack unshare <STACK> <EMAIL>",
+              "desc": "Revoke a share. The account immediately loses access."
+            },
+            {
+              "cmd": "ownstack stack share-accept <STACK>",
+              "desc": "Accept a stack shared with your account (recipient side)."
+            },
+            {
+              "cmd": "ownstack stack share-reject <STACK>",
+              "desc": "Reject a pending invitation (recipient side)."
+            },
+            {
+              "cmd": "ownstack stack leave <STACK>",
+              "desc": "Leave a stack that was shared with you. Apps your account deployed keep running."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clusters",
+      "title": "Clusters and load balancing",
+      "body": "A cluster pools stacks behind a hostname. It owns a Caddy proxy app (deployed to N proxy stacks\nfor redundancy) and routes traffic to member app-stacks. Pick the edge mode at create time:\n  - dns_rr      DNS round-robin. Free, works anywhere.\n  - cloudflare  Proxied origins, sub-second failover.\n  - aws_alb     AWS ALB (LBaaS).\n\nThe proxy app is just an OwnStack app — same logs / restart / SSH / scale / maintenance as\nanything else. The cluster regenerates its Caddyfile on member changes and dokku-deploys it.\n",
+      "commands": [
+        {
+          "name": "cluster list",
+          "summary": "List clusters in the active profile.",
+          "examples": [
+            {
+              "cmd": "ownstack cluster list"
+            }
+          ]
+        },
+        {
+          "name": "cluster show",
+          "summary": "Show edge / proxies / members / status for a cluster.",
+          "examples": [
+            {
+              "cmd": "ownstack cluster show <NAME>"
+            }
+          ]
+        },
+        {
+          "name": "cluster create",
+          "summary": "Create a cluster and stamp its proxy app from the Caddy template.",
+          "flags": [
+            {
+              "flag": "--hostname=HOST",
+              "desc": "Public hostname."
+            },
+            {
+              "flag": "--edge=MODE",
+              "desc": "dns_rr | cloudflare | aws_alb."
+            },
+            {
+              "flag": "--proxy-count=N",
+              "desc": "Number of proxy replicas."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack cluster create <NAME> --hostname=api.example.com \\\n  --edge=dns_rr --proxy-count=2\n"
+            }
+          ]
+        },
+        {
+          "name": "cluster destroy",
+          "summary": "Destroy a cluster (proxy app stays unless --with-proxy).",
+          "flags": [
+            {
+              "flag": "--with-proxy",
+              "desc": "Also destroy the proxy app."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack cluster destroy <NAME>"
+            }
+          ]
+        },
+        {
+          "name": "cluster member",
+          "summary": "Add, drain, undrain, remove, or reweight member apps.",
+          "examples": [
+            {
+              "cmd": "ownstack cluster member add <CLUSTER> <APP>"
+            },
+            {
+              "cmd": "ownstack cluster member drain <CLUSTER> <APP>",
+              "desc": "Existing connections finish, no new ones."
+            },
+            {
+              "cmd": "ownstack cluster member undrain <CLUSTER> <APP>"
+            },
+            {
+              "cmd": "ownstack cluster member remove <CLUSTER> <APP>"
+            },
+            {
+              "cmd": "ownstack cluster member weight <CLUSTER> <APP> <0-1000>",
+              "desc": "Set the member's load-balancer weight. 0 = no traffic (true drain); used for blue/green flips."
+            }
+          ]
+        },
+        {
+          "name": "cluster deploy",
+          "summary": "Deploy across cluster members.",
+          "flags": [
+            {
+              "flag": "--strategy=MODE",
+              "desc": "parallel (default) | rolling. Rolling drains then deploys one at a time."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack cluster deploy <CLUSTER>"
+            },
+            {
+              "cmd": "ownstack cluster deploy <CLUSTER> --strategy=rolling"
+            }
+          ]
+        },
+        {
+          "name": "cluster autodeploy",
+          "summary": "Show or toggle cluster autodeploy. When enabled, a push to the cluster's repo fires a zero-downtime rolling release across members (drain, deploy, health-gate, restore) instead of deploying any single member in place. The Heroku \"automatic deploys\" analog, made safe for a self-hosted cluster.",
+          "flags": [
+            {
+              "flag": "--branch=REF",
+              "desc": "Only auto-deploy pushes to this branch. Omit to accept whatever branch each member app is configured for; pass an empty value to clear the filter."
+            }
+          ],
+          "notes": "Requires the GitHub webhook (autobuild) to be installed on at least\none member app so deliveries arrive. Autodeploy then routes that\ndelivery to a rolling cluster release rather than an in-place deploy.\nA push is ignored while a previous rolling release is still in flight.\n",
+          "examples": [
+            {
+              "cmd": "ownstack cluster autodeploy <CLUSTER>",
+              "desc": "Show the current autodeploy state."
+            },
+            {
+              "cmd": "ownstack cluster autodeploy <CLUSTER> on",
+              "desc": "Enable rolling autodeploy on push."
+            },
+            {
+              "cmd": "ownstack cluster autodeploy <CLUSTER> on --branch=main",
+              "desc": "Enable, restricted to the main branch."
+            },
+            {
+              "cmd": "ownstack cluster autodeploy <CLUSTER> off",
+              "desc": "Disable autodeploy."
+            }
+          ]
+        },
+        {
+          "name": "cluster status",
+          "summary": "Topology view of a cluster (variants, upstreams, live state).",
+          "examples": [
+            {
+              "cmd": "ownstack cluster status <CLUSTER>"
+            }
+          ]
+        },
+        {
+          "name": "cluster domain",
+          "summary": "Manage the hostnames a cluster fronts. A cluster can serve many hostnames; cutover happens atomically across all of them.",
+          "examples": [
+            {
+              "cmd": "ownstack cluster domain list <CLUSTER>"
+            },
+            {
+              "cmd": "ownstack cluster domain add <CLUSTER> myhavenbot.com"
+            },
+            {
+              "cmd": "ownstack cluster domain add <CLUSTER> app.myhavenbot.com"
+            },
+            {
+              "cmd": "ownstack cluster domain remove <CLUSTER> app.myhavenbot.com"
+            }
+          ]
+        },
+        {
+          "name": "cluster variant",
+          "summary": "Manage named swappable backend groups (e.g. heroku, havenhelix). Each variant has weight (0 standby, >0 receives traffic) and status (active or draining).",
+          "flags": [
+            {
+              "flag": "--weight=N",
+              "desc": "Traffic weight, 0..1000. 0 = standby."
+            },
+            {
+              "flag": "--status=STATE",
+              "desc": "active | draining (draining stops new connections)."
+            },
+            {
+              "flag": "--description=TEXT",
+              "desc": "Human-readable note."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack cluster variant list <CLUSTER>"
+            },
+            {
+              "cmd": "ownstack cluster variant add <CLUSTER> heroku --weight=100"
+            },
+            {
+              "cmd": "ownstack cluster variant add <CLUSTER> havenhelix --weight=0"
+            },
+            {
+              "cmd": "ownstack cluster variant update <CLUSTER> heroku --weight=0"
+            },
+            {
+              "cmd": "ownstack cluster variant remove <CLUSTER> staging"
+            }
+          ]
+        },
+        {
+          "name": "cluster upstream",
+          "summary": "Manage per-variant, per-domain routes. An upstream is either an internal OwnStack app or an external HTTPS URL. Exactly one of --url or --app is required.",
+          "flags": [
+            {
+              "flag": "--variant=NAME",
+              "desc": "Variant this upstream belongs to."
+            },
+            {
+              "flag": "--hostname=HOST",
+              "desc": "Restrict to one hostname; omit to serve all hostnames on the cluster."
+            },
+            {
+              "flag": "--url=URL",
+              "desc": "External upstream (https://...). Use for routing to a Heroku / external backend."
+            },
+            {
+              "flag": "--app=APP",
+              "desc": "Internal OwnStack app (resolves to its stack IPs)."
+            },
+            {
+              "flag": "--weight=N",
+              "desc": "Upstream weight 0..1000."
+            },
+            {
+              "flag": "--host-header=HOST",
+              "desc": "Host header to send upstream (defaults to the cluster hostname)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack cluster upstream list <CLUSTER>"
+            },
+            {
+              "cmd": "ownstack cluster upstream add <CLUSTER> \\\n  --variant=heroku --hostname=myhavenbot.com \\\n  --url=https://myhavenbot.herokuapp.com\n"
+            },
+            {
+              "cmd": "ownstack cluster upstream add <CLUSTER> \\\n  --variant=havenhelix --hostname=myhavenbot.com \\\n  --url=https://heroku.havenhelix.com\n"
+            },
+            {
+              "cmd": "ownstack cluster upstream remove <CLUSTER> <UPSTREAM_ID>"
+            }
+          ]
+        },
+        {
+          "name": "cluster switch",
+          "summary": "Atomically flip the active variant; reweights everything inside a transaction and fires one reconcile. All hostnames cutover together.",
+          "flags": [
+            {
+              "flag": "--to=NAME",
+              "desc": "Name of the variant that should receive 100% of traffic."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack cluster switch <CLUSTER> --to=havenhelix"
+            },
+            {
+              "cmd": "ownstack cluster switch <CLUSTER> --to=heroku",
+              "desc": "Roll back in seconds if the new variant misbehaves."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "apps",
+      "title": "App management",
+      "body": "Operations on apps already in the control plane.",
+      "commands": [
+        {
+          "name": "app list",
+          "aliases": [
+            "apps"
+          ],
+          "summary": "List apps in the active account.",
+          "examples": [
+            {
+              "cmd": "ownstack app list"
+            },
+            {
+              "cmd": "ownstack apps"
+            }
+          ]
+        },
+        {
+          "name": "app stacks",
+          "summary": "List the stacks an app is deployed to.",
+          "examples": [
+            {
+              "cmd": "ownstack app stacks <APP>"
+            }
+          ]
+        },
+        {
+          "name": "app test",
+          "aliases": [
+            "app tests"
+          ],
+          "summary": "Run the app's test command as a one-off process on its stack (Heroku `heroku run` style) and stream output live.",
+          "flags": [
+            {
+              "flag": "--command=CMD",
+              "aliases": [
+                "--cmd=CMD"
+              ],
+              "desc": "One-off command to run instead of the configured test_command."
+            },
+            {
+              "flag": "--stack=ID",
+              "desc": "Run on a specific stack (defaults to the app's primary/deployable stack)."
+            },
+            {
+              "flag": "--no-wait",
+              "desc": "Start the run and return immediately instead of streaming."
+            },
+            {
+              "flag": "--json",
+              "desc": "Print the created run as JSON (no streaming)."
+            }
+          ],
+          "notes": "Runs inside a fresh container booted from the app's deployed image,\nso the test sees the real config vars and linked add-ons\n(DATABASE_URL, REDIS_URL, ...). Exit code is captured via a sentinel\nsince `dokku run` does not forward it. Requires jq for live output.\nExit status: 0 passed, 1 failed, 2 timeout/unknown.\n",
+          "examples": [
+            {
+              "cmd": "ownstack app test <APP>",
+              "desc": "Run the configured test command and stream output."
+            },
+            {
+              "cmd": "ownstack app test <APP> --command=\"bundle exec rspec spec/models\"",
+              "desc": "One-off ad-hoc command."
+            },
+            {
+              "cmd": "ownstack app test <APP> --stack=43 --no-wait"
+            }
+          ]
+        },
+        {
+          "name": "app test:list",
+          "aliases": [
+            "app tests:list"
+          ],
+          "summary": "List recent test runs (status, exit code, duration, command).",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Raw JSON array."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app test:list <APP>"
+            }
+          ]
+        },
+        {
+          "name": "app test:show",
+          "aliases": [
+            "app tests:show"
+          ],
+          "summary": "Show a test run's details and full output.",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Raw JSON."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app test:show <RUN_ID> <APP>"
+            }
+          ]
+        },
+        {
+          "name": "app test:config",
+          "aliases": [
+            "app tests:config"
+          ],
+          "summary": "Show or set the app's test command.",
+          "flags": [
+            {
+              "flag": "--command=CMD",
+              "aliases": [
+                "--cmd=CMD"
+              ],
+              "desc": "Set the test command (omit to just show current config)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app test:config <APP>"
+            },
+            {
+              "cmd": "ownstack app test:config <APP> --command=\"npm test\""
+            }
+          ]
+        },
+        {
+          "name": "app destroy",
+          "aliases": [
+            "app rm",
+            "app delete"
+          ],
+          "summary": "Destroy a control-plane app and tear down its Dokku app + linked services on every stack it's deployed to.",
+          "flags": [
+            {
+              "flag": "--yes",
+              "aliases": [
+                "-y",
+                "--force"
+              ],
+              "desc": "Skip the interactive name-match confirmation."
+            }
+          ],
+          "notes": "Server-side `AppDestroyWorker` runs the SSH cleanup\n(apps:destroy plus postgres/mysql/redis/etc. unlink + destroy).\nPersistent volumes are not removed automatically — host\n`/var/lib/dokku/data/storage/*` dirs survive for now.\n",
+          "examples": [
+            {
+              "cmd": "ownstack app destroy <NAME>",
+              "desc": "Interactive — prompts you to retype the name to confirm."
+            },
+            {
+              "cmd": "ownstack app destroy my-metabase --yes",
+              "desc": "Non-interactive (CI/scripts)."
+            },
+            {
+              "cmd": "ownstack app rm <UUID>",
+              "desc": "Same as destroy, accepts UUID instead of name."
+            }
+          ]
+        },
+        {
+          "name": "app autodeploy",
+          "summary": "Show or toggle per-(app, stack) autodeploy. Turning autodeploy on also installs the GitHub push webhook if it isn't there yet — both layers have to be enabled for pushes to actually deploy.",
+          "flags": [
+            {
+              "flag": "--stack=NAME_OR_ID",
+              "desc": "Toggle on a single stack instead of every linked stack."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app autodeploy <APP>",
+              "desc": "Show the per-stack autodeploy state."
+            },
+            {
+              "cmd": "ownstack app autodeploy <APP> on",
+              "desc": "Turn autodeploy on for every linked stack (and install the webhook if missing)."
+            },
+            {
+              "cmd": "ownstack app autodeploy <APP> --stack=solar-zone-607 off",
+              "desc": "Turn it off for one stack."
+            }
+          ]
+        },
+        {
+          "name": "app autobuild",
+          "summary": "Manage the GitHub push webhook on an app's repository. Required for autodeploy to actually fire.",
+          "notes": "GitHub autobuild and per-stack autodeploy are two independent layers.\nAutobuild owns the webhook on the repo; autodeploy owns whether a\nreceived webhook actually enqueues a deploy. `app autodeploy on` will\nenable autobuild for you when both are off, but you can also manage\nthe webhook directly with these commands.\n",
+          "examples": [
+            {
+              "cmd": "ownstack app autobuild <APP>",
+              "desc": "Show enabled state and the GitHub webhook id."
+            },
+            {
+              "cmd": "ownstack app autobuild:enable <APP>",
+              "desc": "Install the GitHub push webhook on the app's repo."
+            },
+            {
+              "cmd": "ownstack app autobuild:disable <APP>",
+              "desc": "Remove the webhook (deploys still work manually)."
+            }
+          ]
+        },
+        {
+          "name": "app autobuild:consolidate",
+          "summary": "Collapse redundant per-app GitHub webhooks on the same repo down to a single survivor. Cleans up the per-app era for accounts that ran ahead of the share-on-create fix.",
+          "notes": "Picks the lowest-id app's hook as canonical, deletes every other\nGitHub-side hook for the same repo via the deploy-token user's\nGitHub credentials, and re-points all sibling apps at the survivor.\n--dry-run shows the plan without touching GitHub or the DB.\n",
+          "flags": [
+            {
+              "flag": "--dry-run",
+              "aliases": [
+                "--dry"
+              ],
+              "desc": "Report the plan but don't modify anything."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app autobuild:consolidate <APP>",
+              "desc": "Consolidate the repo this app belongs to."
+            },
+            {
+              "cmd": "ownstack app autobuild:consolidate <APP> --dry-run",
+              "desc": "Preview the consolidation before doing it."
+            }
+          ]
+        },
+        {
+          "name": "app cron",
+          "summary": "Manage scheduled jobs that run via `dokku run <app> <command>` on the stack's crontab.",
+          "notes": "The control plane keeps a managed block in the dokku user's crontab,\ndelimited by `# OWNSTACK-CRON: <dokku-app> BEGIN/END` markers. Any\nadd/update/remove triggers a re-push to every deployable stack. Use\n`cron:sync` to force a re-push without changing the job set (useful\nafter restoring a stack or recovering from drift).\n\nSchedule is standard 5-field cron (`minute hour day-of-month month\nday-of-week`). Commands run inside `dokku run`, so use your app's\nprocess binary directly (`rake db:cleanup`, `python manage.py jobs:run`).\n`%` in the command must be escaped as `\\%` — cron treats unescaped\n`%` as a stdin separator.\n",
+          "examples": [
+            {
+              "cmd": "ownstack app cron <APP>",
+              "desc": "List scheduled jobs."
+            },
+            {
+              "cmd": "ownstack app cron:add <APP> '0 3 * * *' 'rake nightly' --description='nightly DB cleanup'",
+              "desc": "Add a nightly job at 03:00."
+            },
+            {
+              "cmd": "ownstack app cron:add <APP> '*/15 * * * *' 'curl -fsS http://localhost/health'",
+              "desc": "Health check every 15 minutes."
+            },
+            {
+              "cmd": "ownstack app cron:update <APP> 12 --schedule='0 4 * * *'",
+              "desc": "Change job"
+            },
+            {
+              "cmd": "ownstack app cron:disable <APP> 12",
+              "desc": "Pause a job without deleting it."
+            },
+            {
+              "cmd": "ownstack app cron:enable <APP> 12",
+              "desc": "Resume a paused job."
+            },
+            {
+              "cmd": "ownstack app cron:remove <APP> 12",
+              "desc": "Delete a job permanently."
+            },
+            {
+              "cmd": "ownstack app cron:sync <APP>",
+              "desc": "Force re-push of the managed crontab block to every deployable stack."
+            }
+          ]
+        },
+        {
+          "name": "app nuke",
+          "summary": "Reset an app's Dokku-side state (apps:destroy + linked services) without touching the control-plane app, domains, env vars, or group.",
+          "flags": [
+            {
+              "flag": "--stack=NAME_OR_ID",
+              "desc": "Limit the nuke to a single stack instead of every stack the app deploys to."
+            },
+            {
+              "flag": "--yes",
+              "aliases": [
+                "-y",
+                "--force"
+              ],
+              "desc": "Skip the interactive name-match confirmation."
+            }
+          ],
+          "notes": "Use this when a Dokku build is stuck in a half-built state\n(`Removing invalid image tag dokku/<app>:latest` with zero\nbuildpack output between cleanup and failure). Server-side\n`AppNukeWorker` SSHs into each stack and runs `apps:destroy --force`\nplus `postgres/redis/etc.:destroy` on linked services. The next\ndeploy rebuilds from scratch.\n",
+          "examples": [
+            {
+              "cmd": "ownstack app nuke <APP>",
+              "desc": "Interactive — prompts you to retype the name to confirm."
+            },
+            {
+              "cmd": "ownstack app nuke <APP> --yes",
+              "desc": "Non-interactive."
+            },
+            {
+              "cmd": "ownstack app nuke <APP> --stack=solar-zone-607",
+              "desc": "Only nuke state on one stack (use when an app is on multiple stacks)."
+            }
+          ]
+        },
+        {
+          "name": "app clone",
+          "summary": "Clone an app — independent copy with its own database.",
+          "flags": [
+            {
+              "flag": "--stack=NAME",
+              "desc": "Target stack."
+            },
+            {
+              "flag": "--domain=DOMAIN",
+              "desc": "Custom domain TLD."
+            },
+            {
+              "flag": "--letsencrypt-email=EMAIL"
+            },
+            {
+              "flag": "--description=DESC"
+            },
+            {
+              "flag": "--deploy",
+              "desc": "Trigger deploy after creation."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app clone <SOURCE> <NEW_NAME> [opts]"
+            }
+          ]
+        },
+        {
+          "name": "app replicate",
+          "summary": "Replicate an app — shares its database and Redis.",
+          "flags": [
+            {
+              "flag": "--stack=NAME"
+            },
+            {
+              "flag": "--domain=DOMAIN"
+            },
+            {
+              "flag": "--letsencrypt-email=EMAIL"
+            },
+            {
+              "flag": "--description=DESC"
+            },
+            {
+              "flag": "--deploy"
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app replicate <SOURCE> <NEW_NAME> [opts]"
+            }
+          ]
+        },
+        {
+          "name": "ssl-enable",
+          "summary": "Enable Let's Encrypt for the linked app.",
+          "flags": [
+            {
+              "flag": "--email=EMAIL",
+              "desc": "Let's Encrypt account email."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack ssl-enable"
+            },
+            {
+              "cmd": "ownstack ssl-enable --email=admin@example.com"
+            }
+          ]
+        },
+        {
+          "name": "app group",
+          "summary": "Show or set the AppGroup an app belongs to.",
+          "notes": "AppGroups are the sidebar groupings you see in the dashboard. Each app can belong\nto one group (or none). The group is resolved by case-insensitive name or numeric id\nwithin the current account. With no arguments, the app must be linked or passed\nexplicitly, and the current group is printed.\n",
+          "flags": [
+            {
+              "flag": "--clear",
+              "desc": "Remove the app from any group (sets app_group_id to null)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app group",
+              "desc": "Show the linked app's current group."
+            },
+            {
+              "cmd": "ownstack app group <APP>",
+              "desc": "Show the named app's current group."
+            },
+            {
+              "cmd": "ownstack app group <APP> \"Streamlit Apps\"",
+              "desc": "Assign by case-insensitive group name."
+            },
+            {
+              "cmd": "ownstack app group <APP> 18",
+              "desc": "Assign by numeric group id."
+            },
+            {
+              "cmd": "ownstack app group <APP> --clear",
+              "desc": "Remove from any group."
+            }
+          ]
+        },
+        {
+          "name": "app groups",
+          "summary": "List app groups in the active account (id, name, app count, parent).",
+          "examples": [
+            {
+              "cmd": "ownstack app groups"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "certs",
+      "title": "SSL certificates",
+      "body": "Certificates live in an account-scoped \"locker\" (`/api/ssl_certificates`).\nEach cert can be pushed to one or more apps; pushing writes the cert into\nDokku's per-app `tls/` directory and rebuilds nginx with a `listen 443 ssl`\nblock. Pushes are asynchronous — the CLI enqueues a `SslCertificatePushWorker`\njob and polls for the result before reporting success/fail per stack.\n",
+      "commands": [
+        {
+          "name": "cert publish",
+          "summary": "Upload a sslgen cert (fullchain.pem + privkey.pem) to the locker, then push to an app.",
+          "notes": "Each invocation uploads a new locker entry. To attach the same cert\nto multiple apps without duplicates, run `cert publish` once and then\n`cert push --cert-id=N --app=APP` for each additional app.\n",
+          "flags": [
+            {
+              "flag": "--app=APP",
+              "desc": "App name or id to push the cert to. Required."
+            },
+            {
+              "flag": "--cert-dir=DIR",
+              "desc": "Directory containing fullchain.pem and privkey.pem. Defaults to ~/.sslgen/certs/ownstack.org."
+            },
+            {
+              "flag": "--name=NAME",
+              "desc": "Display name for the locker entry. Defaults to basename of --cert-dir."
+            },
+            {
+              "flag": "--stack=NAME",
+              "desc": "Push only to the given stack instead of every stack the app deploys to."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack cert publish --app my-app --cert-dir ~/.sslgen/certs/example.com"
+            }
+          ]
+        },
+        {
+          "name": "cert list",
+          "aliases": [
+            "cert ls"
+          ],
+          "summary": "List certificates in the locker (id, name, not-after).",
+          "examples": [
+            {
+              "cmd": "ownstack cert list"
+            }
+          ]
+        },
+        {
+          "name": "cert push",
+          "summary": "Push an existing locker certificate to an app — no re-upload, no duplicate locker entries.",
+          "notes": "Use this when you already uploaded a wildcard cert (e.g., for\n*.apps.example.com) and just want to attach it to a new app.\n",
+          "flags": [
+            {
+              "flag": "--cert-id=N",
+              "desc": "Locker certificate id (from `ownstack cert list`). Required."
+            },
+            {
+              "flag": "--app=APP",
+              "desc": "App name or id. Required."
+            },
+            {
+              "flag": "--stack=NAME_OR_ID",
+              "desc": "Push to one stack instead of every deployable stack on the app."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack cert list",
+              "desc": "Find the cert id you want to reuse."
+            },
+            {
+              "cmd": "ownstack cert push --cert-id=12 --app=my-other-app",
+              "desc": "Attach an existing cert to another app."
+            }
+          ]
+        },
+        {
+          "name": "cert renew",
+          "summary": "Re-issue a locker certificate via Let's Encrypt and re-push it to every app using it.",
+          "notes": "Requires a connected DNSimple integration (`ownstack dnsimple connect`).\nThe control plane answers the DNS-01 challenge with TXT records in your\nDNSimple account, updates the locker entry in place, and re-pushes to all\napps whose `ssl_certificate_id` references the cert. Issuance takes a few\nminutes; the CLI polls until the job completes. Certs expiring within 30\ndays renew automatically when auto-renew is on — this command is for\nrenewing on demand.\n",
+          "flags": [
+            {
+              "flag": "--cert-id=N",
+              "desc": "Locker certificate id (from `ownstack cert list`)."
+            },
+            {
+              "flag": "--expiring",
+              "desc": "Instead of one cert, renew every locker cert expiring within the account's renewal window (the on-demand version of the daily sweep; works with auto-renew off)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack cert list",
+              "desc": "Find the expiring cert id."
+            },
+            {
+              "cmd": "ownstack cert renew --cert-id=12",
+              "desc": "Re-issue and re-push in one shot."
+            },
+            {
+              "cmd": "ownstack cert renew --expiring",
+              "desc": "Renew everything inside the renewal window now."
+            }
+          ]
+        },
+        {
+          "name": "dnsimple",
+          "summary": "Manage the account's DNSimple integration (powers Let's Encrypt issuance and auto-renewal).",
+          "notes": "One DNSimple connection per account. The token must be a DNSimple\n*account* token (DNSimple → Account → Automation → API tokens); user\ntokens are rejected because they carry no account identity. With\nauto-renew on (the default), a daily job re-issues any locker cert\nexpiring within 30 days whose domains are hosted in the connected\nDNSimple account, then re-pushes it to the apps using it. Same\nintegration as Settings → Integrations → DNSimple in the dashboard.\n",
+          "flags": [
+            {
+              "flag": "--token=TOKEN",
+              "desc": "For `connect` — the DNSimple account API token. Prompts on stdin if omitted (keeps the secret out of shell history)."
+            },
+            {
+              "flag": "--days=N",
+              "desc": "For `auto-renew` — renew certs expiring within N days (1-89, default 30). Combinable with on|off."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack dnsimple status",
+              "desc": "Show connection and auto-renew state."
+            },
+            {
+              "cmd": "ownstack dnsimple connect",
+              "desc": "Link a DNSimple account token (prompted)."
+            },
+            {
+              "cmd": "ownstack dnsimple auto-renew off",
+              "desc": "Pause automatic renewals; `on` re-enables."
+            },
+            {
+              "cmd": "ownstack dnsimple auto-renew --days=45",
+              "desc": "Widen the renewal window to 45 days before expiry."
+            },
+            {
+              "cmd": "ownstack dnsimple disconnect",
+              "desc": "Remove the integration."
+            }
+          ]
+        },
+        {
+          "name": "route53",
+          "summary": "Manage the account's Route53 integration (powers Let's Encrypt issuance and auto-renewal).",
+          "notes": "One Route53 connection per account, mirroring the DNSimple\nintegration. The IAM key needs route53:ListHostedZones,\nroute53:ListResourceRecordSets, and route53:ChangeResourceRecordSets.\nRenewal picks whichever connected integration (DNSimple or Route53)\ncovers the cert's domains, so accounts can connect both. Same\nintegration as Settings → Integrations → Route53 in the dashboard.\n",
+          "flags": [
+            {
+              "flag": "--credential=NAME_OR_ID",
+              "desc": "For `connect` — reuse a saved AWS credential from the account's credential vault instead of pasting a key pair."
+            },
+            {
+              "flag": "--access-key-id=AKIA...",
+              "desc": "For `connect` — the AWS access key id (when not using --credential)."
+            },
+            {
+              "flag": "--secret-access-key=KEY",
+              "desc": "For `connect` — the AWS secret. Prompts on stdin if omitted (keeps the secret out of shell history)."
+            },
+            {
+              "flag": "--region=REGION",
+              "desc": "For `connect` — AWS region for the client (Route53 is global; default us-east-1)."
+            },
+            {
+              "flag": "--days=N",
+              "desc": "For `auto-renew` — renew certs expiring within N days (1-89, default 30). Combinable with on|off."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack route53 status",
+              "desc": "Show connection and auto-renew state."
+            },
+            {
+              "cmd": "ownstack route53 connect --credential=prod-aws",
+              "desc": "Link using a saved AWS credential."
+            },
+            {
+              "cmd": "ownstack route53 connect --access-key-id=AKIA123EXAMPLE",
+              "desc": "Link a raw key pair (secret prompted)."
+            },
+            {
+              "cmd": "ownstack route53 auto-renew off",
+              "desc": "Pause automatic renewals; `on` re-enables."
+            },
+            {
+              "cmd": "ownstack route53 auto-renew --days=45",
+              "desc": "Widen the renewal window to 45 days before expiry."
+            },
+            {
+              "cmd": "ownstack route53 disconnect",
+              "desc": "Remove the integration."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pipelines",
+      "title": "Pipelines (staging → production)",
+      "body": "Heroku-style staging → production flow. Each app gets one pipeline (created on first\ndeploy or via `add-staging`). Stages are tagged by name — anything matching /staging/i\nis the staging stage; /prod(uction)?/i is production. The staging stage is a first-class\napp (`<app>-staging`) with its own config vars, database, domains, and autobuild toggle:\nleave autobuild on for staging and turn it off on production, and pushes to the tracked\nbranch deploy staging only. `promote` ships staging's exact image to production\n(buildless, `dokku git:from-image`) when both stages share a stack; the production\nrelease phase (migrations) runs against production config as usual.\n",
+      "commands": [
+        {
+          "name": "pipeline show",
+          "aliases": [
+            "pipelines"
+          ],
+          "summary": "Print the app's pipeline stages with backing app, autobuild state, and last deploy.",
+          "examples": [
+            {
+              "cmd": "ownstack pipeline show",
+              "desc": "Linked app."
+            },
+            {
+              "cmd": "ownstack pipeline show my-app"
+            }
+          ]
+        },
+        {
+          "name": "pipeline add-staging",
+          "summary": "Create a `<app>-staging` app on the production stack and deploy the current branch to it.",
+          "flags": [
+            {
+              "flag": "--domain=DOMAIN",
+              "desc": "Staging-only custom domain (repeatable). Falls back to pilot domain if omitted."
+            },
+            {
+              "flag": "--set KEY=VALUE",
+              "desc": "Override a staging config var (repeatable). Empty value removes the key. Production config vars are copied minus service-link vars (DATABASE_URL etc.)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack pipeline add-staging",
+              "desc": "Add staging for the linked app."
+            },
+            {
+              "cmd": "ownstack pipeline add-staging my-app --domain=staging.my-app.com --set PRIMARY_INSTANCE=false"
+            }
+          ],
+          "notes": "App must have a successful production deploy first. The production stage is\nauto-created on first deploy; staging reuses the same stack. The staging app gets\nits own postgres/redis links and rides the production repo webhook for autobuild.\nTo stop production from auto-deploying on push, run\n`ownstack app autobuild:disable <app>` and keep autobuild on for `<app>-staging`.\n"
+        },
+        {
+          "name": "pipeline promote",
+          "summary": "Ship staging's release to production (buildless image promote when possible).",
+          "examples": [
+            {
+              "cmd": "ownstack pipeline promote"
+            },
+            {
+              "cmd": "ownstack pipeline promote my-app"
+            }
+          ],
+          "notes": "Same-stack stages: the running staging image is pinned\n(`dokku/<prod>:promote-<sha>`) and deployed via `dokku git:from-image`, so the\nexact tested artifact ships with production config vars and release phase\n(migrations). Different stacks or missing image: falls back to rebuilding\nstaging's last successful commit. Refuses while a staging deploy is in flight.\nOutput says which strategy ran. Tail with `ownstack remote deploy-log`.\n"
+        },
+        {
+          "name": "pipeline stage:create",
+          "summary": "Add a custom stage to the pipeline.",
+          "flags": [
+            {
+              "flag": "--name=NAME",
+              "desc": "Stage label (required). Use \"staging\" or \"production\" to get role detection."
+            },
+            {
+              "flag": "--dokku-app=NAME",
+              "desc": "Dokku app name on the target stack (required unless --app is given)."
+            },
+            {
+              "flag": "--app=APP",
+              "desc": "Couple an existing account app as this stage (app-backed stage with its own settings)."
+            },
+            {
+              "flag": "--stack=NAME",
+              "desc": "Target stack name or id."
+            },
+            {
+              "flag": "--position=N",
+              "desc": "Sort order (0 = staging, 1 = production by convention)."
+            },
+            {
+              "flag": "--domain=DOMAIN",
+              "desc": "Custom domain (repeatable)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack pipeline stage:create my-app --name=qa --dokku-app=my-app-qa --stack=staging-stack --position=0",
+              "desc": "Build a QA stage on a different stack."
+            },
+            {
+              "cmd": "ownstack pipeline stage:create my-app --name=staging --app=my-app-staging",
+              "desc": "Couple an existing app as the staging stage."
+            }
+          ]
+        },
+        {
+          "name": "pipeline stage:update",
+          "summary": "Patch a stage's name, dokku app, stack, position, or domains.",
+          "flags": [
+            {
+              "flag": "--stage=ID",
+              "desc": "Stage id (required, from `pipeline show`)."
+            },
+            {
+              "flag": "--name=NAME"
+            },
+            {
+              "flag": "--dokku-app=NAME"
+            },
+            {
+              "flag": "--stack=NAME"
+            },
+            {
+              "flag": "--position=N"
+            },
+            {
+              "flag": "--domain=DOMAIN",
+              "desc": "Repeatable. Passing any --domain replaces the full list."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack pipeline stage:update my-app --stage=42 --domain=staging.my-app.com --domain=qa.my-app.com"
+            }
+          ]
+        },
+        {
+          "name": "pipeline stage:destroy",
+          "aliases": [
+            "pipeline stage:remove"
+          ],
+          "summary": "Delete a stage from the pipeline.",
+          "flags": [
+            {
+              "flag": "--stage=ID",
+              "desc": "Stage id (required)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack pipeline stage:destroy my-app --stage=42"
+            }
+          ],
+          "notes": "Removing an app-backed stage does not destroy the backing app; destroy it\nseparately with `ownstack app destroy` if you no longer want it.\n"
+        }
+      ]
+    },
+    {
+      "id": "db",
+      "title": "Database (Postgres)",
+      "body": "Manage the linked Postgres service on the stack: health checks, dumps,\nlifecycle, and local tunnels. Postgres-only today; MySQL apps use\n`db dump` but not the other verbs.\n",
+      "commands": [
+        {
+          "name": "db check",
+          "summary": "Check connectivity and auth on each stack the app is deployed to.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name (defaults to the linked app)."
+            },
+            {
+              "flag": "--stack=ID",
+              "desc": "Limit the check to one stack."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack db check --app=myapp"
+            }
+          ]
+        },
+        {
+          "name": "db connections",
+          "summary": "Show Postgres connection usage vs max_connections, the active/idle/idle-in-txn breakdown, and top consumers by application_name.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name (defaults to the linked app)."
+            },
+            {
+              "flag": "--json",
+              "desc": "Emit raw numbers as JSON for scripting or dashboards."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack db connections --app=myapp"
+            },
+            {
+              "cmd": "ownstack db connections --app=myapp --json"
+            }
+          ],
+          "notes": "Connection saturation is a common cause of deploy failures on these\nstacks: during a deploy the old containers keep running, so the\nrelease one-off has to fit on top of the steady-state worker pools.\nIf usage sits near max_connections the release task dies with\n\"FATAL: sorry, too many clients already\". This command makes that\nvisible without dropping to `dokku postgres:connect` + raw SQL.\nWarns at >70% of max_connections, flags red at >85%.\n"
+        },
+        {
+          "name": "db config:show",
+          "summary": "Show OwnStack-managed Postgres settings and current live values.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name (defaults to the linked app)."
+            },
+            {
+              "flag": "--json",
+              "desc": "Emit { managed, live } as JSON."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack db config:show --app=myapp"
+            },
+            {
+              "cmd": "ownstack db config:show myapp --json"
+            }
+          ],
+          "notes": "Goes through the control plane (which SSHes to the stack), so no local SSH access is\nneeded. The CONTEXT column shows whether a parameter needs a restart (postmaster) or\njust a reload. MANAGED values are the ones OwnStack re-applies if the DB is recreated.\n"
+        },
+        {
+          "name": "db config:set",
+          "summary": "Set Postgres settings; persisted as managed (survive a recreate) and applied live.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name (defaults to the linked app)."
+            },
+            {
+              "flag": "--no-restart",
+              "desc": "Apply now but defer any restart-required change to the next restart."
+            },
+            {
+              "flag": "--json",
+              "desc": "Emit the result as JSON."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack db config:set myapp shared_buffers=12GB effective_cache_size=36GB"
+            },
+            {
+              "cmd": "ownstack db config:set --app=myapp work_mem=32MB"
+            },
+            {
+              "cmd": "ownstack db config:set myapp shared_preload_libraries=pg_stat_statements --no-restart"
+            }
+          ],
+          "notes": "Each setting is stored on the app and re-applied on top of the sized provisioning\ndefaults whenever the Postgres service is (re)created, so a postgres:destroy/recreate no\nlonger reverts your tuning to compiled defaults. The control plane applies the change via\nALTER SYSTEM and then reloads, or restarts only when a changed parameter requires it\n(e.g. shared_buffers, shared_preload_libraries). Use --no-restart to stage a\nrestart-required change without bouncing Postgres now.\n"
+        },
+        {
+          "name": "db repair",
+          "summary": "Re-link DB, resync the postgres role password if drifted, restart the app.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name."
+            },
+            {
+              "flag": "--stack=ID",
+              "desc": "Target stack."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack db repair --app=myapp"
+            }
+          ]
+        },
+        {
+          "name": "db dump",
+          "summary": "Stream a Postgres or MySQL dump to a local file via the control plane.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name."
+            },
+            {
+              "flag": "--stack=ID",
+              "desc": "Target stack."
+            },
+            {
+              "flag": "--output=FILE",
+              "desc": "Local file (default = Content-Disposition filename from server)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack db dump --app=myapp --output=myapp.dump"
+            }
+          ],
+          "notes": "Postgres dumps are pg_dump custom format (.dump); MySQL dumps are SQL (.sql).\n"
+        },
+        {
+          "name": "db tunnel",
+          "summary": "Forward a local TCP port to the app's Dokku-internal Postgres on the stack.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name (defaults to the linked app)."
+            },
+            {
+              "flag": "--stack=ID",
+              "desc": "Target stack (required when the app spans multiple stacks)."
+            },
+            {
+              "flag": "--local-port=PORT",
+              "desc": "Local port to bind. Defaults to 15432."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack db tunnel --app=myapp",
+              "desc": "Tunnel postgres-myapp to localhost:15432."
+            },
+            {
+              "cmd": "ownstack db tunnel --app=myapp --local-port=5433",
+              "desc": "Pick a custom local port."
+            }
+          ],
+          "notes": "Uses the same SSH transport as `ssh stack`. Reads the Dokku DSN to\nconstruct a localhost-keyed connection string, then runs `ssh -L`\nin the foreground. Ctrl-C closes the tunnel. Equivalent to\n`heroku pg:psql --tunnel` for Heroku users.\n"
+        },
+        {
+          "name": "db version",
+          "summary": "Show the Postgres image version for the linked service.",
+          "examples": [
+            {
+              "cmd": "ownstack db version --app=myapp"
+            }
+          ]
+        },
+        {
+          "name": "db status",
+          "summary": "Show service status (alias of `db version`).",
+          "examples": [
+            {
+              "cmd": "ownstack db status --app=myapp"
+            }
+          ]
+        },
+        {
+          "name": "db logs",
+          "summary": "Tail the Postgres container logs.",
+          "examples": [
+            {
+              "cmd": "ownstack db logs --app=myapp"
+            }
+          ]
+        },
+        {
+          "name": "db create",
+          "summary": "Create the postgres-<app> service on the linked stack.",
+          "flags": [
+            {
+              "flag": "--app=NAME"
+            },
+            {
+              "flag": "--version=N",
+              "desc": "Postgres major version (default 17)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack db create --app=myapp --version=17"
+            }
+          ]
+        },
+        {
+          "name": "db destroy",
+          "summary": "Unlink and destroy the postgres service. Confirms by service name.",
+          "flags": [
+            {
+              "flag": "--app=NAME"
+            },
+            {
+              "flag": "--force",
+              "desc": "Skip the interactive confirmation."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack db destroy --app=myapp"
+            }
+          ]
+        },
+        {
+          "name": "db recreate",
+          "summary": "Destroy + create + link (all data lost). Requires interactive confirmation.",
+          "flags": [
+            {
+              "flag": "--app=NAME"
+            },
+            {
+              "flag": "--version=N",
+              "desc": "Postgres major version of the new service."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack db recreate --app=myapp --version=17"
+            }
+          ]
+        },
+        {
+          "name": "db link",
+          "summary": "Link the postgres-<app> service to the app and set DATABASE_URL.",
+          "examples": [
+            {
+              "cmd": "ownstack db link --app=myapp"
+            }
+          ]
+        },
+        {
+          "name": "db backups",
+          "summary": "List Heroku Postgres backups (Heroku app, not the ownstack one).",
+          "flags": [
+            {
+              "flag": "--heroku-app=NAME",
+              "desc": "Heroku app to list backups from."
+            },
+            {
+              "flag": "--app=NAME",
+              "desc": "ownstack app context (for auth/permissions)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack db backups --heroku-app=myapp-prod"
+            }
+          ]
+        },
+        {
+          "name": "db backups:capture",
+          "summary": "Trigger a fresh Heroku backup.",
+          "examples": [
+            {
+              "cmd": "ownstack db backups:capture --heroku-app=myapp-prod"
+            }
+          ]
+        },
+        {
+          "name": "db restore",
+          "summary": "Restore from a Heroku backup or an arbitrary dump URL.",
+          "flags": [
+            {
+              "flag": "--heroku-app=NAME"
+            },
+            {
+              "flag": "--backup=NUM",
+              "desc": "Specific Heroku backup number (default = latest)."
+            },
+            {
+              "flag": "--url=URL",
+              "desc": "Dump URL (alternative to --heroku-app)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack db restore --heroku-app=myapp-prod"
+            },
+            {
+              "cmd": "ownstack db restore --url=https://example.com/dump.sql --app=myapp"
+            }
+          ]
+        },
+        {
+          "name": "db restore:info",
+          "summary": "Show progress and logs for a restore job. --follow streams live.",
+          "examples": [
+            {
+              "cmd": "ownstack db restore:info 42 --follow"
+            }
+          ]
+        },
+        {
+          "name": "db restore:cancel",
+          "summary": "Cancel an in-progress restore.",
+          "examples": [
+            {
+              "cmd": "ownstack db restore:cancel 42"
+            }
+          ]
+        },
+        {
+          "name": "db restores",
+          "summary": "List recent restore jobs.",
+          "examples": [
+            {
+              "cmd": "ownstack db restores --app=myapp"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pg",
+      "title": "Postgres backups (object storage)",
+      "body": "Per-app Postgres backups to object storage (S3, GCS, or DreamObjects),\nmirroring Heroku's `pg:backups`: capture, list, download, restore, and a\nscheduled backup with a grandfather-father-son (GFS) retention calendar.\n\nBackups are captured on the stack via `dokku postgres:export`, uploaded to\nthe object storage configured for the app's stack, and pruned on the\nretention calendar. Each backup has a short id (e.g. `b042`) and is\nindividually downloadable and restorable. The destination credential and\nbucket come from the stack's backup configuration unless overridden.\n",
+      "commands": [
+        {
+          "name": "pg backups",
+          "summary": "List this app's Postgres backups (id, date, size, status, type).",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name (defaults to the linked app)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack pg backups --app=myapp"
+            }
+          ]
+        },
+        {
+          "name": "pg backups:capture",
+          "summary": "Capture a new backup now and upload it to object storage.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name (defaults to the linked app)."
+            },
+            {
+              "flag": "--stack=ID",
+              "desc": "Capture from a specific stack (default = first deployable stack)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack pg backups:capture --app=myapp"
+            }
+          ]
+        },
+        {
+          "name": "pg backups:info",
+          "summary": "Show one backup's details (status, phase, uploaded/size, service, timestamps).",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name (defaults to the linked app)."
+            },
+            {
+              "flag": "--follow",
+              "desc": "Live-update a one-line status (phase + bytes uploaded) until the backup completes or fails."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack pg backups:info b042 --app=myapp"
+            },
+            {
+              "cmd": "ownstack pg backups:info b042 --app=myapp --follow"
+            }
+          ]
+        },
+        {
+          "name": "pg backups:download",
+          "summary": "Download a backup dump to a local file via a presigned URL.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name (defaults to the linked app)."
+            },
+            {
+              "flag": "--output=FILE",
+              "desc": "Local file to write (default = the backup's filename)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack pg backups:download b042 --app=myapp --output=myapp.dump"
+            }
+          ]
+        },
+        {
+          "name": "pg backups:url",
+          "summary": "Print a time-limited presigned download URL for a backup.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name (defaults to the linked app)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack pg backups:url b042 --app=myapp"
+            }
+          ]
+        },
+        {
+          "name": "pg backups:restore",
+          "summary": "Restore a stored backup into the app's database (overwrites current data).",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name (defaults to the linked app)."
+            },
+            {
+              "flag": "--stack=ID",
+              "desc": "Restore into a specific stack (default = the backup's stack)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack pg backups:restore b042 --app=myapp"
+            }
+          ],
+          "notes": "Reuses the same restore pipeline as `db restore --url=...`: the control\nplane signs a download URL for the backup and streams it into the\ntarget Postgres. Track progress with `ownstack db restore:info ID --follow`.\n"
+        },
+        {
+          "name": "pg backups:delete",
+          "summary": "Delete a backup and its object-storage dump.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name (defaults to the linked app)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack pg backups:delete b042 --app=myapp"
+            }
+          ]
+        },
+        {
+          "name": "pg backups:schedule",
+          "summary": "Enable scheduled backups with a GFS retention calendar.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name (defaults to the linked app)."
+            },
+            {
+              "flag": "--at=HH:MM",
+              "desc": "Daily UTC time (e.g. 02:00). Converted to a cron expression."
+            },
+            {
+              "flag": "--cron=EXPR",
+              "desc": "Full cron expression (UTC), overrides --at."
+            },
+            {
+              "flag": "--keep-daily=N",
+              "desc": "Keep the newest backup of each of the last N days (default 7)."
+            },
+            {
+              "flag": "--keep-weekly=N",
+              "desc": "Keep the newest backup of each of the last N ISO weeks (default 4)."
+            },
+            {
+              "flag": "--keep-monthly=N",
+              "desc": "Keep the newest backup of each of the last N months (default 6)."
+            },
+            {
+              "flag": "--keep-yearly=N",
+              "desc": "Keep the newest backup of each of the last N years (default 0)."
+            },
+            {
+              "flag": "--bucket=ID",
+              "desc": "Send backups to a managed bucket (owned or shared) instead of the stack default. See `ownstack bucket`."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack pg backups:schedule --app=myapp --at=02:00"
+            },
+            {
+              "cmd": "ownstack pg backups:schedule --app=myapp --cron='0 3 * * *' --keep-daily=14 --keep-weekly=8 --keep-monthly=12"
+            }
+          ],
+          "notes": "A backup is retained if it is the newest in any kept calendar bucket,\nso a single backup can satisfy the daily, weekly, monthly and yearly\nslots at once. Everything outside the kept buckets is pruned from both\nobject storage and the backup list.\n"
+        },
+        {
+          "name": "pg backups:schedules",
+          "summary": "Show the current schedule and retention calendar.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name (defaults to the linked app)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack pg backups:schedules --app=myapp"
+            }
+          ]
+        },
+        {
+          "name": "pg backups:unschedule",
+          "summary": "Disable scheduled backups (existing backups are kept).",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name (defaults to the linked app)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack pg backups:unschedule --app=myapp"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "buckets",
+      "title": "Object-storage buckets",
+      "body": "First-class object-storage buckets (S3, GCS, DreamObjects) owned by your\naccount and shareable to other accounts, just like stacks. A share recipient\ngets their own isolated prefix inside the bucket: they can only ever see and\nwrite their own objects, never anyone else's; the owner sees everything.\n\nBuckets are the recommended destination for per-app database backups\n(`ownstack pg backups`). OwnStack never lends its own storage implicitly: if\nanother account wants backups, they bring (or are shared) a bucket.\n",
+      "commands": [
+        {
+          "name": "bucket list",
+          "summary": "List buckets you own or have accepted a share to.",
+          "examples": [
+            {
+              "cmd": "ownstack bucket list"
+            }
+          ]
+        },
+        {
+          "name": "bucket create",
+          "summary": "Register a bucket backed by one of your object-storage credentials.",
+          "flags": [
+            {
+              "flag": "--credential=ID",
+              "desc": "Object-storage credential (S3/GCS/DreamObjects) in your account."
+            },
+            {
+              "flag": "--region=R",
+              "desc": "Bucket region (e.g. us-west-2)."
+            },
+            {
+              "flag": "--remote",
+              "desc": "Also create the underlying bucket in object storage (not just the record)."
+            },
+            {
+              "flag": "--label=L",
+              "desc": "Friendly display name."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack bucket create my-backups --credential=17 --region=us-west-2 --remote"
+            }
+          ]
+        },
+        {
+          "name": "bucket rm",
+          "summary": "Remove the bucket record. The underlying object-storage bucket is left intact.",
+          "examples": [
+            {
+              "cmd": "ownstack bucket rm 3"
+            }
+          ]
+        },
+        {
+          "name": "bucket share",
+          "summary": "Invite another account by email. They get an isolated prefix on accept.",
+          "examples": [
+            {
+              "cmd": "ownstack bucket share 3 teammate@example.com"
+            }
+          ]
+        },
+        {
+          "name": "bucket shares",
+          "summary": "List a bucket's shares with status (pending / accepted) and prefix.",
+          "examples": [
+            {
+              "cmd": "ownstack bucket shares 3"
+            }
+          ]
+        },
+        {
+          "name": "bucket unshare",
+          "summary": "Revoke a share. The account loses access (its objects remain under its prefix).",
+          "examples": [
+            {
+              "cmd": "ownstack bucket unshare 3 teammate@example.com"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ssh",
+      "title": "SSH access",
+      "body": "Interactive SSH via the control plane — no local SSH key needed. Credentials come from the API.",
+      "commands": [
+        {
+          "name": "ssh app",
+          "summary": "Shell into an app container (dokku enter), or run a one-off command with --run.",
+          "flags": [
+            {
+              "flag": "--stack=NAME",
+              "desc": "Target stack (multi-stack apps)."
+            },
+            {
+              "flag": "--process=NAME",
+              "desc": "Enter a specific process (default web)."
+            },
+            {
+              "flag": "--run 'COMMAND'",
+              "desc": "Run COMMAND in the running container instead of opening a shell. The command is streamed over stdin (so quotes/parens/semicolons are never mangled) and run with the app's buildpack env, so rails/rake/bundle resolve."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack ssh app my-app"
+            },
+            {
+              "cmd": "ownstack ssh app my-app --stack=production"
+            },
+            {
+              "cmd": "ownstack ssh app my-app --process=worker"
+            },
+            {
+              "cmd": "ownstack ssh app my-app --run 'rake db:version'"
+            },
+            {
+              "cmd": "ownstack ssh app my-app --run 'rails runner \"puts User.count\"'"
+            }
+          ],
+          "notes": "--run requires host (sudo docker) access on the stack, which the standard\nubuntu stack SSH user has; it is unavailable on stacks whose app SSH user is\nthe restricted dokku ForceCommand user.\n"
+        },
+        {
+          "name": "ssh stack",
+          "summary": "SSH into a stack host as the ubuntu user.",
+          "examples": [
+            {
+              "cmd": "ownstack ssh stack my-stack"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "llm",
+      "title": "LLM addons",
+      "body": "Self-hosted language models running on stacks you own. Apps link to them\nvia env vars (LLM_URL, LLM_MODEL, LLM_API_KEY). The endpoint speaks the\nOpenAI-compatible API on top of llama.cpp server.\n\nTopology: `dedicated` (addon owns its stack, stop = instance off) or\n`colocated` (addon shares a stack with apps, stop = process only).\n",
+      "commands": [
+        {
+          "name": "llm list",
+          "aliases": [
+            "llm ls"
+          ],
+          "summary": "List LLM addons on this account with model, status, topology, and cost state.",
+          "examples": [
+            {
+              "cmd": "ownstack llm list"
+            }
+          ]
+        },
+        {
+          "name": "llm create",
+          "summary": "Create an LLM addon. Provisioning runs in the background.",
+          "flags": [
+            {
+              "flag": "--model=ID",
+              "desc": "Curated model id (default qwen-2.5-7b). Or `hf:org/repo[/file.gguf]` for HuggingFace."
+            },
+            {
+              "flag": "--topology=dedicated|colocated",
+              "desc": "Default dedicated (own stack, stop = instance off)."
+            },
+            {
+              "flag": "--stack=ID",
+              "desc": "Required for colocated; the existing stack to share."
+            },
+            {
+              "flag": "--provider=aws|gcp|...",
+              "desc": "Cloud provider when creating a dedicated stack."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack llm create my-llm",
+              "desc": "Default model on a new dedicated stack."
+            },
+            {
+              "cmd": "ownstack llm create my-llm --model=qwen-2.5-3b",
+              "desc": "Smaller model for tighter RAM budgets."
+            },
+            {
+              "cmd": "ownstack llm create my-llm --topology=colocated --stack=42",
+              "desc": "Colocate on stack 42 (inference competes with apps)."
+            },
+            {
+              "cmd": "ownstack llm create my-llm --model=hf:Qwen/Qwen2.5-32B-Instruct-GGUF/qwen2.5-32b-instruct-q4_k_m.gguf",
+              "desc": "Arbitrary HuggingFace GGUF (no guarantees)."
+            }
+          ]
+        },
+        {
+          "name": "llm link",
+          "summary": "Inject LLM_URL/LLM_MODEL/LLM_API_KEY into an app.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App to link the addon to."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack llm link my-llm --app=my-app"
+            }
+          ]
+        },
+        {
+          "name": "llm unlink",
+          "summary": "Remove the LLM_* env vars from an app.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App to unlink."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack llm unlink my-llm --app=my-app"
+            }
+          ]
+        },
+        {
+          "name": "llm start",
+          "aliases": [
+            "llm wake"
+          ],
+          "summary": "Start the inference container. Also serves as `wake` for stopped addons.",
+          "examples": [
+            {
+              "cmd": "ownstack llm start my-llm"
+            },
+            {
+              "cmd": "ownstack llm wake my-llm"
+            }
+          ]
+        },
+        {
+          "name": "llm update",
+          "summary": "Update addon settings (auto-wake / idle timeout) without restarting.",
+          "flags": [
+            {
+              "flag": "--frozen",
+              "desc": "Disable auto-wake."
+            },
+            {
+              "flag": "--unfreeze",
+              "desc": "Re-enable auto-wake."
+            },
+            {
+              "flag": "--idle-timeout=N",
+              "desc": "Set idle-stop timeout in seconds."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack llm update my-llm --idle-timeout=600"
+            },
+            {
+              "cmd": "ownstack llm update my-llm --unfreeze"
+            }
+          ]
+        },
+        {
+          "name": "llm stop",
+          "summary": "Stop the inference container.",
+          "flags": [
+            {
+              "flag": "--frozen",
+              "desc": "Disable auto-wake; the addon won't restart on incoming requests."
+            },
+            {
+              "flag": "--keep-instance",
+              "desc": "(dedicated) keep the host instance running; only stop the process."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack llm stop my-llm"
+            },
+            {
+              "cmd": "ownstack llm stop my-llm --frozen"
+            },
+            {
+              "cmd": "ownstack llm stop my-llm --keep-instance"
+            }
+          ]
+        },
+        {
+          "name": "llm logs",
+          "summary": "Print provisioning and runtime logs for an addon.",
+          "flags": [
+            {
+              "flag": "--follow",
+              "desc": "Poll the logs endpoint every 3 seconds and stream new content."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack llm logs my-llm"
+            },
+            {
+              "cmd": "ownstack llm logs my-llm --follow"
+            }
+          ]
+        },
+        {
+          "name": "llm info",
+          "aliases": [
+            "llm show"
+          ],
+          "summary": "Show full state including cost, model metadata, endpoint URL.",
+          "examples": [
+            {
+              "cmd": "ownstack llm info my-llm"
+            }
+          ]
+        },
+        {
+          "name": "llm destroy",
+          "aliases": [
+            "llm rm"
+          ],
+          "summary": "Tear down the addon. Dedicated stacks also torn down unless --keep-stack.",
+          "flags": [
+            {
+              "flag": "--keep-stack",
+              "desc": "(dedicated) keep the underlying stack."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack llm destroy my-llm"
+            },
+            {
+              "cmd": "ownstack llm destroy my-llm --keep-stack"
+            }
+          ]
+        },
+        {
+          "name": "llm models",
+          "summary": "Show the curated model list (size, RAM, license).",
+          "examples": [
+            {
+              "cmd": "ownstack llm models"
+            }
+          ]
+        },
+        {
+          "name": "llm diagnose",
+          "summary": "Ask the linked LLM to diagnose a failed deployment from its log tail.",
+          "flags": [
+            {
+              "flag": "--deployment=ID",
+              "desc": "Deployment id to diagnose."
+            },
+            {
+              "flag": "--wait",
+              "desc": "If the addon is waking, poll up to ~50s for the result rather than returning a pending response."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack llm diagnose --deployment=12345"
+            },
+            {
+              "cmd": "ownstack llm diagnose --deployment=12345 --wait"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "voice",
+      "title": "Voice addons",
+      "body": "Self-hosted Moonshine speech-to-text running on stacks you own. Apps link\nto them via env vars (SPEECH_URL, SPEECH_MODEL, SPEECH_API_KEY) and call an\nOpenAI-compatible endpoint (POST {SPEECH_URL}/audio/transcriptions). CPU-only\n(no GPU), so colocated is cheap. Pairs with the LLM addon for voice agents:\nspeech to text, then the LLM, then text to speech.\n\nTopology: `dedicated` (addon owns its stack, stop = instance off) or\n`colocated` (addon shares a stack with apps, stop = process only).\n",
+      "commands": [
+        {
+          "name": "voice list",
+          "aliases": [
+            "voice ls"
+          ],
+          "summary": "List voice addons on this account with model, status, topology, and cost state.",
+          "examples": [
+            {
+              "cmd": "ownstack voice list"
+            }
+          ]
+        },
+        {
+          "name": "voice create",
+          "summary": "Create a voice addon. Provisioning builds the image on the stack in the background.",
+          "flags": [
+            {
+              "flag": "--model=ID",
+              "desc": "Curated Moonshine language pack (default moonshine-en)."
+            },
+            {
+              "flag": "--topology=dedicated|colocated",
+              "desc": "Default dedicated (own stack, stop = instance off)."
+            },
+            {
+              "flag": "--stack=ID",
+              "desc": "Required for colocated; the existing stack to share."
+            },
+            {
+              "flag": "--provider=aws|gcp|...",
+              "desc": "Cloud provider when creating a dedicated stack."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack voice create captions",
+              "desc": "English speech-to-text on a new dedicated stack."
+            },
+            {
+              "cmd": "ownstack voice create captions --model=moonshine-es",
+              "desc": "Spanish language pack."
+            },
+            {
+              "cmd": "ownstack voice create captions --topology=colocated --stack=42",
+              "desc": "Colocate on stack 42 (cheap, CPU-only)."
+            }
+          ]
+        },
+        {
+          "name": "voice link",
+          "summary": "Inject SPEECH_URL/SPEECH_MODEL/SPEECH_API_KEY into an app.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App to link the addon to."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack voice link captions --app=my-app"
+            }
+          ]
+        },
+        {
+          "name": "voice unlink",
+          "summary": "Remove the SPEECH_* env vars from an app.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App to unlink."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack voice unlink captions --app=my-app"
+            }
+          ]
+        },
+        {
+          "name": "voice start",
+          "aliases": [
+            "voice wake"
+          ],
+          "summary": "Start the speech container. Also serves as `wake` for stopped addons.",
+          "examples": [
+            {
+              "cmd": "ownstack voice start captions"
+            },
+            {
+              "cmd": "ownstack voice wake captions"
+            }
+          ]
+        },
+        {
+          "name": "voice update",
+          "summary": "Update addon settings (auto-wake / idle timeout) without restarting.",
+          "flags": [
+            {
+              "flag": "--frozen",
+              "desc": "Disable auto-wake."
+            },
+            {
+              "flag": "--unfreeze",
+              "desc": "Re-enable auto-wake."
+            },
+            {
+              "flag": "--idle-timeout=N",
+              "desc": "Set idle-stop timeout in seconds."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack voice update captions --idle-timeout=600"
+            },
+            {
+              "cmd": "ownstack voice update captions --unfreeze"
+            }
+          ]
+        },
+        {
+          "name": "voice stop",
+          "summary": "Stop the speech container.",
+          "flags": [
+            {
+              "flag": "--frozen",
+              "desc": "Disable auto-wake; the addon won't restart on incoming requests."
+            },
+            {
+              "flag": "--keep-instance",
+              "desc": "(dedicated) keep the host instance running; only stop the process."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack voice stop captions"
+            },
+            {
+              "cmd": "ownstack voice stop captions --frozen"
+            },
+            {
+              "cmd": "ownstack voice stop captions --keep-instance"
+            }
+          ]
+        },
+        {
+          "name": "voice logs",
+          "summary": "Print provisioning (image build) and runtime logs for an addon.",
+          "flags": [
+            {
+              "flag": "--follow",
+              "desc": "Poll the logs endpoint every 3 seconds and stream new content."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack voice logs captions"
+            },
+            {
+              "cmd": "ownstack voice logs captions --follow"
+            }
+          ]
+        },
+        {
+          "name": "voice info",
+          "aliases": [
+            "voice show"
+          ],
+          "summary": "Show full state including language, cost, model metadata, endpoint URL.",
+          "examples": [
+            {
+              "cmd": "ownstack voice info captions"
+            }
+          ]
+        },
+        {
+          "name": "voice destroy",
+          "aliases": [
+            "voice rm"
+          ],
+          "summary": "Tear down the addon. Dedicated stacks also torn down unless --keep-stack.",
+          "flags": [
+            {
+              "flag": "--keep-stack",
+              "desc": "(dedicated) keep the underlying stack."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack voice destroy captions"
+            },
+            {
+              "cmd": "ownstack voice destroy captions --keep-stack"
+            }
+          ]
+        },
+        {
+          "name": "voice models",
+          "summary": "Show the curated Moonshine model list (language, RAM, license).",
+          "examples": [
+            {
+              "cmd": "ownstack voice models"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "open-source",
+      "title": "Open Source templates",
+      "body": "One-click installs for popular open-source apps. Each template declares its\nofficial Docker image and required services (Postgres, Redis, etc.). Running\n`ownstack oss install` creates a new OwnStack app on a provisioned stack,\nlinks the required services, and deploys the image. Same catalog the\nExtras → Open Source page in the web UI consumes.\n\nWhat install does for you:\n  - Creates the OwnStack app with the right needs_* flags so deploys\n    install / link the right Dokku plugin services automatically.\n  - Generates any required secrets (placeholders like SECRET_KEY,\n    MEILI_MASTER_KEY) with SecureRandom.hex.\n  - Mounts persistent volumes declared by the template (Ollama models,\n    Qdrant storage, etc.) via `dokku storage:mount` before the deploy.\n  - For templates that need a post-link env-var copy (currently Metabase:\n    MB_DB_CONNECTION_URI from DATABASE_URL), a worker fires ~45 s after\n    the initial deploy lands, sets the derived vars, and rebuilds.\n",
+      "commands": [
+        {
+          "name": "oss list",
+          "aliases": [
+            "oss ls"
+          ],
+          "summary": "List one-click open-source templates.",
+          "examples": [
+            {
+              "cmd": "ownstack oss list"
+            }
+          ]
+        },
+        {
+          "name": "oss show",
+          "aliases": [
+            "oss info"
+          ],
+          "summary": "Show image, required services, env vars, persistent volumes, and docs URL for a single template.",
+          "examples": [
+            {
+              "cmd": "ownstack oss show metabase"
+            },
+            {
+              "cmd": "ownstack oss show ollama"
+            }
+          ]
+        },
+        {
+          "name": "oss install",
+          "summary": "Install a template onto an existing provisioned stack.",
+          "notes": "The picked stack must be provisioned. If you don't have one yet, open\n/stacks/new in the web UI or run `ownstack stack ...` to create one.\nRequired secrets are auto-generated; you can read them after install\nwith `dokku config:show <app>` over SSH or via the app's config in\nthe web UI.\n",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "New app name (lowercase letters, numbers, hyphens; start with a letter)."
+            },
+            {
+              "flag": "--stack=ID",
+              "desc": "Target stack id. Must be provisioned."
+            },
+            {
+              "flag": "--domain=HOST",
+              "desc": "Optional custom domain; defaults to the stack's default app TLD."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack oss install metabase --app=my-metabase --stack=12",
+              "desc": "BI dashboards. Postgres auto-linked; MB_DB_CONNECTION_URI copied from DATABASE_URL ~45s after first deploy."
+            },
+            {
+              "cmd": "ownstack oss install ollama --app=my-ollama --stack=12 --domain=ollama.example.com",
+              "desc": "Local LLM runtime. /root/.ollama mounted from a persistent host volume."
+            },
+            {
+              "cmd": "ownstack oss install n8n --app=workflows --stack=12"
+            },
+            {
+              "cmd": "ownstack oss install qdrant --app=vectors --stack=12",
+              "desc": "Vector DB. /qdrant/storage mounted from a persistent host volume."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-context",
+      "title": "AI assistant context",
+      "body": "Generate context files (CLAUDE.md, .cursorrules) so AI assistants understand the app layout.",
+      "commands": [
+        {
+          "name": "ai:setup",
+          "summary": "Generate AI assistant context files for the current app.",
+          "examples": [
+            {
+              "cmd": "ownstack ai:setup",
+              "desc": "Generate both CLAUDE.md and .cursorrules (default)."
+            },
+            {
+              "cmd": "ownstack ai:setup claude",
+              "desc": "Just CLAUDE.md."
+            },
+            {
+              "cmd": "ownstack ai:setup cursor",
+              "desc": "Just .cursorrules."
+            }
+          ],
+          "notes": "Run from inside an OwnStack app directory (must have .ownstack-config).\n"
+        }
+      ]
+    },
+    {
+      "id": "auth",
+      "title": "Authentication",
+      "body": "Sign in to the control plane. Tokens are stored in ~/.ownstack/config, or per\naccount under ~/.ownstack/profiles/<name> when using profiles.\n",
+      "commands": [
+        {
+          "name": "login",
+          "summary": "Authenticate with the control plane.",
+          "flags": [
+            {
+              "flag": "--token TOKEN",
+              "desc": "Direct token from Settings → API token."
+            },
+            {
+              "flag": "--profile NAME",
+              "desc": "With --token, save the token as profile NAME and switch the active profile to it. To add a profile WITHOUT switching, use `ownstack profile add`."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack login",
+              "desc": "Browser device-code flow."
+            },
+            {
+              "cmd": "ownstack login --token YOUR_API_TOKEN"
+            }
+          ]
+        },
+        {
+          "name": "profile",
+          "summary": "Manage multiple control-plane accounts (list, show, use, add).",
+          "body": "Profiles let one machine hold tokens for several control-plane accounts.\nFiles live in ~/.ownstack/profiles/<name>. The active profile is recorded\nin ~/.ownstack/config; any command can override it for a single invocation\nwith the OWNSTACK_PROFILE environment variable, which is the safest pattern\nwhen multiple terminals or agents share the machine.\n\n`profile add` creates a profile WITHOUT changing the active profile, so\nconcurrent work against other accounts is never disturbed. By contrast\n`ownstack login --token TOKEN --profile NAME` creates the profile AND\nswitches the active profile to it.\n",
+          "flags": [
+            {
+              "flag": "--token TOKEN",
+              "desc": "(add) API token for the new profile. Prompted for interactively if omitted."
+            },
+            {
+              "flag": "--api-url URL",
+              "desc": "(add) Control-plane URL. Defaults to the current config's URL."
+            },
+            {
+              "flag": "--force",
+              "desc": "(add) Overwrite an existing profile of the same name."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack profile list",
+              "desc": "List profiles, active one marked."
+            },
+            {
+              "cmd": "ownstack profile add acme --token YOUR_API_TOKEN",
+              "desc": "Add a profile without switching to it."
+            },
+            {
+              "cmd": "ownstack profile use acme",
+              "desc": "Switch the active profile."
+            },
+            {
+              "cmd": "OWNSTACK_PROFILE=acme ownstack stacks",
+              "desc": "One-off command against a profile without switching."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "meta",
+      "title": "Discovery and self-description",
+      "body": "Commands that describe the CLI itself, for humans and agents.",
+      "commands": [
+        {
+          "name": "whatami",
+          "summary": "Print an AI-friendly markdown brief of the CLI (built from this manifest).",
+          "examples": [
+            {
+              "cmd": "ownstack whatami",
+              "desc": "Print full brief."
+            },
+            {
+              "cmd": "ownstack whatami | head -40",
+              "desc": "Just the overview."
+            }
+          ]
+        },
+        {
+          "name": "docs",
+          "summary": "Export the docs manifest as JSON or YAML.",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "JSON output (default)."
+            },
+            {
+              "flag": "--yaml",
+              "desc": "YAML output (the source file as-is)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack docs --json"
+            },
+            {
+              "cmd": "ownstack docs --yaml"
+            },
+            {
+              "cmd": "ownstack docs --json > docs.json",
+              "desc": "Pipe into a docs site build step."
+            }
+          ]
+        },
+        {
+          "name": "help",
+          "summary": "Show top-level help.",
+          "examples": [
+            {
+              "cmd": "ownstack help"
+            },
+            {
+              "cmd": "ownstack --help"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "workflows": [
+    {
+      "title": "First-time setup",
+      "steps": [
+        "Install the CLI (curl install or local clone).",
+        "Run `ownstack login` and complete the browser flow.",
+        "Run `ownstack apps` to confirm you can see your account."
+      ]
+    },
+    {
+      "title": "Generate and deploy a new app from scratch",
+      "steps": [
+        "`ownstack generate myapp rails react` — scaffold.",
+        "`cd myapp && ownstack git push --name=myapp --app=myapp` — push to ownstack Git and create the app.",
+        "`ownstack deploy --wait` — kick off the first deploy and stream the log."
+      ]
+    },
+    {
+      "title": "Adopt an existing local repo into the control plane",
+      "steps": [
+        "`ownstack remote -a my-app` — link the repo to an existing app.",
+        "`ownstack deploy --wait` — deploy.",
+        "`ownstack remote logs` — follow runtime logs."
+      ]
+    },
+    {
+      "title": "Promote staging to production",
+      "steps": [
+        "`ownstack pipeline add-staging` — creates the staging stage on the same stack and kicks off a staging deploy.",
+        "Test the staging deploy at its assigned domain (or pilot URL).",
+        "`ownstack pipeline promote` — re-deploys staging's last successful commit to the production stage.",
+        "`ownstack remote deploy-log` to tail the build."
+      ]
+    },
+    {
+      "title": "Debug a failing deploy",
+      "steps": [
+        "`ownstack remote deploy-log` — see the build/release log.",
+        "If the build failed, fix locally, commit, and `ownstack deploy --wait` again.",
+        "If the release (e.g. migrations) failed, fix in code and redeploy; for db connectivity see `ownstack ssh app <name>` or the Data → Health tab in the UI."
+      ]
+    }
+  ],
+  "config": {
+    "global": {
+      "path": "~/.ownstack/config",
+      "keys": [
+        {
+          "key": "OWNSTACK_API_URL",
+          "desc": "Control-plane base URL (default https://localhost.ownstack.org:6443)."
+        },
+        {
+          "key": "OWNSTACK_API_TOKEN",
+          "desc": "API token from `ownstack login`."
+        }
+      ]
+    },
+    "project": {
+      "path": ".ownstack-config",
+      "keys": [
+        {
+          "key": "OWNSTACK_APP_ID",
+          "desc": "App identifier (numeric id or alias)."
+        },
+        {
+          "key": "APP_NAME",
+          "desc": "Alternative to OWNSTACK_APP_ID."
+        },
+        {
+          "key": "OWNSTACK_APP_TOKEN",
+          "desc": "Deploy token (set automatically by `ownstack remote -a`)."
+        }
+      ]
+    },
+    "linked_marker": {
+      "path": ".ownstack-app",
+      "desc": "Contains the linked app id. Created by `ownstack remote -a`."
+    },
+    "gitignore": {
+      "desc": "Add `.ownstack-config` to .gitignore if it contains tokens."
+    }
+  }
+}

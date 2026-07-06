@@ -445,6 +445,16 @@ ownstack stack destroy stage-gcp    # Interactive — prompts you to retype the 
 ownstack stack destroy 50 --yes    # Non-interactive, by id.
 ```
 
+#### `stack retry`
+
+Retry provisioning for a stack stuck in pending, provisioning, or failed. Calls `POST /api/stacks/:id/retry_provisioning`, which resets the status to pending, clears the provisioning error, and re-triggers provisioning. Non-destructive (keeps the stack record, id, and config); use this instead of destroy + create when a provision failed transiently.
+
+Examples:
+```
+ownstack stack retry prod-hub    # Re-trigger provisioning for a stack whose provision failed, by name.
+ownstack stack retry 56    # Retry by id.
+```
+
 #### `stack unmanaged`
 
 List orphan cloud instances — instances that exist under the account's AWS/GCP credentials but are tracked by no managed stack (e.g. left behind by a deleted stack or a crashed provision, still billing). CLI parity with the web Stacks page and `GET /api/stacks/unmanaged`. GCP credentials with no associated stack have no derivable project and are reported as a scan notice rather than scanned.
@@ -643,6 +653,19 @@ Examples:
 ```
 ownstack stack memory <STACK>
 ownstack stack memory <STACK> --json
+```
+
+#### `stack resources`
+
+Memory budget — per-app limits vs usable host RAM, with over-allocation and uncapped-app warnings.
+
+Flags:
+- `--json` — Emit the full resource_budget payload as JSON.
+
+Examples:
+```
+ownstack stack resources <STACK>
+ownstack stack resources <STACK> --json
 ```
 
 #### `stack reboot`

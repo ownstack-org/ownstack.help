@@ -682,6 +682,20 @@
           ]
         },
         {
+          "name": "stack retry",
+          "summary": "Retry provisioning for a stack stuck in pending, provisioning, or failed. Calls `POST /api/stacks/:id/retry_provisioning`, which resets the status to pending, clears the provisioning error, and re-triggers provisioning. Non-destructive (keeps the stack record, id, and config); use this instead of destroy + create when a provision failed transiently.",
+          "examples": [
+            {
+              "cmd": "ownstack stack retry prod-hub",
+              "desc": "Re-trigger provisioning for a stack whose provision failed, by name."
+            },
+            {
+              "cmd": "ownstack stack retry 56",
+              "desc": "Retry by id."
+            }
+          ]
+        },
+        {
           "name": "stack unmanaged",
           "summary": "List orphan cloud instances — instances that exist under the account's AWS/GCP credentials but are tracked by no managed stack (e.g. left behind by a deleted stack or a crashed provision, still billing). CLI parity with the web Stacks page and `GET /api/stacks/unmanaged`. GCP credentials with no associated stack have no derivable project and are reported as a scan notice rather than scanned.",
           "flags": [
@@ -977,6 +991,25 @@
             },
             {
               "cmd": "ownstack stack memory <STACK> --json"
+            }
+          ]
+        },
+        {
+          "name": "stack resources",
+          "summary": "Memory budget — per-app limits vs usable host RAM, with over-allocation and uncapped-app warnings.",
+          "body": "Aggregates every app's committed memory limit on the stack and compares\nit to usable host RAM (host minus OS/docker headroom). Flags\nover-allocation (committed limits exceed usable RAM) and apps with no\nlimit at all (uncapped apps can balloon and OOM the whole host). UI\nparity with the Memory budget card on the stack detail page.\n\nSet a per-app limit with `ownstack app limit <APP> --process-type=web --memory=512m`.\n",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Emit the full resource_budget payload as JSON."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack stack resources <STACK>"
+            },
+            {
+              "cmd": "ownstack stack resources <STACK> --json"
             }
           ]
         },

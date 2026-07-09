@@ -3452,6 +3452,144 @@
       ]
     },
     {
+      "id": "developer-access",
+      "title": "Developer access and permissions",
+      "body": "A self-check of your own roles and capabilities, plus manager/superuser\ncommands for the developer role. Developers are scoped to specific\nstacks/apps with granular capabilities (see `permissions` for the schema).\n",
+      "commands": [
+        {
+          "name": "permissions",
+          "summary": "Show your roles, permitted stacks/apps, and capabilities (alias perms).",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Emit the raw /api/me/permissions payload."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack permissions"
+            },
+            {
+              "cmd": "ownstack permissions --json"
+            }
+          ]
+        },
+        {
+          "name": "developers list",
+          "summary": "List developers in the current account (id, email, name, app count, stacks).",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Raw API payload."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack developers list"
+            }
+          ]
+        },
+        {
+          "name": "developers show",
+          "summary": "Show one developer's stacks, apps, capabilities, and recent activity.",
+          "examples": [
+            {
+              "cmd": "ownstack developers show dev@example.com"
+            },
+            {
+              "cmd": "ownstack developers show 14 --json"
+            }
+          ]
+        },
+        {
+          "name": "developers create",
+          "summary": "Create a developer account and grant access (--password required).",
+          "flags": [
+            {
+              "flag": "--first, --last",
+              "desc": "Name."
+            },
+            {
+              "flag": "--password PW",
+              "desc": "Initial password, included in the welcome email. Required."
+            },
+            {
+              "flag": "--stack NAME|UUID|ID",
+              "desc": "Grant a permitted stack (repeatable)."
+            },
+            {
+              "flag": "--app NAME|UUID|ID",
+              "desc": "Restrict to specific apps (repeatable; omit means all apps on permitted stacks)."
+            },
+            {
+              "flag": "--app-limit N",
+              "desc": "Cap apps they can create (0 = unlimited)."
+            },
+            {
+              "flag": "--cap GROUP.KEY=true|false",
+              "desc": "Override a capability (repeatable). Groups are apps, stacks, platform."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack developers create dev@example.com --password 'S3cret!' --stack prod-hub"
+            }
+          ]
+        },
+        {
+          "name": "developers update",
+          "summary": "Update a developer's stacks/apps/limit/capabilities.",
+          "examples": [
+            {
+              "cmd": "ownstack developers update dev@example.com --app kaya-payroll-api --cap apps.deploy=true"
+            }
+          ]
+        },
+        {
+          "name": "developers profile",
+          "summary": "Update a developer's first/last name, email, or password.",
+          "examples": [
+            {
+              "cmd": "ownstack developers profile 14 --password 'N3wPass!'"
+            }
+          ]
+        },
+        {
+          "name": "developers resend-welcome",
+          "summary": "Re-send the welcome email.",
+          "examples": [
+            {
+              "cmd": "ownstack developers resend-welcome dev@example.com"
+            }
+          ]
+        },
+        {
+          "name": "developers activity",
+          "summary": "Show a developer's last sign-in and recent audit entries.",
+          "flags": [
+            {
+              "flag": "--limit N",
+              "desc": "Number of entries (default 25)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack developers activity dev@example.com --limit 10"
+            }
+          ]
+        },
+        {
+          "name": "developers delete",
+          "summary": "Delete the user (admin-only on backend).",
+          "examples": [
+            {
+              "cmd": "ownstack developers delete dev@example.com"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "meta",
       "title": "Discovery and self-description",
       "body": "Commands that describe the CLI itself, for humans and agents.",

@@ -2383,6 +2383,112 @@ ownstack profile use acme    # Switch the active profile.
 OWNSTACK_PROFILE=acme ownstack stacks    # One-off command against a profile without switching.
 ```
 
+### Developer access and permissions
+
+A self-check of your own roles and capabilities, plus manager/superuser
+commands for the developer role. Developers are scoped to specific
+stacks/apps with granular capabilities (see `permissions` for the schema).
+
+#### `permissions`
+
+Show your roles, permitted stacks/apps, and capabilities (alias perms).
+
+Flags:
+- `--json` — Emit the raw /api/me/permissions payload.
+
+Examples:
+```
+ownstack permissions
+ownstack permissions --json
+```
+
+#### `developers list`
+
+List developers in the current account (id, email, name, app count, stacks).
+
+Flags:
+- `--json` — Raw API payload.
+
+Examples:
+```
+ownstack developers list
+```
+
+#### `developers show`
+
+Show one developer's stacks, apps, capabilities, and recent activity.
+
+Examples:
+```
+ownstack developers show dev@example.com
+ownstack developers show 14 --json
+```
+
+#### `developers create`
+
+Create a developer account and grant access (--password required).
+
+Flags:
+- `--first, --last` — Name.
+- `--password PW` — Initial password, included in the welcome email. Required.
+- `--stack NAME|UUID|ID` — Grant a permitted stack (repeatable).
+- `--app NAME|UUID|ID` — Restrict to specific apps (repeatable; omit means all apps on permitted stacks).
+- `--app-limit N` — Cap apps they can create (0 = unlimited).
+- `--cap GROUP.KEY=true|false` — Override a capability (repeatable). Groups are apps, stacks, platform.
+
+Examples:
+```
+ownstack developers create dev@example.com --password 'S3cret!' --stack prod-hub
+```
+
+#### `developers update`
+
+Update a developer's stacks/apps/limit/capabilities.
+
+Examples:
+```
+ownstack developers update dev@example.com --app kaya-payroll-api --cap apps.deploy=true
+```
+
+#### `developers profile`
+
+Update a developer's first/last name, email, or password.
+
+Examples:
+```
+ownstack developers profile 14 --password 'N3wPass!'
+```
+
+#### `developers resend-welcome`
+
+Re-send the welcome email.
+
+Examples:
+```
+ownstack developers resend-welcome dev@example.com
+```
+
+#### `developers activity`
+
+Show a developer's last sign-in and recent audit entries.
+
+Flags:
+- `--limit N` — Number of entries (default 25).
+
+Examples:
+```
+ownstack developers activity dev@example.com --limit 10
+```
+
+#### `developers delete`
+
+Delete the user (admin-only on backend).
+
+Examples:
+```
+ownstack developers delete dev@example.com
+```
+
 ### Discovery and self-description
 
 Commands that describe the CLI itself, for humans and agents.

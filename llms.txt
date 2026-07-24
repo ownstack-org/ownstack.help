@@ -1642,6 +1642,8 @@ Examples:
 ownstack db link --app=myapp
 ```
 
+Notes: Reaches the stack over control-plane-issued SSH credentials (like `ownstack ssh stack`), so it works for anyone authenticated to the control plane, not only operators whose key is in the stack's authorized_keys. Reports a real error and exits non-zero if the link fails (it will not falsely print success).
+
 #### `db backups`
 
 List Heroku Postgres backups (Heroku app, not the ownstack one).

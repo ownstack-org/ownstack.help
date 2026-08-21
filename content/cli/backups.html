@@ -1,0 +1,23 @@
+<!-- meta {"title":"ownstack backups","desc":"Fleet-wide backup coverage: every stack and database app, with the last completed backup.","section":"CLI"} -->
+
+<p class="lede">The command that answers "is everything actually backed up?" — because a backup system nobody can see is a backup system nobody uses.</p>
+
+<h2>Usage</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack backups
+<span class="out">Stacks:
+  prod-hub     aws      backups=on   bucket=ownstack-db-backups   last=2026-08-20T10:15Z
+  hz-budbooks  hetzner  backups=off  bucket=ownstack-db-backups   last=never
+
+Apps with databases:
+  covered-api  prod-hub   schedule=15 7 * * *   last=2026-08-21T07:15Z
+  naked-api    bare-stack schedule=-            last=NEVER
+
+1 database app(s) have NEVER completed a backup.</span></code></pre>
+
+<p>Two tables: stacks (backup config, destination bucket, last stack backup job) and every database-bearing app (schedule cron, last <em>completed</em> backup). Failed backups never count as coverage, and apps that have a database but no completed backup are counted in red — that is the number that bites.</p>
+
+<h2>For scripts and agents</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack backups --json</code></pre>
+<p>Emits the raw <code>/api/backups/overview</code> payload unmodified.</p>
+
+<p>See also <a href="/stacks/backups/">Stack backups</a> for configuring schedules and destinations.</p>

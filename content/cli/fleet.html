@@ -1,0 +1,22 @@
+<!-- meta {"title":"ownstack fleet","desc":"Fleet-wide health in one call: what needs attention, plus every app's deploy status.","section":"CLI"} -->
+
+<p class="lede">One read-only call that answers "is anything on fire?" across every app in your account.</p>
+
+<h2>Usage</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack fleet
+<span class="out">12 apps | 1 need attention (1 critical)
+
+ATTENTION
+  [CRITICAL] web/prod-hub — 5xx spike (12m ago)
+
+APPS
+  web            prod-hub: released 2h ago  (alerts: 1)
+  api            prod-hub: released 2h ago</span></code></pre>
+
+<p>Attention leads: active alerts and stuck deploys print before the roster, each with severity, target, and relative age. Then every app gets one compact line with its per-stack deploy status and active alert count.</p>
+
+<h2>For scripts and agents</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack fleet --json</code></pre>
+<p>Emits the raw <code>/api/fleet</code> payload unmodified.</p>
+
+<p>See also <a href="/cli/backups/">ownstack backups</a> for the fleet's backup coverage.</p>

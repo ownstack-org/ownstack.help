@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ownstack stack — OwnStack</title>
-<meta name="description" content="Stack management: list, backups, plugins, data, disk usage.">
+<title>ownstack backups — OwnStack</title>
+<meta name="description" content="Fleet-wide backup coverage: every stack and database app, with the last completed backup.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="alternate icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="stylesheet" href="/assets/site.css">
-<meta property="og:title" content="ownstack stack — OwnStack">
-<meta property="og:description" content="Stack management: list, backups, plugins, data, disk usage.">
+<meta property="og:title" content="ownstack backups — OwnStack">
+<meta property="og:description" content="Fleet-wide backup coverage: every stack and database app, with the last completed backup.">
 <meta property="og:site_name" content="OwnStack">
 </head>
 <body>
@@ -121,9 +121,9 @@
 			<li><a href="/cli/app/">app</a></li>
 			<li><a href="/cli/deploy/">deploy</a></li>
 			<li><a href="/cli/db/">db</a></li>
-			<li><a class="active" href="/cli/stack/">stack</a></li>
+			<li><a href="/cli/stack/">stack</a></li>
 			<li><a href="/cli/fleet/">fleet</a></li>
-			<li><a href="/cli/backups/">backups</a></li>
+			<li><a class="active" href="/cli/backups/">backups</a></li>
 			<li><a href="/cli/profile/">profile</a></li>
 			<li><a href="/cli/config/">config</a></li>
 			<li><a href="/cli/ssh/">ssh</a></li>
@@ -149,66 +149,33 @@
 
 	<main class="content">
 		<article class="article">
-			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/cli/">cli</a><span class="sep">›</span><span>ownstack stack</span></nav>
-			<h1>ownstack stack</h1>
-			<h2 id="listing">Listing</h2>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack stacks
-<span class="prompt">$</span> ownstack stack list [--json]</code></pre>
+			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/cli/">cli</a><span class="sep">›</span><span>ownstack backups</span></nav>
+			<h1>ownstack backups</h1>
+			<p class="lede">The command that answers "is everything actually backed up?" — because a backup system nobody can see is a backup system nobody uses.</p>
 
-<h2 id="plugins">Plugins</h2>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack stack plugin-install [--stack=NAME] &lt;plugin&gt;</code></pre>
+<h2 id="usage">Usage</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack backups
+<span class="out">Stacks:
+  prod-hub     aws      backups=on   bucket=ownstack-db-backups   last=2026-08-20T10:15Z
+  hz-budbooks  hetzner  backups=off  bucket=ownstack-db-backups   last=never
 
-<h2 id="patches">Patches</h2>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack stack patches &lt;stack&gt;
-<span class="prompt">$</span> ownstack stack patches apply &lt;stack&gt;</code></pre>
+Apps with databases:
+  covered-api  prod-hub   schedule=15 7 * * *   last=2026-08-21T07:15Z
+  naked-api    bare-stack schedule=-            last=NEVER
 
-<h2 id="data">Data</h2>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack stack data databases &lt;stack&gt;
-<span class="prompt">$</span> ownstack stack data volumes &lt;stack&gt; [list|add|remove]</code></pre>
+1 database app(s) have NEVER completed a backup.</span></code></pre>
 
-<h2 id="backups">Backups</h2>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack stack backup config &lt;stack&gt;
-<span class="prompt">$</span> ownstack stack backup run &lt;stack&gt;
-<span class="prompt">$</span> ownstack stack backup list &lt;stack&gt;</code></pre>
-<p>See <a href="/stacks/backups/">Stack backups</a> for the configuration story.</p>
+<p>Two tables: stacks (backup config, destination bucket, last stack backup job) and every database-bearing app (schedule cron, last <em>completed</em> backup). Failed backups never count as coverage, and apps that have a database but no completed backup are counted in red — that is the number that bites.</p>
 
-<h2 id="disk">Disk</h2>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack stack disk-usage &lt;stack&gt;</code></pre>
+<h2 id="for-scripts-and-agents">For scripts and agents</h2>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack backups --json</code></pre>
+<p>Emits the raw <code>/api/backups/overview</code> payload unmodified.</p>
 
-<h2 id="health-amp-monitoring">Health &amp; monitoring</h2>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack stack health &lt;stack&gt;
-<span class="out">=== node-hub-538 ===
-  IP:                44.237.78.27
-  Provider state:    running
-
-  Host reachability: ● Active (port:22, 60s probe)
-  On-box agent:      ○ Not installed
-
-  Active alerts (1):
-    • [critical] host_unreachable — TCP timeout (2026-05-10T18:13:25Z)</span></code></pre>
-<p>Shows the off-box port:22 probe state, the on-box Heartbeat agent state, the cloud provider's view of the instance, and any active alerts. See <a href="/stacks/monitoring/">Stack monitoring</a> for what each layer covers.</p>
-
-<h2 id="direct-ssh-access">Direct SSH access</h2>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack stack add-key &lt;stack&gt; [--key=PATH]
-<span class="out">Key added. You can now connect directly:
-  ssh ubuntu@203.0.113.10</span></code></pre>
-<p>Appends your local public key (<code>~/.ssh/id_ed25519.pub</code> by default) to the stack's <code>authorized_keys</code>. After that you can <code>ssh ubuntu@&lt;ip&gt;</code> directly without going through the control-plane proxy. Idempotent. See <a href="/cli/ssh/">ownstack ssh</a> for the proxy-based alternative.</p>
-
-<h2 id="local-stacks-for-development">Local stacks (for development)</h2>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack stack add-local
-<span class="prompt">$</span> ownstack local stack start
-<span class="prompt">$</span> ownstack local stack stop</code></pre>
-<p>Local stacks run dokku in a Docker container on your machine — same workflow as a cloud stack.</p>
-
-<h2 id="read-next">Read next</h2>
-<ul>
-	<li><a href="/stacks/">Stacks overview</a></li>
-	<li><a href="/stacks/aws/">AWS</a> · <a href="/stacks/gcp/">GCP</a> · <a href="/stacks/openstack/">OpenStack</a> · <a href="/stacks/ssh/">SSH</a></li>
-</ul>
+<p>See also <a href="/stacks/backups/">Stack backups</a> for configuring schedules and destinations.</p>
 		</article>
 	</main>
 	<aside class="toc" aria-label="On this page">
-		<h4>On this page</h4><ul><li class="h2"><a href="#listing">Listing</a></li><li class="h2"><a href="#plugins">Plugins</a></li><li class="h2"><a href="#patches">Patches</a></li><li class="h2"><a href="#data">Data</a></li><li class="h2"><a href="#backups">Backups</a></li><li class="h2"><a href="#disk">Disk</a></li><li class="h2"><a href="#health-amp-monitoring">Health &amp; monitoring</a></li><li class="h2"><a href="#direct-ssh-access">Direct SSH access</a></li><li class="h2"><a href="#local-stacks-for-development">Local stacks (for development)</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+		<h4>On this page</h4><ul><li class="h2"><a href="#usage">Usage</a></li><li class="h2"><a href="#for-scripts-and-agents">For scripts and agents</a></li></ul>
 	</aside>
 </div>
 <footer class="site-footer">

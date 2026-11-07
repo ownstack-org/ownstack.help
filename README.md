@@ -37,7 +37,10 @@ Add a new article:
 npm install
 npm run build       # walks content/, emits final HTML at the repo root, builds search-index.json
 npm start           # serves the repo root on $PORT (default 3000)
+npm test            # node --test under c8; fails below 90% (.c8rc.json)
 ```
+
+Every deploy runs `bin/ci-test` first (OwnStack's test gate). It fails if a test fails, if coverage of `build.js` or `assets/*.js` drops under 90%, or if a committed page is stale against `content/` (so run `npm run build` and commit the output).
 
 The build script is small and lives at `build.js` — read it before changing it. It does template substitution, scroll-spy ID injection, breadcrumb building, sidebar active-state marking, and a flat search index.
 

@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# ownstack.help's test gate.
+#
+# Runs every test (node --test) under c8, which fails the run below 90%
+# statements, branches, functions or lines over build.js and assets/*.js
+# (.c8rc.json; "all" counts files no test loads). One of the tests builds the
+# real content tree and fails if a committed page is stale.
+#
+# OwnStack runs this before every ownstack-help deploy: the app's testing
+# config is test_command=bin/ci-test, test_runner=stack,
+# test_image=node:22-bookworm, tests_block_deploy=true. It then runs in a
+# throwaway container on the deploy stack with the checkout at /app and a
+# cache volume at /cache. Run it locally the same way:
+#
+#   docker run --rm -e OWNSTACK_TEST_GATE=1 -v "$PWD":/app -w /app node:22-bookworm bin/ci-test
+#
+# or, with node_modules present, just `npm test`.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+[ -f .c8rc.json ] || { echo ".c8rc.json is missing: no coverage gate to run" >&2; exit 1; }
+
+if [ "${OWNSTACK_TEST_GATE:-}" = "1" ] && [ -d /cache ]; then
+  export npm_config_cache=/cache/npm
+fi
+
+echo "=====> npm ci"
+npm ci --no-audit --no-fund --loglevel=error
+
+echo "=====> Tests (coverage gate: .c8rc.json)"
+npm test

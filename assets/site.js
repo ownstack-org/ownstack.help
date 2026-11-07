@@ -1,7 +1,14 @@
 // OwnStack docs — sidebar toggle, copy buttons, search.
 // No framework. Plain JS. Loaded with `defer` from every page.
 
-(function () {
+// In the browser it runs at once against the page. Under Node (the tests) it
+// exports init(window) so a test can run it against a jsdom window.
+(function (start) {
+	if (typeof module === 'object' && module.exports) module.exports = start;
+	else start(window);
+})(function init(window) {
+	const { document, navigator, IntersectionObserver, fetch, setTimeout, clearTimeout } = window;
+
 	// ----- Mobile sidebar toggle -----
 	const sidebar = document.querySelector('.sidebar');
 	const toggle = document.querySelector('.menu-toggle');
@@ -202,4 +209,4 @@
 			}
 		});
 	}
-})();
+});

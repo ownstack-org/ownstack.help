@@ -1,0 +1,10 @@
+{
+  "all": true,
+  "include": ["build.js", "assets/**/*.js"],
+  "reporter": ["text", "text-summary"],
+  "check-coverage": true,
+  "statements": 90,
+  "branches": 90,
+  "functions": 90,
+  "lines": 90
+}

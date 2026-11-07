@@ -8,18 +8,6 @@
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = __dirname;
-const CONTENT = path.join(ROOT, 'content');
-const LAYOUT_FILE = path.join(ROOT, '_layout', 'page.html');
-const SIDEBAR_FILE = path.join(ROOT, '_layout', 'sidebar.html');
-const HEADER_FILE = path.join(ROOT, '_layout', 'header.html');
-const FOOTER_FILE = path.join(ROOT, '_layout', 'footer.html');
-
-const layout = fs.readFileSync(LAYOUT_FILE, 'utf8');
-const sidebar = fs.readFileSync(SIDEBAR_FILE, 'utf8');
-const header = fs.readFileSync(HEADER_FILE, 'utf8');
-const footer = fs.readFileSync(FOOTER_FILE, 'utf8');
-
 const META_RE = /^\s*<!--\s*meta\s+(\{[\s\S]*?\})\s*-->/;
 const H_RE = /<h([23])\b[^>]*?(?:\sid="([^"]+)")?[^>]*>([\s\S]*?)<\/h\1>/g;
 
@@ -91,45 +79,63 @@ function stripHtmlForSearch(html) {
 		.trim();
 }
 
-const searchIndex = [];
+// Builds every page under <root>/content into <root> and writes
+// <root>/search-index.json. Returns the search index. `log` takes the
+// progress lines (console by default).
+function build(root = __dirname, log = console) {
+	const read = (...p) => fs.readFileSync(path.join(root, ...p), 'utf8');
+	const layout = read('_layout', 'page.html');
+	const sidebar = read('_layout', 'sidebar.html');
+	const header = read('_layout', 'header.html');
+	const footer = read('_layout', 'footer.html');
 
-for (const file of walk(CONTENT)) {
-	const raw = fs.readFileSync(file.full, 'utf8');
-	const m = META_RE.exec(raw);
-	if (!m) {
-		console.warn(`[build] skip ${file.rel}: missing meta header`);
-		continue;
+	const searchIndex = [];
+
+	for (const file of walk(path.join(root, 'content'))) {
+		const raw = fs.readFileSync(file.full, 'utf8');
+		const m = META_RE.exec(raw);
+		if (!m) {
+			log.warn(`[build] skip ${file.rel}: missing meta header`);
+			continue;
+		}
+		const meta = JSON.parse(m[1]);
+		const body = raw.slice(m[0].length).trim();
+		const slug = (meta.slug || file.rel.replace(/\.html$/, '').replace(/\/index$/, '')).replace(/^\/+/, '');
+
+		const { html: bodyWithIds, toc } = buildToc(body);
+		const breadcrumb = buildBreadcrumb(meta, slug);
+		const sidebarActive = applySidebarActive(sidebar, slug);
+
+		// Function replacements: a string replacement would treat "$&" or "$'"
+		// in a page (shell snippets) as a replace pattern.
+		const page = layout
+			.replace(/{{TITLE}}/g, () => meta.title)
+			.replace(/{{DESC}}/g, () => meta.desc || '')
+			.replace(/{{HEADER}}/g, () => header)
+			.replace(/{{FOOTER}}/g, () => footer)
+			.replace(/{{SIDEBAR}}/g, () => sidebarActive)
+			.replace(/{{BREADCRUMB}}/g, () => breadcrumb)
+			.replace(/{{CONTENT}}/g, () => bodyWithIds)
+			.replace(/{{TOC}}/g, () => toc);
+
+		const outPath = slug === '' ? path.join(root, 'index.html') : path.join(root, slug, 'index.html');
+		fs.mkdirSync(path.dirname(outPath), { recursive: true });
+		fs.writeFileSync(outPath, page);
+		log.log(`[build] ${slug || 'index'} → ${path.relative(root, outPath)}`);
+
+		searchIndex.push({
+			title: meta.title,
+			section: meta.section || '',
+			url: '/' + (slug ? slug + '/' : ''),
+			body: stripHtmlForSearch(body).slice(0, 4000),
+		});
 	}
-	const meta = JSON.parse(m[1]);
-	const body = raw.slice(m[0].length).trim();
-	const slug = (meta.slug || file.rel.replace(/\.html$/, '').replace(/\/index$/, '')).replace(/^\/+/, '');
 
-	const { html: bodyWithIds, toc } = buildToc(body);
-	const breadcrumb = buildBreadcrumb(meta, slug);
-	const sidebarActive = applySidebarActive(sidebar, slug);
-
-	let page = layout
-		.replace(/{{TITLE}}/g, meta.title)
-		.replace(/{{DESC}}/g, meta.desc || '')
-		.replace(/{{HEADER}}/g, header)
-		.replace(/{{FOOTER}}/g, footer)
-		.replace(/{{SIDEBAR}}/g, sidebarActive)
-		.replace(/{{BREADCRUMB}}/g, breadcrumb)
-		.replace(/{{CONTENT}}/g, bodyWithIds)
-		.replace(/{{TOC}}/g, toc);
-
-	const outPath = slug === '' ? path.join(ROOT, 'index.html') : path.join(ROOT, slug, 'index.html');
-	fs.mkdirSync(path.dirname(outPath), { recursive: true });
-	fs.writeFileSync(outPath, page);
-	console.log(`[build] ${slug || 'index'} → ${path.relative(ROOT, outPath)}`);
-
-	searchIndex.push({
-		title: meta.title,
-		section: meta.section || '',
-		url: '/' + (slug ? slug + '/' : ''),
-		body: stripHtmlForSearch(body).slice(0, 4000),
-	});
+	fs.writeFileSync(path.join(root, 'search-index.json'), JSON.stringify(searchIndex));
+	log.log(`[build] search-index.json (${searchIndex.length} entries)`);
+	return searchIndex;
 }
 
-fs.writeFileSync(path.join(ROOT, 'search-index.json'), JSON.stringify(searchIndex));
-console.log(`[build] search-index.json (${searchIndex.length} entries)`);
+module.exports = { build, slugify, buildToc, buildBreadcrumb, applySidebarActive, walk, stripHtmlForSearch };
+
+if (require.main === module) build();

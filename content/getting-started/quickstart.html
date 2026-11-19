@@ -17,42 +17,32 @@ JS
 <span class="prompt">$</span> echo "web: npm start" &gt; Procfile
 <span class="prompt">$</span> git init -b main && git add . && git commit -m initial</code></pre>
 
-<h2>1. Generate the app</h2>
-<p>From inside the repo, scaffold an app and link your checkout to it:</p>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack generate --no-interview hello buildpack
-<span class="prompt">$</span> ownstack remote -a hello</code></pre>
-<p><code>generate</code> scaffolds the app and writes a minimal <code>.ownstack-config</code> in your repo. <code>remote -a</code> embeds the app token so subsequent commands know which app to talk to.</p>
+<h2>1. Put the repo where the control plane can clone it</h2>
+<p>Deploys are git-based: the control plane clones your repo onto the stack. Push it to GitHub (a private repo works if your GitHub account is linked in the dashboard):</p>
+<pre class="terminal"><code><span class="prompt">$</span> git remote add origin https://github.com/YOU/hello.git
+<span class="prompt">$</span> git push -u origin main</code></pre>
+<p>Prefer not to use GitHub? After step 2, <code>ownstack git push --app=hello</code> pushes the checkout to OwnStack Git and points the app at it instead.</p>
 
-<h2>2. Pick a stack</h2>
-<p>Apps deploy to one or more stacks. If you only have one provisioned stack, the deploy will use it automatically. If you have several, attach the one you want explicitly:</p>
+<h2>2. Create the app on a stack</h2>
+<p>List your stacks, then create the app on one. Run this from inside the repo: <code>app create</code> also links the checkout to the new app, so later commands know which app you mean.</p>
 <pre class="terminal"><code><span class="prompt">$</span> ownstack stacks
-<span class="out">  ID            NAME                IP                STATUS       PROVIDER
-  jJCsl6B9...   prod-cluster-1      54.x.x.x          provisioned  aws</span>
-
-<span class="prompt">$</span> ownstack app stacks:add hello prod-cluster-1</code></pre>
+<span class="prompt">$</span> ownstack app create hello --stack=YOUR_STACK --git-url=https://github.com/YOU/hello.git --no-services</code></pre>
+<p><code>--no-services</code> skips the database and Redis this app doesn't need. Drop it, or pass <code>--postgres</code> / <code>--redis</code>, for apps that do. To link a different checkout to an existing app later, use <code>ownstack remote -a hello</code>.</p>
 
 <h2>3. Deploy</h2>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack deploy
-<span class="out">Triggering deploy for app 47…
-✓ Deploy started</span></code></pre>
-<p>The control plane enqueues a deployment job, SSHes to the stack, pushes your repo to dokku, runs the buildpack and the release task, and rotates traffic to the new container. Build logs stream live with <code>--wait</code>:</p>
 <pre class="terminal"><code><span class="prompt">$</span> ownstack deploy --wait</code></pre>
-<p>Or fetch them after with <code>ownstack remote deploy-log</code>.</p>
+<p>The control plane enqueues a deployment job, SSHes to the stack, pushes your repo to dokku, runs the buildpack and the release task, and rotates traffic to the new container. <code>--wait</code> streams the build log until it finishes. Without it, fetch the log afterwards with <code>ownstack remote deploy-log</code>.</p>
 
 <h2>4. View it</h2>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack app info
-<span class="out">hello
-  Status:  deployed
-  Domain:  hello.&lt;stack-domain&gt;
-  Stack:   prod-cluster-1 — deployed abc1234</span></code></pre>
-<p>Hit the URL in a browser. If something looks wrong, <code>ownstack remote logs --tail 100 --follow</code> tails the running container.</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app info hello</code></pre>
+<p>Open the app's URL in a browser. If something looks wrong, <code>ownstack remote logs --tail 100</code> shows the last 100 lines from the running container.</p>
 
 <h2>What's next</h2>
 <ul>
 	<li><strong>Custom domain</strong> — see <a href="/domains-ssl/custom-domain/">Add a custom domain</a>.</li>
 	<li><strong>Add a database</strong> — <a href="/databases/postgres/">Postgres</a> walks through provisioning and linking.</li>
 	<li><strong>Scale processes</strong> — <a href="/processes/scaling/">Scale processes</a>.</li>
-	<li><strong>Tail logs</strong> — <code>ownstack remote logs --follow</code>.</li>
+	<li><strong>Read logs</strong>: <code>ownstack remote logs --tail 200</code>.</li>
 </ul>
 
 <div class="related">

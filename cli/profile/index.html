@@ -173,7 +173,7 @@ Token: 9242e4bc…</span></code></pre>
 
 <h2 id="adding-profiles">Adding profiles</h2>
 <pre class="terminal"><code><span class="prompt">$</span> ownstack login                                <span class="out"># creates/refreshes the active profile</span>
-<span class="prompt">$</span> ownstack login --api=https://api.example.com  <span class="out"># new profile pointing at a different control plane</span>
+<span class="prompt">$</span> ownstack profile add selfhosted --api-url https://api.example.com --token &lt;token&gt;  <span class="out"># new profile for a different control plane, active profile unchanged</span>
 <span class="prompt">$</span> ownstack login --token &lt;token&gt;                 <span class="out"># skip browser, paste a token directly</span></code></pre>
 <p><code>--token</code> is useful for CI environments and headless machines.</p>
 

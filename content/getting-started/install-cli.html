@@ -17,9 +17,10 @@
 </div>
 
 <h2>Pick a control plane</h2>
-<p>The CLI talks to a control plane. By default that's the hosted one at <code>https://api.ownstack.org</code>. If you're self-hosting, point at your own URL when you log in.</p>
-<pre class="terminal"><code><span class="prompt">$</span> ownstack login                                      <span class="out"># hosted</span>
-<span class="prompt">$</span> ownstack login --api=https://api.example.com        <span class="out"># self-hosted</span></code></pre>
+<p>The CLI talks to a control plane. By default that's the hosted one at <code>https://api.ownstack.org</code>. If you're self-hosting, add a profile that points at your own URL, using an API token from that control plane's Settings page.</p>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack login                                                                  <span class="out"># hosted</span>
+<span class="prompt">$</span> ownstack profile add selfhosted --api-url https://api.example.com --token YOUR_API_TOKEN  <span class="out"># self-hosted</span>
+<span class="prompt">$</span> OWNSTACK_PROFILE=selfhosted ownstack apps                                       <span class="out"># use it per command</span></code></pre>
 <p>Login opens a browser, completes the OAuth flow, and writes the resulting token to <code>~/.ownstack/profiles/&lt;name&gt;</code>.</p>
 
 <h2>Profiles</h2>

@@ -191,7 +191,7 @@ DOKKU_POSTGRES_BLACK_URL=postgres://…@dokku-postgres-postgres-app:5432/...   #
 <span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:rebuild &lt;app&gt;</code></pre>
 
 <h3 id="suddenly-broken-after-a-control-plane-upgrade">Suddenly broken after a control-plane upgrade</h3>
-<p>Roll back the control-plane deploy if it landed recently. Past incidents have rewritten <code>DATABASE_URL</code> incorrectly when control-plane code changed how the postgres link was managed. See <a href="https://github.com/ownstack-org/control-plane/issues/289">control-plane#289</a>.</p>
+<p>Roll back the control-plane deploy if it landed recently. Past incidents have rewritten <code>DATABASE_URL</code> incorrectly when control-plane code changed how the postgres link was managed.</p>
 
 <h2 id="how-to-never-see-this-in-the-first-place">How to never see this in the first place</h2>
 <ul>

@@ -178,7 +178,7 @@
 <h2 id="why-not-just-run-ownstack-db-repair">Why not just run <code>ownstack db repair</code>?</h2>
 <p>The current <code>ownstack db repair</code> aligns the role to dokku's <em>service DSN</em> (dokku's own stored password). For the dump-import case, the service DSN itself is sometimes already in sync with <code>DATABASE_URL</code>, but the import desync'd the actual <em>role</em> password — so <code>db repair</code> may not see anything wrong, or may re-set the role to a value that still doesn't match the URL.</p>
 <p>The manual <code>ALTER ROLE</code> above is precise: it sets the role to exactly what <code>DATABASE_URL</code> claims, which is what the app uses.</p>
-<p>(See <a href="https://github.com/ownstack-org/control-plane/issues/289">control-plane#289</a> — we're working on a safer redo.)</p>
+<p>(A safer version is in progress.)</p>
 
 <h2 id="don-t-do-these-instead">Don't do these instead</h2>
 <table>

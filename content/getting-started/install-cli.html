@@ -10,7 +10,7 @@
 
 <p>Verify the install:</p>
 <pre class="terminal"><code><span class="prompt">$</span> ownstack --version
-<span class="out">ownstack 2026.7.24.1</span></code></pre>
+<span class="out">ownstack 2026.11.19.3</span></code></pre>
 
 <div class="callout tip">
 	<div><strong>Updating</strong><p>Re-run the install one-liner to upgrade, or <code>brew upgrade ownstack</code> if you installed via Homebrew.</p></div>
@@ -26,16 +26,16 @@
 <h2>Profiles</h2>
 <p>Each control-plane endpoint is a <strong>profile</strong>. Run multiple at once if you have a hosted account and a self-hosted instance, or one profile per organization.</p>
 <pre class="terminal"><code><span class="prompt">$</span> ownstack profile list
-<span class="out">  budbooks
-* haven (active)
-  ownstack</span>
+<span class="out">  personal
+* work (active)
+  selfhosted</span>
 
 <span class="prompt">$</span> ownstack profile show
 <span class="out">API URL: https://api.ownstack.org
-Active profile: ownstack
-Token: 9242e4bc…</span>
+Active profile: work
+Token: 1a2b3c4d…</span>
 
-<span class="prompt">$</span> ownstack profile use haven</code></pre>
+<span class="prompt">$</span> ownstack profile use work</code></pre>
 
 <div class="callout warning">
 	<div><strong>Always check before state-changing commands</strong><p>The CLI does <em>not</em> warn you when <code>deploy</code>, <code>db</code>, or <code>ssh</code> would run against the wrong profile. Run <code>ownstack profile show</code> first if you've been switching contexts.</p></div>

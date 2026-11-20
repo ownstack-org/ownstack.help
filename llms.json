@@ -87,6 +87,54 @@
           ]
         },
         {
+          "name": "import",
+          "summary": "Import an existing Procfile-only app (any language) into OwnStack.",
+          "flags": [
+            {
+              "flag": "--name=NAME",
+              "desc": "App name (defaults to the target directory's basename)."
+            },
+            {
+              "flag": "--app-number=N",
+              "desc": "Numeric suffix when multiple apps share one base (default 1)."
+            },
+            {
+              "flag": "--domain-tld=TLD",
+              "desc": "Base TLD for the generated local domain (default ownstack.org)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack import --name=myapp",
+              "desc": "Import the current directory (must contain a Procfile)."
+            },
+            {
+              "cmd": "ownstack import --name=myapp --app-number=7",
+              "desc": "Import with an explicit app number."
+            },
+            {
+              "cmd": "ownstack import ./path/to/app --name=myapp",
+              "desc": "Import a specific directory."
+            }
+          ],
+          "notes": "Requires a Procfile in the target directory. Writes a minimal\n.ownstack-config (COMPONENTS=\"buildpack\") so the app deploys via\nProcfile + buildpack detection, with no component template.\n"
+        },
+        {
+          "name": "adopt",
+          "summary": "Retrofit OwnStack infrastructure onto an already scaffolded app.",
+          "examples": [
+            {
+              "cmd": "ownstack adopt",
+              "desc": "Adopt the app in the current directory."
+            },
+            {
+              "cmd": "ownstack adopt ./path/to/app",
+              "desc": "Adopt a specific directory."
+            }
+          ],
+          "notes": "Requires a .ownstack-config in the target directory (write one manually,\nor run 'ownstack import' for a Procfile-only app). For a Rails backend it\ncopies the OwnStack infra files (Procfile, Dockerfile, docker-compose.yml,\nnginx.conf, config files, the lib/ownstack engine), writes\ndocker-compose.override.yml and .env, rewrites the docker-compose project\nand network names plus the nginx cert paths and redirect ports, generates\na manifest, and sets up cert directories. For an Angular frontend it fixes\nthe dev-server port. Existing files are skipped (never overwritten). Local\nonly (no control plane).\n"
+        },
+        {
           "name": "list",
           "summary": "List available components.",
           "examples": [
@@ -104,6 +152,21 @@
             },
             {
               "cmd": "ownstack info react"
+            }
+          ]
+        },
+        {
+          "name": "set-app-number",
+          "summary": "Set APP_NUMBER for the current app and recompute its local ports.",
+          "notes": "Run from inside an app directory (one containing .ownstack-config). N must be 1 to 99.\nRewrites APP_NUMBER and recomputes the component ports (Rails, NestJS, React, Angular, WordPress)\nand API_URL from N. Only ports already present in the config are updated (none are added).\nLocal only (no control plane). Run `ownstack regen` afterward to apply Redis DB and template changes.\n",
+          "examples": [
+            {
+              "cmd": "ownstack set-app-number 30",
+              "desc": "Set app number to 30 (base port 30000, Rails/NestJS 30443, React 30001, Angular 30200)."
+            },
+            {
+              "cmd": "ownstack set-app-number 1",
+              "desc": "Reset to app number 1."
             }
           ]
         }
@@ -209,6 +272,31 @@
           ]
         },
         {
+          "name": "status",
+          "summary": "Workspace-wide overview of every local app (ports, infra, issues).",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Machine-readable JSON instead of the table."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack status",
+              "desc": "Table of all apps found in the workspace apps directory."
+            },
+            {
+              "cmd": "ownstack status --json",
+              "desc": "JSON output for scripts and agents."
+            },
+            {
+              "cmd": "ownstack status /path/to/apps",
+              "desc": "Scan an explicit apps directory."
+            }
+          ],
+          "notes": "Local only, makes no control-plane request. Scans */.ownstack-config,\nauto-detecting the apps directory ($HOME/dev/ownstack/apps, the parent\ndirectory, then the current directory) unless one is passed. Flags\ninfra gaps (missing Procfile/Dockerfile/etc.), non-standard ports\n(Rails = N*1000+443, frontend = N*1000+200), and port collisions.\nExits 1 if no apps directory can be found.\n"
+        },
+        {
           "name": "connect",
           "summary": "Open the control plane web UI to link a local app.",
           "flags": [
@@ -234,12 +322,283 @@
       "body": "Talk to the control-plane API. Most require `ownstack login` first.",
       "commands": [
         {
+          "name": "backups",
+          "summary": "Fleet-wide backup coverage, every stack and database-bearing app with its schedule and last completed backup.",
+          "body": "Read-only. Calls GET /api/backups/overview and prints two tables:\nstacks (backup config on/off, destination bucket, last stack backup\njob) and apps with databases (schedule cron, last COMPLETED backup).\nApps that have a database and have NEVER completed a backup are\ncounted and called out in red, because that is the number that bites.\nUse --json for the raw payload.\n",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Emit the raw /api/backups/overview response for agents and scripts."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack backups",
+              "desc": "Show fleet-wide backup coverage with NEVER-backed-up apps called out."
+            }
+          ]
+        },
+        {
+          "name": "fleet",
+          "summary": "Fleet-wide health in one call, what needs attention (alerts, stuck deploys) plus every app's deploy status.",
+          "body": "Read-only. Calls GET /api/fleet and prints an agent-first snapshot:\na one-line summary (apps, how many need attention, how many are\ncritical), then an ATTENTION section (each active alert or stuck\ndeploy with severity, target, detail, and relative age), then an\nAPPS section (one compact line per app with its per-stack deploy\nstatus and active alert count). Attention leads so an agent sees the\nfires before the roster. Use --json to get the raw payload for\nscripting.\n",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Emit the raw /api/fleet JSON response verbatim (for agents and scripts)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack fleet",
+              "desc": "Human/agent text, attention first then the app roster."
+            },
+            {
+              "cmd": "ownstack fleet --json",
+              "desc": "Raw JSON for piping into jq or an agent."
+            }
+          ]
+        },
+        {
+          "name": "spend list",
+          "summary": "List cloud spend budgets with current cost, limit, and credential.",
+          "examples": [
+            {
+              "cmd": "ownstack spend list",
+              "desc": "Show all cloud budgets (the default subcommand for `ownstack spend`)."
+            }
+          ]
+        },
+        {
+          "name": "spend show",
+          "summary": "Show the full JSON for one spend budget.",
+          "examples": [
+            {
+              "cmd": "ownstack spend show 7"
+            }
+          ]
+        },
+        {
+          "name": "spend credentials",
+          "summary": "List stored stack credentials (id, provider, name, masked summary).",
+          "examples": [
+            {
+              "cmd": "ownstack spend credentials"
+            },
+            {
+              "cmd": "ownstack spend credentials show 3",
+              "desc": "Reveal the stored credential values for one credential id."
+            }
+          ]
+        },
+        {
+          "name": "spend create",
+          "summary": "Create a cloud spend budget tied to a stored credential.",
+          "flags": [
+            {
+              "flag": "--name=NAME",
+              "desc": "Budget name (required)."
+            },
+            {
+              "flag": "--credential-id=ID",
+              "desc": "Stored stack-credential id to meter against (required, see `ownstack spend credentials`)."
+            },
+            {
+              "flag": "--limit=USD",
+              "desc": "Spend cap in US dollars (required, converted to cents)."
+            },
+            {
+              "flag": "--alert=PCT",
+              "desc": "Alert threshold as a percent of the limit (default 80)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack spend create --name=prod-aws --credential-id=5 --limit=500 --alert=90"
+            }
+          ]
+        },
+        {
+          "name": "spend update",
+          "summary": "Update a spend budget's name, limit, or alert threshold.",
+          "flags": [
+            {
+              "flag": "--name=NAME",
+              "desc": "New budget name."
+            },
+            {
+              "flag": "--limit=USD",
+              "desc": "New spend cap in US dollars."
+            },
+            {
+              "flag": "--alert=PCT",
+              "desc": "New alert threshold percent."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack spend update 7 --name=renamed --limit=250"
+            }
+          ],
+          "notes": "At least one of --name, --limit, or --alert is required.\n"
+        },
+        {
+          "name": "spend delete",
+          "summary": "Delete a cloud spend budget.",
+          "examples": [
+            {
+              "cmd": "ownstack spend delete 7"
+            }
+          ]
+        },
+        {
+          "name": "credits",
+          "summary": "Show your account's usage-credit balance and recent credit activity.",
+          "body": "Usage credits are prepaid: 500,000 credits = $1. Calls\nGET /api/pricing/credits and prints the balance in dollars and\ncredits, then recent ledger entries (date, signed credits,\npending or settled, description). A top-up stays pending until its\npayment completes.\n",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Emit the raw /api/pricing/credits response (credits_balance, usd_balance, recent_ledger)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack credits",
+              "desc": "Show balance and recent activity."
+            },
+            {
+              "cmd": "ownstack credits --json",
+              "desc": "Raw JSON for scripts and agents."
+            }
+          ]
+        },
+        {
+          "name": "credits add",
+          "summary": "Buy usage credits for any amount from $1 to $50,000 and get a checkout link.",
+          "body": "AMOUNT is in dollars (25, 19.99, or $19.99), whole cents only, between\n$1 and $50,000. It is validated before anything is sent: a\nnon-numeric, negative, out-of-range, or more-than-two-decimals amount\nprints an error and exits 1 without contacting the control plane.\n\nCalls POST /api/pricing/credits/topup with the amount in integer\ncents and prints the hosted checkout URL. Credits land after the\npayment completes (the control plane is notified by the payment\nprovider), not when the URL is printed; check with\n`ownstack credits`. A refused amount (422) or unconfigured billing\n(503) prints the control plane's error and exits 1.\n",
+          "flags": [
+            {
+              "flag": "--open",
+              "desc": "Also open the checkout URL in your browser."
+            },
+            {
+              "flag": "--json",
+              "desc": "Emit the raw topup response (hosted_url, checkout_id, credit_entry_id, amount_cents)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack credits add 25",
+              "desc": "Start a $25 checkout (12,500,000 credits) and print the payment link."
+            },
+            {
+              "cmd": "ownstack credits add 19.99 --open",
+              "desc": "Start a $19.99 checkout and open it in the browser."
+            }
+          ]
+        },
+        {
+          "name": "autobuild holds",
+          "summary": "List pushes that autobuild held instead of building (supply-chain push watch).",
+          "body": "Autobuild does not build a GitHub push to an autobuild branch when:\n  - it rewrites history (force-push), or deletes or recreates the branch;\n  - a commit carries GitHub's \"Merge pull request #N\" message but GitHub\n    did not commit it (a forged PR merge);\n  - a commit claims GitHub as committer and GitHub's API says GitHub did\n    not make and sign it, or GitHub cannot be asked (held, not trusted);\n  - the branch still contains the head of a hold that was dismissed.\nIt opens a hold instead, emails the account, and builds nothing. Later\npushes to a held branch fold into the same hold and wait too, because a\nnormal push on top of a poisoned history builds the poison all the\nsame. While a hold is open, no other path builds that branch either:\n`ownstack deploy` gets 409, and cluster rolls wait.\n\nCalls GET /api/autobuild_holds and prints each open hold: why it was\nheld, the head commit, its committer, who pushed it, and the apps\nwaiting on it.\n",
+          "flags": [
+            {
+              "flag": "--all",
+              "desc": "Include released and dismissed holds (history), not only open ones."
+            },
+            {
+              "flag": "--json",
+              "desc": "Emit the raw /api/autobuild_holds response."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack autobuild holds",
+              "desc": "Show what is held right now."
+            },
+            {
+              "cmd": "ownstack autobuild holds --all --json",
+              "desc": "Full history for scripts and agents."
+            }
+          ]
+        },
+        {
+          "name": "autobuild release",
+          "summary": "Build a held push on every app it was holding.",
+          "body": "Usage: ownstack autobuild release <ID> <SHA>. SHA is the head you\nreviewed (7 or more hex characters, as `ownstack autobuild holds`\nprints it). If another push has folded into the hold since, the\ncontrol plane refuses with 409 so you never build a commit you did not\nsee; list the holds again and review the new head.\n\nCalls POST /api/autobuild_holds/<ID>/release with head_sha. The held\npush is replayed through the normal autobuild path (same cluster\nrouting and CI gate) for exactly the apps on the hold, and monorepo\napps build even if the push did not list their paths, since a\nrewritten history's commit list is not a diff. Only account users can\nrelease; developers get 403. Release only a push you can account for.\n",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Emit the raw response (the resolved hold plus deployments_triggered)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack autobuild release 7 716d8b34"
+            }
+          ]
+        },
+        {
+          "name": "autobuild dismiss",
+          "summary": "Clear a held push without building anything.",
+          "body": "Calls POST /api/autobuild_holds/<ID>/dismiss. Nothing is built. The\ndismissed head stays untrusted: later pushes that still contain it\n(checked with GitHub's compare API) are held again, so restore the\nbranch rather than building on top of it. If the push was not yours:\nrevoke the pusher's access, restore the branch, then dismiss.\n",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Emit the raw response (the resolved hold)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack autobuild dismiss 7"
+            }
+          ]
+        },
+        {
+          "name": "autobuild rules",
+          "summary": "List, add, enable or disable the pre-build diff screen's rules (superuser).",
+          "body": "Before a deploy builds anything, the control plane diffs the commit it\nis about to build against the app's last deployed commit and matches\nevery added line, and every changed font/image-looking file, against\nthese rules. A match holds the deploy (category supply_chain) and opens\nan autobuild hold with the rule, file:line and an excerpt; see\n`ownstack autobuild holds`. Releasing the hold approves that commit.\n\nRules are rows on the control plane, so a new pattern applies to the\nnext deploy with no release. Patterns are Ruby regular expressions with\na 0.5s match timeout (a timeout counts as a match, not as safe).\n\nUsage:\n  ownstack autobuild rules [--json]\n  ownstack autobuild rules add <KEY> --description=D --line=RE [--path=RE] [--exclude=RE] [--kind=added_line|disguised_asset]\n  ownstack autobuild rules enable|disable <KEY>\n\nKinds: added_line (an added line matches --line), disguised_asset (a\nmatching path whose content is text), changed_file (any change to a\nmatching path), package_scripts (a package.json script the build runs\nchanged, compared as parsed JSON), package_dependency_source (a\ndependency now comes from a URL, git or a local path).\n\nDefaults (calibrated on the 2026-10-27 attack and measured on real\nhistory): package_scripts_changed, dependency_from_url,\nbuild_control_file_changed (Dockerfile, Procfile, app.json, npm/yarn/pnpm\nconfig, buildpack hooks, Gemfile, .gitattributes, .vscode/),\ncode_hidden_after_whitespace, code_disguised_as_asset,\nlifecycle_script_runs_local_file, install_hook_added,\neditor_autorun_task, editor_auto_tasks_allowed, and\nvery_long_source_line (off: it flagged long prose in real data files).\nA monorepo app is screened on its own subdirectory plus repo-root files.\n",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Emit the raw rules list."
+            },
+            {
+              "flag": "--line=RE",
+              "desc": "For added_line rules, the pattern an added line must match."
+            },
+            {
+              "flag": "--path=RE",
+              "desc": "Only files whose path matches (default any)."
+            },
+            {
+              "flag": "--exclude=RE",
+              "desc": "Skip files whose path matches (generated files, lockfiles)."
+            },
+            {
+              "flag": "--kind=KIND",
+              "desc": "added_line (default), disguised_asset, changed_file, package_scripts or package_dependency_source."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack autobuild rules"
+            },
+            {
+              "cmd": "ownstack autobuild rules add eth_rpc_lookup --description=\"Reads a C2 address from a public Ethereum RPC\" --line='eth\\.drpc\\.org|1rpc\\.io'"
+            },
+            {
+              "cmd": "ownstack autobuild rules disable very_long_source_line"
+            }
+          ]
+        },
+        {
           "name": "remote",
-          "summary": "Show or set the control-plane app linked to this repo.",
+          "summary": "Show or set the control-plane app linked to this repo, or run one remote command against any app.",
           "flags": [
             {
               "flag": "-a APP",
-              "desc": "Link to the given app (by name or id)."
+              "desc": "With nothing after it, link this repo to the app (by name or id). With a command after it (restart, logs, deploy-log), run that command against the app without linking or writing anything."
             },
             {
               "flag": "--relink",
@@ -247,6 +606,13 @@
                 "--force-link"
               ],
               "desc": "Replace an existing link in this directory (overwrites .ownstack-app / .ownstack-config)."
+            },
+            {
+              "flag": "--yes",
+              "aliases": [
+                "-y"
+              ],
+              "desc": "Link even though the current directory is not a git repository (otherwise you are asked, and a non-interactive run refuses)."
             }
           ],
           "examples": [
@@ -261,9 +627,48 @@
             {
               "cmd": "ownstack remote -a my-app --relink",
               "desc": "Re-link a directory that already points to a different app."
+            },
+            {
+              "cmd": "ownstack remote -a my-app restart worker",
+              "desc": "Restart only my-app's worker processes, from any directory. Nothing is linked or written."
+            },
+            {
+              "cmd": "ownstack remote -a my-app logs --tail 50",
+              "desc": "Recent logs for my-app without linking this directory."
             }
           ],
-          "notes": "Creates `.ownstack-app` and stores the deploy token in `.ownstack-config`.\nIf the directory is already linked to a *different* app, linking is refused so you\ndon't clobber another app's link by standing in the wrong repo (a common footgun with\n`ownstack app create`, which auto-links the current directory). Pass `--relink` to\noverride, or `cd` to the intended app's directory first. Re-linking to the same app is\nalways allowed (it just refreshes the deploy token).\n"
+          "notes": "Linking creates `.ownstack-app`, stores your token in `.ownstack-config`, and makes that\ntoken the app's deploy token on the control plane. Outside a git work tree it asks\nfirst, and a non-interactive run refuses unless you pass `--yes`. (The check is \"inside\nsome git work tree\", so a subfolder of an unrelated repo still links without asking.)\n`remote -a APP <command>` never links: it runs restart, logs or deploy-log against APP\nfor that one call. Other remote subcommands (stop, start, status, shell, run, open) use\nthis repo's Dokku git remote and do not take -a.\nIf the directory is already linked to a *different* app, linking is refused so you\ndon't clobber another app's link by standing in the wrong repo (a common footgun with\n`ownstack app create`, which auto-links the current directory). Pass `--relink` to\noverride, or `cd` to the intended app's directory first. Re-linking to the same app is\nalways allowed (it just refreshes the deploy token).\n"
+        },
+        {
+          "name": "remote restart",
+          "summary": "Restart the linked app (or one process type) on its stack(s) via the control plane.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "Target app explicitly (defaults to the linked app). Same as `remote -a NAME restart`."
+            },
+            {
+              "flag": "--stack=NAME_OR_ID",
+              "desc": "Restart on one stack only (defaults to every stack the app is on)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack remote restart"
+            },
+            {
+              "cmd": "ownstack remote restart worker",
+              "desc": "Restart only the worker processes."
+            },
+            {
+              "cmd": "ownstack remote -a myapp restart worker --stack=prod",
+              "desc": "Restart another app's worker without linking this folder."
+            },
+            {
+              "cmd": "ownstack remote restart --app=myapp --stack=prod"
+            }
+          ],
+          "notes": "Usage: `ownstack remote restart [TYPE]`. With TYPE (e.g. worker), only that process type restarts (`dokku ps:restart APP TYPE`). If the control\nplane does not confirm a single-type restart (an older server restarts everything), the\ncommand warns and exits 1 rather than claim it restarted only TYPE.\nWithout TYPE it halts and restarts running processes (web + workers). This is what applies config\nvars written with `ownstack config:push --no-restart`, since Dokku config:set runs\nwith --no-restart and leaves running containers on their old environment.\nEquivalent to `ownstack app restart <APP>`.\n"
         },
         {
           "name": "remote logs",
@@ -272,6 +677,10 @@
             {
               "flag": "--tail N",
               "desc": "Last N lines (default 100)."
+            },
+            {
+              "flag": "--app=NAME",
+              "desc": "Target app explicitly (defaults to the linked app). Same as `remote -a NAME logs`."
             }
           ],
           "examples": [
@@ -280,6 +689,9 @@
             },
             {
               "cmd": "ownstack remote logs --tail 200"
+            },
+            {
+              "cmd": "ownstack remote -a myapp logs --tail 50"
             },
             {
               "cmd": "OWNSTACK_LOGS_FOLLOW=1 ownstack remote logs",
@@ -305,70 +717,12 @@
               "cmd": "ownstack remote deploy-log"
             },
             {
-              "cmd": "ownstack remote deploy-log --app=heartbeat"
+              "cmd": "ownstack remote deploy-log --app=my-app"
             },
             {
               "cmd": "ownstack remote deploy-log --deployment=123"
             }
           ]
-        },
-        {
-          "name": "remote agent",
-          "summary": "Claude Code on the stack — status, sessions, headless runs, interactive console.",
-          "flags": [
-            {
-              "flag": "--app=NAME_OR_ID",
-              "desc": "Target app (or link via `ownstack remote -a`)."
-            },
-            {
-              "flag": "--json",
-              "desc": "JSON output for status/sessions/show."
-            },
-            {
-              "flag": "--wait",
-              "desc": "Stream output until the run completes."
-            },
-            {
-              "flag": "--session=ID",
-              "desc": "Specific session."
-            },
-            {
-              "flag": "-m, --message",
-              "desc": "Inline rollout message."
-            }
-          ],
-          "examples": [
-            {
-              "cmd": "ownstack remote agent status [--json] [--app=my-app]"
-            },
-            {
-              "cmd": "ownstack remote agent setup [--app=my-app]"
-            },
-            {
-              "cmd": "ownstack remote agent sessions [--json] [--app=my-app]"
-            },
-            {
-              "cmd": "ownstack remote agent show SESSION_ID [--json] [--app=my-app]"
-            },
-            {
-              "cmd": "ownstack remote agent run \"your prompt\" [--wait] [--app=my-app]"
-            },
-            {
-              "cmd": "ownstack remote agent run --wait - < instructions.md",
-              "desc": "Stdin prompt, then stream."
-            },
-            {
-              "cmd": "ownstack remote agent stream SESSION_ID [--app=my-app]"
-            },
-            {
-              "cmd": "ownstack remote agent rollout [--app=my-app] [--session=ID] [-m \"msg\"]"
-            },
-            {
-              "cmd": "ownstack remote agent console [--app=my-app]",
-              "desc": "Interactive Claude; full repo on stack host (needs jq)."
-            }
-          ],
-          "notes": "Requires jq for `run`, `rollout`, `console`, and human-readable `status` / `sessions` / `show`.\n`console` calls GET …/claude_code/bootstrap on each open; cap defaults to 90/hour per app,\ntunable with CLAUDE_CODE_MAX_BOOTSTRAP_PER_HOUR. Over the cap returns 429 (claude_bootstrap_rate_limited).\nThe \"dangerously skip permissions\" mode defaults on; respect features.claude_code_dangerously_skip_permissions.\n"
         }
       ]
     },
@@ -470,6 +824,10 @@
             {
               "flag": "--clear-stuck",
               "desc": "Clear stuck deployments before deploying."
+            },
+            {
+              "flag": "-h, --help",
+              "desc": "Print usage and deploy nothing. Any other unknown flag, or a second app argument, is an error (exit 2) and deploys nothing."
             }
           ],
           "examples": [
@@ -500,6 +858,29 @@
           "notes": "`--wait` attaches to an in-progress deploy rather than failing with \"a deploy is\nalready in progress\", so re-running `deploy --wait` always ends up streaming the live\ndeployment. Use `deploy:status` for a one-shot, non-interactive status read.\n"
         },
         {
+          "name": "deploy:verify",
+          "summary": "Check what each stack is actually running against what the control plane recorded as deployed.",
+          "body": "Reads, on each stack, the containers dokku serves the app from and the\ncommit each was built from (its GIT_REV), next to the control plane's\nlast \"deployed\" commit for that stack. Verdicts: match, mismatch,\nnot_running (a recorded container is gone or stopped), no_containers,\nno_recorded_deploy, unreadable. Exits 1 unless every stack matches, so\nit can gate scripts.\n\nWhy: during the 2026-10-27 supply-chain incident deploys reported\n\"deployed\" while the old containers kept running (control-plane#1339).\nDeploys now verify this themselves and fail as release_unverified; this\ncommand checks any app on demand, including ones deployed before that.\nCalls GET /api/apps/<id>/running_release.\n",
+          "flags": [
+            {
+              "flag": "--stack=ID",
+              "desc": "Only this stack."
+            },
+            {
+              "flag": "--json",
+              "desc": "Emit the raw response."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack deploy:verify"
+            },
+            {
+              "cmd": "ownstack deploy:verify billing-api --json"
+            }
+          ]
+        },
+        {
           "name": "deploy:status",
           "summary": "Print the latest deployment status per stack (non-interactive; for agents/CI).",
           "flags": [
@@ -525,6 +906,37 @@
             }
           ],
           "notes": "Reads /api/apps/:id/deployments so you do not have to scrape `ownstack app info`.\nExit code reflects the most recent deployment: 0 deployed/idle, 1 failed, 2 in-progress.\n"
+        },
+        {
+          "name": "preflight",
+          "summary": "Run local pre-deploy checks to catch common Dokku issues before you push. Also runs as check.",
+          "flags": [
+            {
+              "flag": "--dir=PATH",
+              "desc": "Check the app in PATH instead of the current directory."
+            },
+            {
+              "flag": "--verbose",
+              "desc": "Print extra detail (e.g. the matched Procfile web line)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack preflight",
+              "desc": "Check the app in the current directory."
+            },
+            {
+              "cmd": "ownstack check",
+              "desc": "Same command (check is an alias for preflight)."
+            },
+            {
+              "cmd": "ownstack preflight --dir=backend"
+            },
+            {
+              "cmd": "ownstack preflight --verbose"
+            }
+          ],
+          "notes": "Fully local, makes no control-plane API call. Checks: a Procfile with a web\nprocess, that the web process listens on $PORT (not a hardcoded port), that a\nDockerfile does not hardcode EXPOSE, that a node server package is in\ndependencies (not devDependencies), that a buildpack is detectable (Gemfile.lock\nfor Ruby, a lockfile for Node, or a Dockerfile), that the git working tree is\nclean, and that the directory is linked to the control plane (.ownstack-config).\nExit code is 1 when any check fails, 0 otherwise (warnings do not fail).\n"
         },
         {
           "name": "run",
@@ -595,10 +1007,10 @@
       "commands": [
         {
           "name": "stack create",
-          "summary": "Provision a new managed stack (AWS, GCP, Azure, OpenStack, DigitalOcean, or SSH-managed). Mirrors the dashboard \"New Stack\" form.",
+          "summary": "Provision a new managed stack (AWS, GCP, Azure, OpenStack, DigitalOcean, Hetzner, or SSH-managed). Mirrors the dashboard \"New Stack\" form.",
           "flags": [
             {
-              "flag": "--provider=aws|gcp|azure|openstack|digitalocean|ssh",
+              "flag": "--provider=aws|gcp|azure|openstack|digitalocean|hetzner|ssh",
               "desc": "Cloud provider (required)."
             },
             {
@@ -607,7 +1019,7 @@
             },
             {
               "flag": "--region=NAME",
-              "desc": "Cloud region (required for aws/azure/openstack/digitalocean; e.g. DigitalOcean nyc3, sfo3)."
+              "desc": "Cloud region (required for aws/azure/openstack/digitalocean/hetzner; e.g. DigitalOcean nyc3, Hetzner ash, hil, fsn1)."
             },
             {
               "flag": "--gcp-project=PROJECT_ID",
@@ -656,6 +1068,10 @@
               "desc": "DigitalOcean droplet (s-1vcpu-2gb) for OSS-app dogfooding."
             },
             {
+              "cmd": "ownstack stack create my-hetzner-box --provider=hetzner --credential='Hetzner' --region=ash --ram=8",
+              "desc": "Hetzner stack in Ashburn, US. Server type is picked live (cheapest current x86 type meeting the RAM ask in that location); the cheap CX line is EU-only (fsn1/nbg1/hel1), US locations carry CPX."
+            },
+            {
               "cmd": "ownstack stack create my-server --provider=ssh --ssh-host=1.2.3.4 --ssh-username=ubuntu --ssh-private-key=~/.ssh/id_ed25519",
               "desc": "Adopt an existing host you SSH into."
             }
@@ -663,7 +1079,7 @@
         },
         {
           "name": "stack destroy",
-          "summary": "Tear down a stack and deprovision its cloud resources. Symmetric with `stack create`. Interactive confirmation by default; use `--yes` for scripts.",
+          "summary": "Tear down a stack and deprovision its cloud resources. Symmetric with `stack create`. Interactive confirmation by default; use `--yes` for scripts. Without `--yes` you must type the stack name; if the CLI cannot load the stack to learn its name, it refuses and destroys nothing.",
           "flags": [
             {
               "flag": "--yes, -y",
@@ -754,11 +1170,11 @@
           ],
           "examples": [
             {
-              "cmd": "ownstack stack containers node-hub-538",
+              "cmd": "ownstack stack containers <STACK>",
               "desc": "All containers across all apps on the stack."
             },
             {
-              "cmd": "ownstack stack containers node-hub-538 --app=myhavenbot --state=stale",
+              "cmd": "ownstack stack containers <STACK> --app=<APP> --state=stale",
               "desc": "Just the stale Sidekiq survivors for one app."
             }
           ]
@@ -778,11 +1194,11 @@
           ],
           "examples": [
             {
-              "cmd": "ownstack stack reconcile-ps myhavenbot --stack=node-hub-538 --dry-run",
+              "cmd": "ownstack stack reconcile-ps <APP> --stack=<STACK> --dry-run",
               "desc": "Preview the reap."
             },
             {
-              "cmd": "ownstack stack reconcile-ps myhavenbot --stack=node-hub-538",
+              "cmd": "ownstack stack reconcile-ps <APP> --stack=<STACK>",
               "desc": "Actually reap."
             }
           ]
@@ -804,7 +1220,7 @@
           "notes": "Supported sizes (GB): 2, 4, 8, 16, 32, 64, 128. The instance is stopped,\nresized, and restarted, so expect brief downtime.\n",
           "examples": [
             {
-              "cmd": "ownstack stack resize-ram node-hub-538 16",
+              "cmd": "ownstack stack resize-ram <STACK> 16",
               "desc": "Resize to 16 GB RAM (causes a restart)."
             }
           ]
@@ -839,6 +1255,7 @@
         {
           "name": "stack data",
           "summary": "List databases and manage volumes on a stack.",
+          "notes": "The control plane services these over SSH to the box, so they can take\n30-60s on a busy stack. That is normal, not a hang.\n\nA volume is how an app keeps data across deploys. Without one, anything\nthe container writes to disk is discarded when it is rebuilt.\n",
           "examples": [
             {
               "cmd": "ownstack stack data databases <STACK>"
@@ -847,10 +1264,12 @@
               "cmd": "ownstack stack data volumes <STACK>"
             },
             {
-              "cmd": "ownstack stack data volumes <STACK> add <app> <host_path> <container_path>"
+              "cmd": "ownstack stack data volumes <STACK> add <app> <host_path> <container_path>",
+              "desc": "Mount a host directory into the container so writes survive a redeploy. Convention: /var/lib/dokku/data/storage/<app> on the host. Restart the app to pick it up."
             },
             {
-              "cmd": "ownstack stack data volumes <STACK> remove <app> <mount_spec>"
+              "cmd": "ownstack stack data volumes <STACK> remove <app> <mount_spec>",
+              "desc": "mount_spec is host_path:container_path, as printed by the list form."
             }
           ]
         },
@@ -976,6 +1395,16 @@
           "notes": "Surfaces CPU cores, total host RAM, the container memory limit (cgroup; \"unlimited\" means\nbounded by host RAM), and whether the root disk is SSD or rotational, plus the provisioned\nsizes. Makes correct DB/app tuning a read instead of an SSH expedition (free -h,\n/sys/fs/cgroup/memory.max, lsblk -d -o NAME,ROTA by hand).\n"
         },
         {
+          "name": "stack health",
+          "summary": "Heartbeat health for a stack, off-box reachability plus on-box agent, provider state, and active alerts.",
+          "body": "Resolves the stack, pulls its detail record and the health endpoint,\nthen prints one snapshot: the off-box host monitor (SSH port probe\nevery 60s), the on-box heartbeat agent status (disk, RAM, docker\nstats), the provider-reported instance state, and any active alerts.\nUI parity with the Health panel on the stack detail page.\n",
+          "examples": [
+            {
+              "cmd": "ownstack stack health <STACK>"
+            }
+          ]
+        },
+        {
           "name": "stack memory",
           "summary": "Host memory + per-container breakdown from the on-box heartbeat agent.",
           "body": "Reads the latest stack_health_snapshot and prints host RAM usage plus a\nper-container table sorted by memory consumption. UI parity with the\nMemory tab on the stack detail page.\n\nRequires the heartbeat agent to be installed on the stack (it pushes\nper-container Docker memory every 60s). If \"No memory metrics yet\" is\nshown, run `ownstack add-on heartbeat <STACK>` to install.\n",
@@ -1052,9 +1481,24 @@
           ]
         },
         {
+          "name": "stack add-key",
+          "summary": "Add your local SSH public key to the stack for direct ssh access.",
+          "body": "Appends a local public key to the stack's authorized_keys so you can\n`ssh <user>@<ip>` directly without going through the control plane.\nAuto-detects ~/.ssh/id_ed25519.pub, id_rsa.pub, or id_ecdsa.pub when\n--key is omitted. On success it prints the exact ssh command to use.\n",
+          "examples": [
+            {
+              "cmd": "ownstack stack add-key <STACK>",
+              "desc": "Auto-detect a local public key and register it."
+            },
+            {
+              "cmd": "ownstack stack add-key <STACK> --key=~/.ssh/id_ed25519.pub",
+              "desc": "Register a specific public key file."
+            }
+          ]
+        },
+        {
           "name": "stack ownstackd",
           "summary": "Manage the on-stack ownstackd daemon (replaces SSH-from-control-plane for routine ops).",
-          "body": "ownstackd is a small Rust daemon that runs on a stack and executes\njobs sent from the control plane. Opt-in per stack: when enabled,\npaths like `ownstack app status` skip the inline SSH and route work\nthrough the daemon instead. When disabled, the stack keeps working\nexactly as before, the daemon idles, and an SSH login MOTD tells the\noperator how to reconnect or fully uninstall.\n\nSource (private): github.com/ownstack-org/ownstackd\n",
+          "body": "ownstackd is a small Rust daemon that runs on a stack and executes\njobs sent from the control plane. Opt-in per stack: when enabled,\npaths like `ownstack app status` skip the inline SSH and route work\nthrough the daemon instead. When disabled, the stack keeps working\nexactly as before, the daemon idles, and an SSH login MOTD tells the\noperator how to reconnect or fully uninstall.\n",
           "examples": [
             {
               "cmd": "ownstack stack ownstackd status <STACK>",
@@ -1071,6 +1515,47 @@
             {
               "cmd": "ownstack stack ownstackd rotate <STACK>",
               "desc": "Invalidate the existing token and issue a new one. Reinstall daemon with the new token."
+            }
+          ]
+        },
+        {
+          "name": "stack add-ons",
+          "summary": "List, add, and remove a stack's add-ons (Heartbeat, Private Network).",
+          "body": "Stack add-ons are opt-in per stack; nothing is added by default.\n\nPrivate Network (`tailscale`) joins the stack's host to a tailnet you\nown: Tailscale, or your own Headscale server via `--login-server`.\nYou bring the auth key. OwnStack holds it (encrypted) only until the\nbackground join uses it, then discards it; it never appears in a\ncommand line or log. The join takes about a minute; `add-ons <STACK>`\nshows joining, joined (with the tailnet IP), or failed (with why).\n\nWhat joining changes on the host: tailscaled runs, and peers your\ntailnet ACL allows can reach the host's listening ports over the\ntailnet (restrict that with tailnet ACLs). What it does not change:\nthe host's DNS resolver (MagicDNS is not applied), and how OwnStack\nreaches the host (still its public address). A host already on a\ntailnet OwnStack did not set up is left alone. Owner-only: share\nrecipients and developers can't add or remove it.\n\nUse `list` explicitly if a stack is named add, remove, or list.\n",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Emit the add-on list as JSON."
+            },
+            {
+              "flag": "--auth-key=KEY",
+              "desc": "Tailscale auth key (tskey-auth-...) or Headscale pre-auth key. Prompted for (hidden) when omitted, which keeps it out of shell history."
+            },
+            {
+              "flag": "--login-server=URL",
+              "desc": "https URL of your Headscale server. Omit for Tailscale."
+            },
+            {
+              "flag": "--yes",
+              "desc": "Skip the confirmation on remove."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack stack add-ons <STACK>",
+              "desc": "Show each add-on as added / joining / failed / available, with the tailnet IP once joined."
+            },
+            {
+              "cmd": "ownstack stack add-ons add <STACK> tailscale",
+              "desc": "Join the stack to your tailnet (prompts for the auth key)."
+            },
+            {
+              "cmd": "ownstack stack add-ons add <STACK> tailscale --login-server=https://hs.example.com",
+              "desc": "Join your own Headscale instead of Tailscale."
+            },
+            {
+              "cmd": "ownstack stack add-ons remove <STACK> tailscale --yes",
+              "desc": "Log the host out of the tailnet and stop tailscaled (also cleans up after a failed join)."
             }
           ]
         },
@@ -1130,6 +1615,46 @@
               "desc": "Leave a stack that was shared with you. Apps your account deployed keep running."
             }
           ]
+        },
+        {
+          "name": "stack subscriptions (owner)",
+          "summary": "See the managed stacks sold on a host you own.",
+          "body": "Owner-side ledger for a host that accepts tenants: who holds a managed\nstack, how much RAM is reserved, and what they pay. Turn selling on by\nsetting accepts_tenants on the stack.\n",
+          "examples": [
+            {
+              "cmd": "ownstack stack subscriptions <STACK>",
+              "desc": "Reservation ledger, one row per buyer, with $/mo."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "managed-stacks",
+      "title": "Managed stacks (pay-to-play shared hosting)",
+      "body": "A managed stack is $5/mo per unit on a shared host that accepts tenants.\nOne unit reserves 4GB RAM and 10 app slots; two units equal a whole\n4vCPU/8GB box. You deploy apps onto it within that quota like any stack,\nand nothing else: no host operations, no access to other tenants' apps.\nBuying starts an OwnBilling subscription; cancel any time.\n",
+      "commands": [
+        {
+          "name": "managed-stacks",
+          "summary": "List your managed stacks, browse the catalog, buy and cancel.",
+          "examples": [
+            {
+              "cmd": "ownstack managed-stacks",
+              "desc": "Your managed stacks across all hosts, with app usage and price."
+            },
+            {
+              "cmd": "ownstack managed-stacks catalog",
+              "desc": "Hosts selling managed stacks, with live remaining capacity."
+            },
+            {
+              "cmd": "ownstack managed-stacks buy <STACK> --units 2",
+              "desc": "Buy two units (8GB reserved, 20 app slots, $10/mo)."
+            },
+            {
+              "cmd": "ownstack managed-stacks cancel <MANAGED_STACK_ID>",
+              "desc": "Cancel your managed stack. Refuses while apps remain unless --force."
+            }
+          ]
         }
       ]
     },
@@ -1181,11 +1706,15 @@
         },
         {
           "name": "cluster destroy",
-          "summary": "Destroy a cluster (proxy app stays unless --with-proxy).",
+          "summary": "Destroy a cluster (proxy app stays unless --with-proxy). Asks you to confirm by typing the name or id, unless you pass `--yes`.",
           "flags": [
             {
               "flag": "--with-proxy",
               "desc": "Also destroy the proxy app."
+            },
+            {
+              "flag": "--yes, -y",
+              "desc": "Skip the confirmation prompt (you otherwise type the name or id back). Required for scripts and non-interactive callers."
             }
           ],
           "examples": [
@@ -1281,19 +1810,19 @@
               "cmd": "ownstack cluster domain list <CLUSTER>"
             },
             {
-              "cmd": "ownstack cluster domain add <CLUSTER> myhavenbot.com"
+              "cmd": "ownstack cluster domain add <CLUSTER> example.com"
             },
             {
-              "cmd": "ownstack cluster domain add <CLUSTER> app.myhavenbot.com"
+              "cmd": "ownstack cluster domain add <CLUSTER> app.example.com"
             },
             {
-              "cmd": "ownstack cluster domain remove <CLUSTER> app.myhavenbot.com"
+              "cmd": "ownstack cluster domain remove <CLUSTER> app.example.com"
             }
           ]
         },
         {
           "name": "cluster variant",
-          "summary": "Manage named swappable backend groups (e.g. heroku, havenhelix). Each variant has weight (0 standby, >0 receives traffic) and status (active or draining).",
+          "summary": "Manage named swappable backend groups (e.g. heroku, hetzner). Each variant has weight (0 standby, >0 receives traffic) and status (active or draining).",
           "flags": [
             {
               "flag": "--weight=N",
@@ -1316,7 +1845,7 @@
               "cmd": "ownstack cluster variant add <CLUSTER> heroku --weight=100"
             },
             {
-              "cmd": "ownstack cluster variant add <CLUSTER> havenhelix --weight=0"
+              "cmd": "ownstack cluster variant add <CLUSTER> hetzner --weight=0"
             },
             {
               "cmd": "ownstack cluster variant update <CLUSTER> heroku --weight=0"
@@ -1360,10 +1889,10 @@
               "cmd": "ownstack cluster upstream list <CLUSTER>"
             },
             {
-              "cmd": "ownstack cluster upstream add <CLUSTER> \\\n  --variant=heroku --hostname=myhavenbot.com \\\n  --url=https://myhavenbot.herokuapp.com\n"
+              "cmd": "ownstack cluster upstream add <CLUSTER> \\\n  --variant=heroku --hostname=example.com \\\n  --url=https://my-app.herokuapp.com\n"
             },
             {
-              "cmd": "ownstack cluster upstream add <CLUSTER> \\\n  --variant=havenhelix --hostname=myhavenbot.com \\\n  --url=https://heroku.havenhelix.com\n"
+              "cmd": "ownstack cluster upstream add <CLUSTER> \\\n  --variant=hetzner --hostname=example.com \\\n  --url=https://new.example.com\n"
             },
             {
               "cmd": "ownstack cluster upstream remove <CLUSTER> <UPSTREAM_ID>"
@@ -1381,7 +1910,7 @@
           ],
           "examples": [
             {
-              "cmd": "ownstack cluster switch <CLUSTER> --to=havenhelix"
+              "cmd": "ownstack cluster switch <CLUSTER> --to=hetzner"
             },
             {
               "cmd": "ownstack cluster switch <CLUSTER> --to=heroku",
@@ -1412,8 +1941,295 @@
           ]
         },
         {
+          "name": "app create",
+          "summary": "Register an existing repo as an app on a stack (Heroku `apps:create` style), then optionally link the current directory.",
+          "notes": "POSTs /api/apps with the app fields, applies any service flags with a\nfollow-up PATCH, and (unless --no-link) links the cwd via the\nremote-add helper so `ownstack deploy` uses this account. The stack is\nresolved by name or numeric id and is required. Service flags are\nopt-in; pass --postgres, --redis, --mysql, or --mongo to provision, or\nthe --no-* form to turn one off. Outside a git work tree the link step\nasks first (a non-interactive run skips it; the app is still created),\nthen link with `ownstack remote -a NAME --yes`. Note that the --template=landing\nlaunch orchestration is bash-only and is not yet supported here.\n",
+          "flags": [
+            {
+              "flag": "--stack=NAME_OR_ID",
+              "desc": "Target stack (required)."
+            },
+            {
+              "flag": "--git-url=URL",
+              "desc": "Git repository URL to deploy from."
+            },
+            {
+              "flag": "--git-branch=BRANCH",
+              "desc": "Branch to deploy (default main)."
+            },
+            {
+              "flag": "--subdir=PATH",
+              "aliases": [
+                "--monorepo-subdir=PATH"
+              ],
+              "desc": "Subdirectory to build from in a monorepo."
+            },
+            {
+              "flag": "--build-type=buildpacks|dockerfile",
+              "desc": "Build strategy (default buildpacks)."
+            },
+            {
+              "flag": "--app-type=raw|rails|nestjs|angular|dockerfile",
+              "desc": "App type preset (default raw)."
+            },
+            {
+              "flag": "--components=LIST",
+              "desc": "Comma-separated component list (default buildpack)."
+            },
+            {
+              "flag": "--description=TEXT",
+              "desc": "Human-readable description."
+            },
+            {
+              "flag": "--no-services",
+              "desc": "Provision no database, redis, or other services."
+            },
+            {
+              "flag": "--postgres",
+              "desc": "Provision Postgres (use --no-postgres to disable)."
+            },
+            {
+              "flag": "--redis",
+              "desc": "Provision Redis (use --no-redis to disable)."
+            },
+            {
+              "flag": "--mysql",
+              "desc": "Provision MySQL (use --no-mysql to disable)."
+            },
+            {
+              "flag": "--mongo",
+              "desc": "Provision Mongo (use --no-mongo to disable)."
+            },
+            {
+              "flag": "--no-link",
+              "desc": "Do not link the current directory to the new app."
+            },
+            {
+              "flag": "--relink",
+              "aliases": [
+                "--force-link"
+              ],
+              "desc": "Replace an existing link in this directory."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app create myapp --stack=prod --git-url=https://github.com/me/myapp.git"
+            },
+            {
+              "cmd": "ownstack app create myapp --stack=prod --postgres --redis"
+            },
+            {
+              "cmd": "ownstack app create myapp --stack=prod --no-services --no-link"
+            }
+          ]
+        },
+        {
+          "name": "app update",
+          "summary": "Patch fields on an existing app (same flag shape as app create); only the flags you pass are changed.",
+          "notes": "Resolves the app by name or id, then PATCHes /api/apps/{id} with just\nthe fields you set. Pass at least one flag. Service flags accept both\nthe bare form (--postgres) and the --no- form (--no-postgres).\n",
+          "flags": [
+            {
+              "flag": "--stack=NAME_OR_ID",
+              "desc": "Repoint the app's primary stack. app stacks:add only adds an association; this is what moves the stack the app reports as its own. Deploy to the new stack and cut DNS over first, then remove the old association with app stacks:remove."
+            },
+            {
+              "flag": "--git-url=URL",
+              "desc": "Git repository URL."
+            },
+            {
+              "flag": "--git-branch=BRANCH",
+              "desc": "Branch to deploy."
+            },
+            {
+              "flag": "--subdir=PATH",
+              "aliases": [
+                "--monorepo-subdir=PATH"
+              ],
+              "desc": "Monorepo subdirectory."
+            },
+            {
+              "flag": "--build-type=buildpacks|dockerfile",
+              "desc": "Build strategy."
+            },
+            {
+              "flag": "--app-type=raw|rails|nestjs|angular|dockerfile",
+              "desc": "App type preset."
+            },
+            {
+              "flag": "--description=TEXT",
+              "desc": "Human-readable description."
+            },
+            {
+              "flag": "--display-name=TEXT",
+              "desc": "Display name shown in the dashboard."
+            },
+            {
+              "flag": "--postgres",
+              "desc": "Provision Postgres (use --no-postgres to disable)."
+            },
+            {
+              "flag": "--redis",
+              "desc": "Provision Redis (use --no-redis to disable)."
+            },
+            {
+              "flag": "--mysql",
+              "desc": "Provision MySQL (use --no-mysql to disable)."
+            },
+            {
+              "flag": "--mongo",
+              "desc": "Provision Mongo (use --no-mongo to disable)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app update myapp --git-branch=release"
+            },
+            {
+              "cmd": "ownstack app update myapp --postgres --no-redis"
+            },
+            {
+              "cmd": "ownstack app update myapp --stack=prod-hub",
+              "desc": "Make prod-hub the app's primary stack after deploying there."
+            }
+          ]
+        },
+        {
+          "name": "config:list",
+          "aliases": [
+            "config"
+          ],
+          "summary": "List an app's environment variables as KEY=VALUE lines.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name. `--app NAME` works too. Defaults to the linked app only when the flag is absent: the flag is never ignored, so it can no longer answer with another app's vars."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack config:list --app=myapp"
+            },
+            {
+              "cmd": "ownstack config --app=myapp"
+            }
+          ]
+        },
+        {
+          "name": "config:get",
+          "summary": "Print the value of one config var (exits 1 if it is not set).",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name. `--app NAME` works too. Defaults to the linked app only when the flag is absent: the flag is never ignored, so it can no longer answer with another app's vars."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack config:get DATABASE_URL --app=myapp"
+            }
+          ]
+        },
+        {
+          "name": "config:set",
+          "summary": "Set one or more config vars (KEY=VALUE), stored on the control plane.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name. `--app NAME` works too. Defaults to the linked app only when the flag is absent: the flag is never ignored, so it can no longer answer with another app's vars."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack config:set RAILS_ENV=production --app=myapp"
+            },
+            {
+              "cmd": "ownstack config:set FOO=bar BAZ=qux --app=myapp"
+            }
+          ],
+          "notes": "Values are stored on the app. They auto-sync only to stacks listed in the\napp's auto_sync_stack_ids; otherwise run `ownstack config:push` to apply them\nto a running stack (which restarts it).\n"
+        },
+        {
+          "name": "config:unset",
+          "summary": "Remove one or more config vars.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name. `--app NAME` works too. Defaults to the linked app only when the flag is absent: the flag is never ignored, so it can no longer answer with another app's vars."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack config:unset FOO --app=myapp"
+            },
+            {
+              "cmd": "ownstack config:unset FOO BAZ --app=myapp"
+            }
+          ]
+        },
+        {
+          "name": "config:push",
+          "summary": "Push managed config vars to a deployed stack and restart it so they take effect.",
+          "flags": [
+            {
+              "flag": "--app=NAME",
+              "desc": "App name. `--app NAME` works too. Defaults to the linked app only when the flag is absent: the flag is never ignored, so it can no longer answer with another app's vars."
+            },
+            {
+              "flag": "--stack=NAME_OR_ID",
+              "desc": "Target stack (required when the app has more than one stack)."
+            },
+            {
+              "flag": "--no-restart",
+              "desc": "Store the vars without restarting. Running containers keep the previous values until the next restart or deploy."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack config:push --app=myapp"
+            },
+            {
+              "cmd": "ownstack config:push --app=myapp --stack=prod"
+            },
+            {
+              "cmd": "ownstack config:push --app=myapp --stack=prod DATABASE_URL REDIS_URL"
+            },
+            {
+              "cmd": "ownstack config:push --app=myapp --no-restart"
+            }
+          ],
+          "notes": "Applies the control-plane config vars to the stack via dokku config:set, then\nrestarts the app so the running containers pick them up. Pass specific KEYs to\npush only those; omit to push all.\n\nThe restart is the part that matters. Dokku config:set runs with --no-restart so\nthe write is instant, which means the vars sit in Dokku's store while every\nrunning container keeps its old environment. Verifying with `ownstack run printenv\nMY_VAR` does not catch this: `run` starts a fresh one-off container that reads the\nnew value regardless. Check `ownstack stack containers <STACK> --app=<APP>` instead\nand look at the container age, or trust this command to restart for you.\n\nWith --no-restart, apply the vars later with `ownstack remote restart` (or\n`ownstack app restart <APP>`) or on your next deploy.\n"
+        },
+        {
           "name": "app stacks",
-          "summary": "List the stacks an app is deployed to.",
+          "summary": "List the stacks an app is deployed to."
+        },
+        {
+          "name": "app stacks:add",
+          "summary": "Assign an app to an additional stack so deploys also target it.",
+          "examples": [
+            {
+              "cmd": "ownstack app stacks:add <APP> <STACK>"
+            },
+            {
+              "cmd": "ownstack app stacks:add <STACK>",
+              "desc": "Assign the linked app."
+            }
+          ]
+        },
+        {
+          "name": "app stacks:remove",
+          "summary": "Unassign an app from a stack so deploys stop targeting it.",
+          "notes": "This drops the control-plane assignment ONLY. It does not tear down the\nDokku app already running on that stack.\n\nTo also remove the containers and linked services, nuke FIRST, then\nunassign, because nuke resolves the stack through this same assignment:\n\n  ownstack app nuke <APP> --stack=<STACK>\n  ownstack app stacks:remove <APP> <STACK>\n\nDoing it in the other order leaves an orphaned Dokku app on the stack\nwith no control-plane record pointing at it.\n",
+          "examples": [
+            {
+              "cmd": "ownstack app stacks:remove <APP> <STACK>"
+            },
+            {
+              "cmd": "ownstack app stacks:remove <STACK>",
+              "desc": "Unassign the linked app."
+            }
+          ],
           "examples": [
             {
               "cmd": "ownstack app stacks <APP>"
@@ -1574,7 +2390,7 @@
               "desc": "Turn autodeploy on for every linked stack (and install the webhook if missing)."
             },
             {
-              "cmd": "ownstack app autodeploy <APP> --stack=solar-zone-607 off",
+              "cmd": "ownstack app autodeploy <APP> --stack=<STACK> off",
               "desc": "Turn it off for one stack."
             }
           ]
@@ -1662,6 +2478,58 @@
           ]
         },
         {
+          "name": "app protect",
+          "summary": "Gate an app behind HTTP Basic Auth (the dokku-http-auth plugin), with a user list and an IP bypass allow-list.",
+          "notes": "Protects every request to the app with a username/password prompt at\nthe nginx layer, before traffic reaches your code. Requires the\nhttp-auth plugin on the stack (install it with\n`ownstack stack plugin-install http-auth`). `protect:status` reports\nwhether the plugin is installed, whether auth is enabled, the\nconfigured users, and any IP/CIDR ranges allowed to bypass the prompt.\nAdd more users with `protect:add-user` and let trusted networks skip\nthe prompt with `protect:allow-ip`.\n",
+          "flags": [
+            {
+              "flag": "--user=NAME",
+              "desc": "Username to create (protect:enable, protect:add-user, protect:remove-user)."
+            },
+            {
+              "flag": "--password=PASS",
+              "aliases": [
+                "-p"
+              ],
+              "desc": "Password for the user (protect:enable, protect:add-user)."
+            },
+            {
+              "flag": "--ip=CIDR",
+              "desc": "IP address or CIDR range to allow or disallow (protect:allow-ip, protect:disallow-ip)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app protect:status <APP>",
+              "desc": "Show auth status, users, and allowed IPs."
+            },
+            {
+              "cmd": "ownstack app protect:enable <APP> --user=admin --password=secret",
+              "desc": "Enable HTTP Basic Auth with a first user."
+            },
+            {
+              "cmd": "ownstack app protect:disable <APP>",
+              "desc": "Turn off HTTP Basic Auth."
+            },
+            {
+              "cmd": "ownstack app protect:add-user <APP> --user=teammate --password=pw",
+              "desc": "Add another user."
+            },
+            {
+              "cmd": "ownstack app protect:remove-user <APP> --user=teammate",
+              "desc": "Remove a user."
+            },
+            {
+              "cmd": "ownstack app protect:allow-ip <APP> --ip=203.0.113.0/24",
+              "desc": "Let an IP range bypass the auth prompt."
+            },
+            {
+              "cmd": "ownstack app protect:disallow-ip <APP> --ip=203.0.113.0/24",
+              "desc": "Remove an IP range from the bypass allow-list."
+            }
+          ]
+        },
+        {
           "name": "app nuke",
           "summary": "Reset an app's Dokku-side state (apps:destroy + linked services) without touching the control-plane app, domains, env vars, or group.",
           "flags": [
@@ -1689,7 +2557,7 @@
               "desc": "Non-interactive."
             },
             {
-              "cmd": "ownstack app nuke <APP> --stack=solar-zone-607",
+              "cmd": "ownstack app nuke <APP> --stack=<STACK>",
               "desc": "Only nuke state on one stack (use when an app is on multiple stacks)."
             }
           ]
@@ -1808,18 +2676,406 @@
               "cmd": "ownstack app groups"
             }
           ]
+        },
+        {
+          "name": "app domains",
+          "aliases": [
+            "app domains:list"
+          ],
+          "summary": "List the custom domains mapped to an app (id, domain, primary, SSL).",
+          "notes": "APP is optional when the current directory is linked to an app. The\nSSL column shows \"yes\" when a stored certificate is attached to the\ndomain, otherwise a dash.\n",
+          "examples": [
+            {
+              "cmd": "ownstack app domains <APP>"
+            },
+            {
+              "cmd": "ownstack app domains",
+              "desc": "Uses the linked app in the current directory."
+            }
+          ]
+        },
+        {
+          "name": "app domains:add",
+          "summary": "Map a custom domain to an app, optionally attaching an SSL cert and key.",
+          "notes": "Pass just the domain to use the linked app, or \"APP domain\" to target\na named app. With no cert, the control plane tries to auto-match a\nstored certificate for the hostname. Provide --cert and --key together\nto upload a specific certificate PEM and private key.\n",
+          "flags": [
+            {
+              "flag": "--cert=FILE",
+              "desc": "Path to a certificate PEM file (use with --key)."
+            },
+            {
+              "flag": "--key=FILE",
+              "desc": "Path to the matching private key PEM file (use with --cert)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app domains:add <APP> app.example.com"
+            },
+            {
+              "cmd": "ownstack app domains:add <APP> app.example.com --cert=fullchain.pem --key=privkey.pem",
+              "desc": "Attach an explicit certificate and key."
+            }
+          ]
+        },
+        {
+          "name": "app domains:remove",
+          "summary": "Remove a mapped domain from an app by its domain id.",
+          "notes": "Run 'ownstack app domains [APP]' first to find the numeric domain id.\nA single numeric argument is treated as the domain id on the linked app.\n",
+          "examples": [
+            {
+              "cmd": "ownstack app domains:remove <APP> <DOMAIN_ID>"
+            },
+            {
+              "cmd": "ownstack app domains:remove <DOMAIN_ID>",
+              "desc": "Remove from the linked app."
+            }
+          ]
+        },
+        {
+          "name": "app add-ons",
+          "summary": "List, add, and remove an app's add-ons (Raven, Log Drain).",
+          "body": "App add-ons are opt-in per app; nothing is enabled by default. The list\nshows each add-on as enabled, available (ready to add), or not\nconfigured (the platform has not set it up yet, so it can't be added).\n\nRaven (`raven`) is email for your apps, sent from your own domains.\nAdding it is synchronous: the control plane issues the app its own\nRaven key and sets three config vars, which are then applied to the\napp on its stacks:\n\n- `RAVEN_API_KEY`: the app's Raven API key.\n- `RAVEN_BASE_URL`: the Raven API to send through.\n- `RAVEN_FROM`: the sender address, printed as \"Sending from\" on add.\n\nRemoving Raven revokes the app's keys and removes the `RAVEN_*` vars.\nLog Drain (`logdrain`) provisions in the background; add prints that\nit started, and `add-ons <APP>` shows it as enabled once it is done.\nAn add-on the control plane refuses (for example Raven not reachable)\nprints its error and exits 1.\n\nAPP is optional when the current directory is linked to an app; with\none argument, add and remove treat it as the add-on. Use `list`\nexplicitly if an app is named add, remove, or list.\n",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Emit the add-on list as JSON."
+            },
+            {
+              "flag": "--yes",
+              "desc": "Skip the confirmation on remove."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app add-ons <APP>",
+              "desc": "Show each add-on as enabled / available / not configured."
+            },
+            {
+              "cmd": "ownstack app add-ons add my-app raven",
+              "desc": "Enable Raven email for my-app. Sets RAVEN_API_KEY, RAVEN_BASE_URL and RAVEN_FROM and prints the sender."
+            },
+            {
+              "cmd": "ownstack app add-ons add <APP> logdrain",
+              "desc": "Start shipping the app's logs to Log Drain (provisions in the background)."
+            },
+            {
+              "cmd": "ownstack app add-ons remove my-app raven --yes",
+              "desc": "Revoke the app's Raven keys and remove its RAVEN_* vars."
+            }
+          ]
+        },
+        {
+          "name": "app stop",
+          "summary": "Stop all process types of an app on its stacks via the control plane (no SSH).",
+          "notes": "Halts web and worker processes. Use before a destructive operation\nsuch as a restore or schema change. Acts on every deployable stack\nunless you narrow it with --stack.\n",
+          "flags": [
+            {
+              "flag": "--stack=NAME_OR_ID",
+              "desc": "Act on a single stack instead of every stack the app deploys to."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app stop <APP>"
+            },
+            {
+              "cmd": "ownstack app stop <APP> --stack=<STACK>"
+            }
+          ]
+        },
+        {
+          "name": "app start",
+          "summary": "Start all process types of an app on its stacks via the control plane.",
+          "flags": [
+            {
+              "flag": "--stack=NAME_OR_ID",
+              "desc": "Act on a single stack instead of every stack the app deploys to."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app start <APP>"
+            },
+            {
+              "cmd": "ownstack app start <APP> --stack=<STACK>"
+            }
+          ]
+        },
+        {
+          "name": "app restart",
+          "summary": "Restart all process types of an app on its stacks via the control plane.",
+          "flags": [
+            {
+              "flag": "--stack=NAME_OR_ID",
+              "desc": "Act on a single stack instead of every stack the app deploys to."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app restart <APP>"
+            },
+            {
+              "cmd": "ownstack app restart <APP> --stack=<STACK>"
+            }
+          ]
+        },
+        {
+          "name": "app processes",
+          "aliases": [
+            "app ps"
+          ],
+          "summary": "Show running process types and their scale per stack.",
+          "examples": [
+            {
+              "cmd": "ownstack app processes <APP>"
+            },
+            {
+              "cmd": "ownstack app ps <APP>"
+            }
+          ]
+        },
+        {
+          "name": "app scale",
+          "summary": "Set how many containers run for one or more process types.",
+          "notes": "Pass one or more TYPE=COUNT pairs (e.g. worker=1 web=2). The type must\nmatch a Procfile process type (lowercase letters, digits, - and _,\nstarting with a letter) and the count must be a non-negative integer;\n0 stops that process type. The control plane saves the scale so it is\nre-applied after every deploy, then runs dokku ps:scale on each of the\napp's stacks now. Use --stack to change only one stack. Check the\nresult with `ownstack app ps <APP>`.\n",
+          "flags": [
+            {
+              "flag": "--stack=NAME_OR_ID",
+              "desc": "Scale only on this stack (default is every stack the app deploys to)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app scale <APP> worker=1",
+              "desc": "Run one worker container on every stack."
+            },
+            {
+              "cmd": "ownstack app scale <APP> web=2 worker=0 --stack=<STACK>",
+              "desc": "Two web containers and no workers on one stack."
+            }
+          ]
+        },
+        {
+          "name": "app build-type",
+          "summary": "Show or set an app's Dokku build type (dockerfile or herokuish buildpacks).",
+          "notes": "With no build type argument, prints the current setting. Pass\n\"dockerfile\" or \"herokuish\" to change it. The change takes effect on\nthe next deploy.\n",
+          "examples": [
+            {
+              "cmd": "ownstack app build-type <APP>",
+              "desc": "Show the current build type."
+            },
+            {
+              "cmd": "ownstack app build-type <APP> dockerfile",
+              "desc": "Build from the app's Dockerfile."
+            },
+            {
+              "cmd": "ownstack app build-type <APP> herokuish",
+              "desc": "Build with Heroku buildpacks."
+            }
+          ]
+        },
+        {
+          "name": "app limit",
+          "aliases": [
+            "app limits"
+          ],
+          "summary": "Show or set per-process-type memory limits (Dokku resource limits).",
+          "notes": "With no flags, lists the current per-process limits (memory and CPU).\nPass --process-type with --memory to set a cap, or with --clear to\nremove one. Add --restart to bounce the affected process afterward.\n",
+          "flags": [
+            {
+              "flag": "--process-type=TYPE",
+              "aliases": [
+                "-p"
+              ],
+              "desc": "Process type to set or clear (e.g. web, worker)."
+            },
+            {
+              "flag": "--memory=SIZE",
+              "aliases": [
+                "-m"
+              ],
+              "desc": "Memory cap to set (e.g. 512m, 2g)."
+            },
+            {
+              "flag": "--clear",
+              "desc": "Remove the limit on the given process type."
+            },
+            {
+              "flag": "--restart",
+              "desc": "Restart the process type after changing its limit."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app limit <APP>",
+              "desc": "List current limits."
+            },
+            {
+              "cmd": "ownstack app limit <APP> --process-type=worker --memory=2g --restart",
+              "desc": "Cap the worker at 2g and restart it."
+            },
+            {
+              "cmd": "ownstack app limit <APP> --process-type=worker --clear",
+              "desc": "Remove the worker limit."
+            }
+          ]
+        },
+        {
+          "name": "app nginx",
+          "summary": "Manage per-app nginx settings (upload limit, proxy timeouts) that survive a stack migration or clone.",
+          "notes": "The control plane persists these per-app nginx properties so they are\nreplayed onto any stack the app deploys to, instead of reverting to\nDokku defaults after a migration or clone (the fix for the 1MB\nupload-cap regression). Subcommands:\n  list (default)  show saved settings, the live values on the stack, and the supported keys\n  set KEY VALUE   save a setting and (unless --no-push) apply it to the app's stacks now\n  delete KEY      remove a saved setting and clear it on the stacks\n  capture         import the live app's non-default overrides into the control plane\n  push            replay all saved settings onto the app's stacks\nKeys: client-max-body-size (e.g. 200m, 2g), proxy-read-timeout,\nproxy-connect-timeout, proxy-send-timeout, keepalive-timeout, hsts-max-age.\n",
+          "flags": [
+            {
+              "flag": "--no-push",
+              "desc": "With set, save the value without applying it to the stacks yet."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app nginx <APP>",
+              "desc": "Show saved and live nginx settings."
+            },
+            {
+              "cmd": "ownstack app nginx set <APP> client-max-body-size 200m",
+              "desc": "Raise the upload limit to 200MB and apply it now."
+            },
+            {
+              "cmd": "ownstack app nginx capture <APP>",
+              "desc": "Import the app's current live overrides into the control plane (e.g. before a migration)."
+            },
+            {
+              "cmd": "ownstack app nginx delete <APP> client-max-body-size",
+              "desc": "Remove the saved upload-limit override."
+            },
+            {
+              "cmd": "ownstack app nginx push <APP>",
+              "desc": "Replay saved settings onto the app's stacks."
+            }
+          ]
+        },
+        {
+          "name": "app repair-db",
+          "summary": "Re-link an app's Postgres or MySQL service on its stack when DATABASE_URL drifted from the linked service.",
+          "notes": "Server-side the control plane re-runs the Dokku link so DATABASE_URL\n(or the MySQL DSN) points at the app's own service again. ENGINE is\nrequired and must be postgres or mysql. APP defaults to the linked app;\nthe stack defaults to the app's primary stack.\n",
+          "flags": [
+            {
+              "flag": "--stack=NAME_OR_ID",
+              "desc": "Stack to repair on. Defaults to the app's primary stack."
+            },
+            {
+              "flag": "--check-only",
+              "desc": "Report what would change without repairing the link."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app repair-db postgres <APP>",
+              "desc": "Re-link the app's Postgres service on its primary stack."
+            },
+            {
+              "cmd": "ownstack app repair-db mysql <APP> --stack=<STACK>",
+              "desc": "Re-link MySQL on a specific stack."
+            },
+            {
+              "cmd": "ownstack app repair-db postgres <APP> --check-only",
+              "desc": "Dry run, no changes."
+            }
+          ]
+        },
+        {
+          "name": "app purge-cache",
+          "summary": "Clear the Dokku build cache and stale docker image for an app on each of its stacks (SSH).",
+          "notes": "SSHes into every stack the app deploys to and runs\n`repo:purge-cache` plus a docker image purge, forcing the next deploy\nto rebuild from a clean cache. APP defaults to the linked app.\n",
+          "examples": [
+            {
+              "cmd": "ownstack app purge-cache <APP>"
+            },
+            {
+              "cmd": "ownstack app purge-cache",
+              "desc": "Uses the linked app in the current directory."
+            }
+          ]
+        },
+        {
+          "name": "app unlock",
+          "summary": "Release a stale Dokku deploy lock for an app on each of its stacks (SSH).",
+          "notes": "SSHes into each stack and runs `apps:unlock`. Use this when a prior\ndeploy was interrupted and left a lock behind that blocks new deploys.\nUnlock does not stop a deploy that is genuinely still running. APP\ndefaults to the linked app.\n",
+          "examples": [
+            {
+              "cmd": "ownstack app unlock <APP>"
+            },
+            {
+              "cmd": "ownstack app unlock",
+              "desc": "Uses the linked app in the current directory."
+            }
+          ]
+        },
+        {
+          "name": "app data heroku",
+          "summary": "Snapshot and download a Heroku app's database into an OwnStack stack.",
+          "notes": "Subcommands (APP defaults to the linked app):\nlist [APP] shows past Heroku data imports; apps [APP] lists the Heroku\napps you can pull from (with Postgres and MySQL flags); start [APP]\ncreates a snapshot and download; delete [APP] IMPORT_ID removes a\ndownload.\n",
+          "flags": [
+            {
+              "flag": "--heroku-app=NAME",
+              "desc": "For start. The Heroku app to snapshot."
+            },
+            {
+              "flag": "--stack=NAME",
+              "desc": "For start. The OwnStack stack that receives the download."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app data heroku list <APP>"
+            },
+            {
+              "cmd": "ownstack app data heroku apps <APP>"
+            },
+            {
+              "cmd": "ownstack app data heroku start <APP> --heroku-app=my-heroku --stack=<STACK>"
+            },
+            {
+              "cmd": "ownstack app data heroku delete <APP> <IMPORT_ID>"
+            }
+          ]
+        },
+        {
+          "name": "app data import",
+          "summary": "Inspect and run a database import into an app from a prepared dump.",
+          "notes": "Subcommands (APP defaults to the linked app):\nlist [APP] shows database imports; status [APP] IMPORT_ID shows an\nimport's status and tables; tables [APP] IMPORT_ID refreshes the table\nlist from the dump; execute [APP] IMPORT_ID applies selected tables.\nEach table takes a mode of replace (truncate then insert) or amend\n(append).\n",
+          "flags": [
+            {
+              "flag": "--tables=LIST",
+              "desc": "For execute. Comma-separated table:mode pairs, e.g. users:replace,orders:amend."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack app data import list <APP>"
+            },
+            {
+              "cmd": "ownstack app data import status <APP> <IMPORT_ID>"
+            },
+            {
+              "cmd": "ownstack app data import tables <APP> <IMPORT_ID>"
+            },
+            {
+              "cmd": "ownstack app data import execute <APP> <IMPORT_ID> --tables=users:replace,orders:amend"
+            }
+          ]
         }
       ]
     },
     {
       "id": "certs",
       "title": "SSL certificates",
-      "body": "Certificates live in an account-scoped \"locker\" (`/api/ssl_certificates`).\nEach cert can be pushed to one or more apps; pushing writes the cert into\nDokku's per-app `tls/` directory and rebuilds nginx with a `listen 443 ssl`\nblock. Pushes are asynchronous — the CLI enqueues a `SslCertificatePushWorker`\njob and polls for the result before reporting success/fail per stack.\n",
+      "body": "Certificates live in an account-scoped \"locker\" (`/api/ssl_certificates`).\nEach cert can be pushed to one or more apps; pushing writes the cert into\nDokku's per-app `tls/` directory and rebuilds nginx with a `listen 443 ssl`\nblock. Pushes are asynchronous — the CLI enqueues a `SslCertificatePushWorker`\njob and polls for the result before reporting success/fail per stack.\n\nDNS for Let's Encrypt (DNS-01): domains whose zones live in OwnStack's\nplatform Hetzner Cloud DNS need nothing connected. The control plane\nwrites the challenge records to Hetzner itself, for issuance and for\nauto-renewal. For a domain hosted in your own AWS account, connect\nRoute53 (`ownstack route53 connect`). DNSimple is a legacy, optional\nintegration (`ownstack dnsimple`), kept for zones still hosted there;\nit is not required for anything. To issue a cert locally, `sslgen`\ndefaults to Hetzner Cloud DNS (token from `HCLOUD_TOKEN` or the hcloud\nCLI config), with `--dns route53` and `--manual-dns` as alternatives.\n",
       "commands": [
         {
           "name": "cert publish",
           "summary": "Upload a sslgen cert (fullchain.pem + privkey.pem) to the locker, then push to an app.",
-          "notes": "Each invocation uploads a new locker entry. To attach the same cert\nto multiple apps without duplicates, run `cert publish` once and then\n`cert push --cert-id=N --app=APP` for each additional app.\n",
+          "notes": "Each invocation uploads a new locker entry. To attach the same cert\nto multiple apps without duplicates, run `cert publish` once and then\n`cert push --cert-id=N --app=APP` for each additional app.\n\nIssue the cert first with sslgen, which answers the DNS-01 challenge\non Hetzner Cloud DNS by default:\n`sslgen request example.com` (writes ~/.sslgen/certs/example.com).\nTest with `--staging` first; use `--dns route53 --aws-profile NAME`\nfor a Route53 zone, or `--manual-dns` for anything else.\n",
           "flags": [
             {
               "flag": "--app=APP",
@@ -1839,6 +3095,10 @@
             }
           ],
           "examples": [
+            {
+              "cmd": "sslgen request example.com",
+              "desc": "Issue a wildcard cert (example.com + *.example.com) using Hetzner Cloud DNS."
+            },
             {
               "cmd": "ownstack cert publish --app my-app --cert-dir ~/.sslgen/certs/example.com"
             }
@@ -1888,7 +3148,7 @@
         {
           "name": "cert renew",
           "summary": "Re-issue a locker certificate via Let's Encrypt and re-push it to every app using it.",
-          "notes": "Requires a connected DNSimple integration (`ownstack dnsimple connect`).\nThe control plane answers the DNS-01 challenge with TXT records in your\nDNSimple account, updates the locker entry in place, and re-pushes to all\napps whose `ssl_certificate_id` references the cert. Issuance takes a few\nminutes; the CLI polls until the job completes. Certs expiring within 30\ndays renew automatically when auto-renew is on — this command is for\nrenewing on demand.\n",
+          "notes": "The control plane answers the DNS-01 challenge with TXT records on\nwhichever DNS provider holds the cert's domains: platform Hetzner\nCloud DNS (automatic, nothing to connect) for domains in OwnStack's\nHetzner zones, otherwise a connected Route53 integration\n(`ownstack route53 connect`), or the legacy DNSimple integration if\none is connected. It then updates the locker entry in place and\nre-pushes to all apps whose `ssl_certificate_id` references the cert.\nIssuance takes a few minutes; the CLI polls until the job completes.\nCerts expiring within 30 days renew automatically (when auto-renew is\non, for integrations). This command is for renewing on demand.\n",
           "flags": [
             {
               "flag": "--cert-id=N",
@@ -1916,8 +3176,8 @@
         },
         {
           "name": "dnsimple",
-          "summary": "Manage the account's DNSimple integration (powers Let's Encrypt issuance and auto-renewal).",
-          "notes": "One DNSimple connection per account. The token must be a DNSimple\n*account* token (DNSimple → Account → Automation → API tokens); user\ntokens are rejected because they carry no account identity. With\nauto-renew on (the default), a daily job re-issues any locker cert\nexpiring within 30 days whose domains are hosted in the connected\nDNSimple account, then re-pushes it to the apps using it. Same\nintegration as Settings → Integrations → DNSimple in the dashboard.\n",
+          "summary": "Manage the account's legacy DNSimple integration (optional; Let's Encrypt issuance and auto-renewal for zones hosted at DNSimple).",
+          "notes": "Legacy and optional. OwnStack's own DNS runs on Hetzner Cloud DNS,\nwhich the control plane uses automatically, and Route53\n(`ownstack route53`) is the documented integration for zones in your\nown AWS account. Connect DNSimple only for zones still hosted there.\n\nOne DNSimple connection per account. The token must be a DNSimple\n*account* token (DNSimple → Account → Automation → API tokens); user\ntokens are rejected because they carry no account identity. With\nauto-renew on (the default), a daily job re-issues any locker cert\nexpiring within 30 days whose domains are hosted in the connected\nDNSimple account, then re-pushes it to the apps using it. Same\nintegration as Settings → Integrations → DNSimple in the dashboard.\n",
           "flags": [
             {
               "flag": "--token=TOKEN",
@@ -1954,7 +3214,7 @@
         {
           "name": "route53",
           "summary": "Manage the account's Route53 integration (powers Let's Encrypt issuance and auto-renewal).",
-          "notes": "One Route53 connection per account, mirroring the DNSimple\nintegration. The IAM key needs route53:ListHostedZones,\nroute53:ListResourceRecordSets, and route53:ChangeResourceRecordSets.\nRenewal picks whichever connected integration (DNSimple or Route53)\ncovers the cert's domains, so accounts can connect both. Same\nintegration as Settings → Integrations → Route53 in the dashboard.\n",
+          "notes": "The integration for domains hosted in your own AWS account (domains in\nOwnStack's platform Hetzner DNS need no integration). One Route53\nconnection per account. The IAM key needs route53:ListHostedZones,\nroute53:ListResourceRecordSets, and route53:ChangeResourceRecordSets.\nRenewal picks whichever connected integration covers the cert's\ndomains (Route53, or the legacy DNSimple integration), falling back to\nplatform Hetzner DNS. Same\nintegration as Settings → Integrations → Route53 in the dashboard.\n",
           "flags": [
             {
               "flag": "--credential=NAME_OR_ID",
@@ -2301,7 +3561,7 @@
         },
         {
           "name": "db tunnel",
-          "summary": "Forward a local TCP port to the app's Dokku-internal Postgres on the stack.",
+          "summary": "Forward a local TCP port (default 15432) to the app's Dokku-internal Postgres on the stack. Prints a connection string and stays in the foreground; press Ctrl-C to close the tunnel.",
           "flags": [
             {
               "flag": "--app=NAME",
@@ -2598,7 +3858,7 @@
         },
         {
           "name": "pg backups:restore",
-          "summary": "Restore a stored backup into the app's database (overwrites current data).",
+          "summary": "Restore a stored backup into the app's database (overwrites current data). Asks you to confirm by typing the name or id, unless you pass `--yes`.",
           "flags": [
             {
               "flag": "--app=NAME",
@@ -2607,6 +3867,10 @@
             {
               "flag": "--stack=ID",
               "desc": "Restore into a specific stack (default = the backup's stack)."
+            },
+            {
+              "flag": "--yes, -y",
+              "desc": "Skip the confirmation prompt (you otherwise type the name or id back). Required for scripts and non-interactive callers."
             }
           ],
           "examples": [
@@ -2618,11 +3882,15 @@
         },
         {
           "name": "pg backups:delete",
-          "summary": "Delete a backup and its object-storage dump.",
+          "summary": "Delete a backup and its object-storage dump. Asks you to confirm by typing the name or id, unless you pass `--yes`.",
           "flags": [
             {
               "flag": "--app=NAME",
               "desc": "App name (defaults to the linked app)."
+            },
+            {
+              "flag": "--yes, -y",
+              "desc": "Skip the confirmation prompt (you otherwise type the name or id back). Required for scripts and non-interactive callers."
             }
           ],
           "examples": [
@@ -2832,10 +4100,60 @@
         },
         {
           "name": "ssh stack",
-          "summary": "SSH into a stack host as the ubuntu user.",
+          "summary": "SSH into a stack host as the ubuntu user, or run one command there and exit.",
           "examples": [
             {
-              "cmd": "ownstack ssh stack my-stack"
+              "cmd": "ownstack ssh stack my-stack",
+              "desc": "Interactive shell on the host."
+            },
+            {
+              "cmd": "ownstack ssh stack my-stack dokku storage:list my-app",
+              "desc": "Run a command. Pass it as SEPARATE arguments, not one quoted string."
+            },
+            {
+              "cmd": "ownstack ssh stack my-stack bash -lc 'sudo dokku nginx:report my-app | head'",
+              "desc": "Wrap pipes, redirects, and multiple statements in `bash -lc '...'`."
+            }
+          ],
+          "notes": "The remote command is taken as an argv vector: each argument is\nshell-quoted individually and joined, so it survives ssh's space-join\nand the remote shell's re-parse exactly as typed (issue #254). That is\nwhat keeps `rails runner '<script>'` intact.\n\nThe consequence is that a command passed as ONE quoted string does not\nwork, because the whole string is quoted into a single argv[0]:\n\n    ownstack ssh stack my-stack 'dokku storage:list my-app'\n    bash: line 1: dokku storage:list my-app: command not found\n\nPass the words separately instead:\n\n    ownstack ssh stack my-stack dokku storage:list my-app\n\nDo not put `--` before the command. It is passed through to `ssh`,\nwhich rejects it as an option (`illegal option -- -`).\n"
+        },
+        {
+          "name": "ssh keys:list",
+          "summary": "List the SSH public keys authorized on a stack.",
+          "examples": [
+            {
+              "cmd": "ownstack ssh keys:list my-stack"
+            }
+          ]
+        },
+        {
+          "name": "ssh keys:add",
+          "summary": "Authorize an SSH public key on a stack so you can ssh directly to its host.",
+          "flags": [
+            {
+              "flag": "--key=PATH",
+              "desc": "Path to the public key file (default ~/.ssh/id_rsa.pub)."
+            },
+            {
+              "flag": "--name=NAME",
+              "desc": "Label for the key (default the key filename without .pub)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack ssh keys:add my-stack"
+            },
+            {
+              "cmd": "ownstack ssh keys:add my-stack --key=~/.ssh/id_ed25519.pub --name=laptop"
+            }
+          ]
+        },
+        {
+          "name": "ssh keys:remove",
+          "summary": "Remove an authorized SSH key from a stack by its id.",
+          "examples": [
+            {
+              "cmd": "ownstack ssh keys:remove my-stack 42"
             }
           ]
         }
@@ -3029,11 +4347,15 @@
           "aliases": [
             "llm rm"
           ],
-          "summary": "Tear down the addon. Dedicated stacks also torn down unless --keep-stack.",
+          "summary": "Tear down the addon. Dedicated stacks also torn down unless --keep-stack. Asks you to confirm by typing the name or id, unless you pass `--yes`.",
           "flags": [
             {
               "flag": "--keep-stack",
               "desc": "(dedicated) keep the underlying stack."
+            },
+            {
+              "flag": "--yes, -y",
+              "desc": "Skip the confirmation prompt (you otherwise type the name or id back). Required for scripts and non-interactive callers."
             }
           ],
           "examples": [
@@ -3262,11 +4584,15 @@
           "aliases": [
             "voice rm"
           ],
-          "summary": "Tear down the addon. Dedicated stacks also torn down unless --keep-stack.",
+          "summary": "Tear down the addon. Dedicated stacks also torn down unless --keep-stack. Asks you to confirm by typing the name or id, unless you pass `--yes`.",
           "flags": [
             {
               "flag": "--keep-stack",
               "desc": "(dedicated) keep the underlying stack."
+            },
+            {
+              "flag": "--yes, -y",
+              "desc": "Skip the confirmation prompt (you otherwise type the name or id back). Required for scripts and non-interactive callers."
             }
           ],
           "examples": [
@@ -3284,6 +4610,667 @@
           "examples": [
             {
               "cmd": "ownstack voice models"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "agents",
+      "title": "AI coding agents",
+      "body": "An agent is a long-lived AI coding worker bound to a codebase and running\non a stack you own. It is its own resource, not a flag on an app: one\nrepository can host several agents, and an agent does not require a\ndeployed app at all.\n\nEach agent gets its own unix user on the stack (ownstack-agent-<id>, no\npassword, no sudo) and its own checkout at /var/ownstack/agents/agent-<id>,\nmode 0700 and owned by that user, so agents on a shared stack cannot read\neach other's source. Claude runs as that user on your Claude subscription,\nsigned in one of two ways: with one of your Claude tokens (`ownstack agent\nclaude-token add`, from `claude setup-token`, one per Claude account, set\nonce for all your agents), or with its own `claude auth login` on the\nstack. No Anthropic API key is used, ever.\n\nRequires the `platform.agents` capability, which is off by default for the\ndeveloper role and granted by a manager via `ownstack developers update`.\n",
+      "commands": [
+        {
+          "name": "agent list",
+          "aliases": [
+            "agent ls",
+            "agents"
+          ],
+          "summary": "List agents with status, whether each can run (USABLE), Claude sign-in (CLAUDE), stack, repo, and branch.",
+          "examples": [
+            {
+              "cmd": "ownstack agent list"
+            },
+            {
+              "cmd": "ownstack agents",
+              "desc": "Same list. `ownstack agents SUBCOMMAND` works like `ownstack agent SUBCOMMAND`."
+            }
+          ],
+          "notes": "STATUS is the workspace's state, so an agent can read `ready` and still be\nunable to run. USABLE and CLAUDE come from the API's `usable` and\n`authenticated`. Below the table, each agent that cannot run gets one line\nsaying why (the first sentence of its readiness), for example\n`probe-agent: stack is not provisioned.` A `-` means the control plane\ndoes not report that field.\n"
+        },
+        {
+          "name": "agent create",
+          "aliases": [
+            "agent new"
+          ],
+          "summary": "Create an agent. The workspace is cloned on the stack in the background.",
+          "flags": [
+            {
+              "flag": "--stack=ID",
+              "desc": "Stack to run on (required)."
+            },
+            {
+              "flag": "--repo=URL",
+              "desc": "Git repository the agent works on. Required unless --app is given. An https URL clones with your linked GitHub login. An SSH URL (git@host:owner/repo.git or ssh://user@host[:port]/path) clones and pushes over SSH, with a git key (see --git-key), never rewritten to https."
+            },
+            {
+              "flag": "--git-key=NAME_OR_ID",
+              "desc": "For an SSH URL: a git key from your SSH Locker (kind git) to clone and push with; you put its public key on the repo. Without it, OwnStack makes an ed25519 key for this agent in your SSH Locker and, on github.com, adds it to the repo as a deploy key with write access using your GitHub login. The key leaves the repo and the locker when the agent is destroyed."
+            },
+            {
+              "flag": "--branch=BR",
+              "desc": "Branch to check out (default main)."
+            },
+            {
+              "flag": "--app=NAME_OR_ID",
+              "desc": "Bind to an app; repo, branch, and monorepo subdir are inherited when not given."
+            },
+            {
+              "flag": "--subdir=PATH",
+              "desc": "Monorepo subdirectory the agent works in."
+            },
+            {
+              "flag": "--no-bypass-permissions",
+              "desc": "Require confirmations instead of running with --dangerously-skip-permissions."
+            },
+            {
+              "flag": "--claude-sign-in=MODE",
+              "desc": "How the agent signs in to Claude: auto (the default; your Claude token when you have one, otherwise its own sign-in), owner-token (always your Claude token), or own-sign-in (its own claude auth login on the stack)."
+            },
+            {
+              "flag": "--claude-token=LABEL_OR_ID",
+              "desc": "Pin one of your Claude tokens (by label or id, see agent claude-token). `default` (the default) uses whichever token is your default."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack agent create backend-dev --stack=12 --repo=https://github.com/me/api.git"
+            },
+            {
+              "cmd": "ownstack agent create docs-bot --stack=12 --app=my-app --branch=docs",
+              "desc": "Inherit the repo from an app but work on a different branch."
+            },
+            {
+              "cmd": "ownstack agent create api-agent --stack=12 --app=my-app --subdir=packages/api"
+            },
+            {
+              "cmd": "ownstack agent create my-agent --stack=<STACK> --repo=git@github.com:example/my-repo.git",
+              "desc": "Over SSH, with a key OwnStack makes and adds to the repo as a deploy key."
+            },
+            {
+              "cmd": "ownstack agent create infra --stack=12 --repo=ssh://git@git.example.com:2222/ops/infra.git --git-key=infra-deploy",
+              "desc": "Over SSH to another git host, with a key from your SSH Locker."
+            }
+          ],
+          "notes": "Requires jq. An agent name is lowercase alphanumeric and dashes, unique per account.\nOver SSH the host key is pinned: github.com's from GitHub's API, any other host's read once\nwith ssh-keyscan on the first sync and kept with the key, so a host key that changes later\nfails the sync instead of being trusted. If the host refuses the key (for example, OwnStack\ncould not add the deploy key because your GitHub login lacks admin on the repo), the agent\nfails with the public key to add; add it and run `ownstack agent sync NAME`.\n"
+        },
+        {
+          "name": "agent show",
+          "aliases": [
+            "agent info"
+          ],
+          "summary": "Full state for one agent, including whether it can actually run.",
+          "examples": [
+            {
+              "cmd": "ownstack agent show backend-dev"
+            }
+          ],
+          "notes": "`usable` is only true once `claude auth status`, run on the stack as the\nagent's unix user, reports a signed-in session. A synced workspace on its own\nis not enough: an agent that is not signed in reports `usable: false` and\nexplains why in `readiness`, rather than failing on the first prompt.\n\n`claude:` is what Claude is doing on the stack right now (working, waiting\nfor you, idle, or no open session), followed by one line per recent Claude\nsession, from a terminal or a run. It comes from the Claude Code hooks\nOwnStack installs for the agent's user on each sync; they report only the\nhook event and session id, never prompts or tool output. A working session\nthat has been silent for 15 minutes is marked \"no activity for a while\" and\nno longer counts toward `claude:` (Claude may still be thinking, or the\nprocess may have died or been interrupted). A run's session ends when the\nrun does.\n\n`live status:` says whether the stack proved it can report (a round trip\nmade from the stack at sync), or why not. Against a control-plane without\nthis feature, `claude:` says it is not reported rather than guessing.\n\n`claude sign-in:` says how the agent signs in to Claude right now, in the\ncontrol plane's words (for example \"Uses the Claude token of\nme@example.com.\"), followed by the stored setting (auto, owner-token, or\nown-sign-in). An agent that uses its owner's Claude token can only be run,\nand its terminal opened, by that owner.\n\n`claude token:` is the token the agent would use (label and last 4 only),\nmarked `(pinned)` when set with --claude-token, otherwise `(default)`.\n`active token:` is the token installed on the stack right now, which\ndiffers after an automatic switch. `last switch:` is the reason and time\nof the last automatic switch, for example when a token hit its Claude\nusage limit and the agent moved to the owner's next usable token.\n"
+        },
+        {
+          "name": "agent update",
+          "summary": "Change an agent's branch, monorepo subdirectory, or how it signs in to Claude.",
+          "flags": [
+            {
+              "flag": "--branch=BR",
+              "desc": "Switch the branch the agent works on."
+            },
+            {
+              "flag": "--subdir=PATH",
+              "desc": "Change the monorepo subdirectory."
+            },
+            {
+              "flag": "--claude-sign-in=MODE",
+              "desc": "auto, owner-token, or own-sign-in (see agent create). Takes effect on the next sync or sign-in check."
+            },
+            {
+              "flag": "--claude-token=LABEL_OR_ID",
+              "desc": "Pin one of your Claude tokens, or `default` to follow your default. Only the agent's creator can change this."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack agent update backend-dev --branch=next"
+            },
+            {
+              "cmd": "ownstack agent update backend-dev --claude-sign-in=owner-token",
+              "desc": "Sign in with your Claude token instead of the agent's own sign-in."
+            },
+            {
+              "cmd": "ownstack agent update backend-dev --claude-token=personal",
+              "desc": "Pin the agent to your token labeled personal."
+            }
+          ],
+          "notes": "Settings are stored immediately; run `ownstack agent sync NAME` to apply them\non the stack and re-run the sign-in check.\n"
+        },
+        {
+          "name": "agent claude-token",
+          "summary": "Your Claude tokens (from claude setup-token), one per Claude account, each with a label. Agents you created sign in with them. To get one, run claude setup-token on your own computer, approve in the browser, and paste the token it prints (it starts with sk-ant-oat01-). It is stored encrypted, only your agents use it, and it is good for a year. It uses your Claude subscription; it is not an Anthropic API key.",
+          "flags": [
+            {
+              "flag": "list",
+              "desc": "The default. Each token's label, last 4 characters, whether it is the default, when it was set, how many agents use it, and until when it is limited. --json prints the API response."
+            },
+            {
+              "flag": "add --label=LABEL [--default]",
+              "desc": "Add a token. The first one you add is the default; --default makes this one the default."
+            },
+            {
+              "flag": "rotate LABEL_OR_ID",
+              "desc": "Replace a token's value, for example after it expires or you ran claude setup-token again."
+            },
+            {
+              "flag": "rename LABEL_OR_ID --label=NEW",
+              "desc": "Change a token's label."
+            },
+            {
+              "flag": "default LABEL_OR_ID",
+              "desc": "Make a token your default."
+            },
+            {
+              "flag": "remove LABEL_OR_ID",
+              "desc": "Remove a token. If it was the default, your newest remaining token becomes the default. Agents pinned to it fall back to your default."
+            },
+            {
+              "flag": "--json",
+              "desc": "Print the API response as JSON."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack agent claude-token"
+            },
+            {
+              "cmd": "ownstack agent claude-token add --label=me@work.com --default",
+              "desc": "Prompts for the token with hidden input."
+            },
+            {
+              "cmd": "pbpaste | ownstack agent claude-token add --label=personal",
+              "desc": "Reads the token from stdin."
+            },
+            {
+              "cmd": "ownstack agent claude-token rotate personal"
+            },
+            {
+              "cmd": "ownstack agent claude-token default personal"
+            },
+            {
+              "cmd": "ownstack agent claude-token remove me@work.com"
+            }
+          ],
+          "notes": "How to get one: on your own computer (where you use Claude Code), run\n`claude setup-token` and approve in the browser. It prints a token that\nstarts with sk-ant-oat01-. It uses your Claude subscription and is good for\na year. It is not an Anthropic API key, and none is needed. Add one per\nClaude account, labeled so you will recognize it (for example the\naccount's email).\n\nadd and rotate read the token from stdin, or prompt with hidden input at a\nterminal. A token is never taken as an argument or flag, so it stays out of\nshell history and process lists; the CLI refuses one without echoing it.\n\nTokens are yours alone: each OwnStack user adds their own, and an agent\nuses only tokens of the user who created it, never another member's. They\nare stored encrypted and no command or endpoint shows one again (only the\nlabel and last 4 characters). An agent uses your default token unless it is\npinned to one with `ownstack agent update NAME --claude-token=LABEL`.\n\nWhen the token an agent is using hits its Claude usage limit, OwnStack marks\nit limited until its reset time, switches the agent to your next usable\ntoken, and continues the run. Once the limit resets, the agent switches back.\n`list` shows the limited tokens and why.\n\nLabels match case-insensitively; a label wins over an id. A rejected token\nor label prints the control plane's reason as is.\n"
+        },
+        {
+          "name": "agent login",
+          "summary": "Sign an agent in with your Claude subscription (no API key, ever), then confirm it worked.",
+          "flags": [
+            {
+              "flag": "--check",
+              "desc": "Re-check the sign-in on the stack and wait for the answer. This is a sync, the same thing the page's \"Done, re-check agent\" button does, so it re-fetches the branch (reset to origin) and the agent cannot run until it finishes. If a sync is already running it waits for that one first. Exits 0 when signed in, 1 when not."
+            },
+            {
+              "flag": "--no-open",
+              "desc": "Do not open a browser, even at a terminal."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack agent login backend-dev"
+            },
+            {
+              "cmd": "ownstack agent login backend-dev --check"
+            }
+          ],
+          "notes": "The sign-in itself happens on the agent's page in the web app. Choose\n\"Sign in to Claude\" there: it opens a terminal on the stack as the agent's\nunix user and runs `claude auth login`. Finish the claude.ai sign-in in that\nterminal (open the URL it prints, approve, paste the code back). The\nsign-in persists in the agent user's home on your stack. This is the\nown-sign-in path; to skip it for all your agents, add your Claude token\nonce with `ownstack agent claude-token add --label=LABEL`.\n\nAt a terminal, `login` opens that page, waits for Enter, then checks. In a\nscript or pipe it prints the page and the next step,\n`ownstack agent login NAME --check`. An agent that is already signed in\nsays so and exits 0.\n\nThe web app URL is derived from the API URL (api.<domain> becomes\nmy.<domain>). Set OWNSTACK_WEB_URL to override it.\n"
+        },
+        {
+          "name": "agent sync",
+          "summary": "Re-create the workspace on the stack and fetch the branch.",
+          "examples": [
+            {
+              "cmd": "ownstack agent sync backend-dev"
+            }
+          ]
+        },
+        {
+          "name": "agent exec",
+          "summary": "Run a command inside the agent's workspace on its stack.",
+          "flags": [
+            {
+              "flag": "--cwd=PATH",
+              "desc": "Subdirectory of the workspace to run in. Relative to the workspace only."
+            },
+            {
+              "flag": "--timeout=SECONDS",
+              "desc": "Give up after SECONDS. Default 120, capped at 900."
+            },
+            {
+              "flag": "--env=KEY=VALUE",
+              "desc": "Set an environment variable for the command. Repeatable."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack agent exec backend-dev -- bundle exec rspec"
+            },
+            {
+              "cmd": "ownstack agent exec backend-dev --cwd=frontend --timeout=600 -- npm run build"
+            },
+            {
+              "cmd": "ownstack agent exec backend-dev --env=RAILS_ENV=test -- bin/rails db:migrate"
+            },
+            {
+              "cmd": "ownstack agent exec backend-dev -- grep -E \"TODO|FIXME\" app/models/user.rb",
+              "desc": "Several arguments arrive exactly as typed; the | stays inside the pattern."
+            },
+            {
+              "cmd": "ownstack agent exec backend-dev -- \"cd frontend && npm test | tail -20\"",
+              "desc": "One quoted argument runs as a shell command, pipes and && included."
+            }
+          ],
+          "notes": "Everything after `--` is the command, passed through untouched, so a command\ncontaining its own dashes works. With several arguments, each one reaches the\nstack as you typed it: quotes, `$VARS`, `|`, globs, and spaces inside an\nargument stay part of that argument, much like `docker exec`. The command still\nruns under bash, so a leading `VAR=value` word sets an environment variable and\na first word like `time` acts as the shell keyword. With a single argument, it\nis run as a shell command string, so a pipeline or `&&` goes in one quoted\nargument. Because of that, never pass untrusted text as the only argument\n(`-- \"$file\"` runs it as shell code; `-- cat \"$file\"` is safe). The exit code\nyou get back is the command's\nown, which means this composes in a script the way `ssh` does; a transport\nfailure uses 125 so it stays distinguishable from a command that genuinely\nfailed.\n\nOutput is capped at 512KB per stream on the stack side. When that cap is hit\nthe command says so instead of quietly handing you a truncated log.\n\nWhat this is and is not: the command runs as the agent's own unix user with\nthat user's rights. Paths are confined to the workspace, so you cannot point `--cwd`\noutside it, but a command is free to walk out on its own. The real boundary is\nwho is allowed to hold an agent at all (`platform.agents`), not the path check.\n"
+        },
+        {
+          "name": "agent run",
+          "summary": "Hand the agent a prompt. Claude runs headless in the workspace; the CLI waits for the result.",
+          "flags": [
+            {
+              "flag": "--resume",
+              "desc": "Continue the agent's most recent Claude session, so it remembers the conversation."
+            },
+            {
+              "flag": "--session=SID",
+              "desc": "Continue a specific Claude session id."
+            },
+            {
+              "flag": "--no-wait",
+              "desc": "Start the run and print its id instead of waiting."
+            },
+            {
+              "flag": "--json",
+              "desc": "Print the run as JSON (the final run, or the created run with --no-wait)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack agent run backend-dev \"fix the failing spec in spec/models/user_spec.rb\""
+            },
+            {
+              "cmd": "ownstack agent run backend-dev --resume \"now open a PR for it\"",
+              "desc": "Continue the previous conversation."
+            },
+            {
+              "cmd": "ownstack agent run backend-dev - < instructions.md",
+              "desc": "Read the prompt from stdin."
+            },
+            {
+              "cmd": "ownstack agent run backend-dev \"upgrade rails\" --no-wait"
+            }
+          ],
+          "notes": "Runs `claude -p` as the agent's unix user, detached on the stack, so the run\nkeeps going through a control-plane restart and is capped by a wall-clock\ntimeout on the stack. The CLI polls every 3 seconds, prints status changes,\nthen the result and a line with turns, cost, and the Claude session id.\nExits 0 only if the run succeeded; a failed or cancelled run prints its\nreason and exits 1.\n\nOne run at a time per agent (the workspace is shared). Starting a second\nwhile one is active, or running an agent that is not signed in, is refused\nwith the reason.\n"
+        },
+        {
+          "name": "agent runs",
+          "summary": "Recent runs for an agent, newest first.",
+          "examples": [
+            {
+              "cmd": "ownstack agent runs backend-dev"
+            }
+          ]
+        },
+        {
+          "name": "agent run:show",
+          "summary": "One run's status, session, turns, cost, error, and result.",
+          "flags": [
+            {
+              "flag": "--output",
+              "desc": "Print the raw stream-json events Claude emitted instead."
+            },
+            {
+              "flag": "--json",
+              "desc": "Print the run as JSON."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack agent run:show backend-dev r1a2b3c4d5e6"
+            },
+            {
+              "cmd": "ownstack agent run:show backend-dev r1a2b3c4d5e6 --output | jq -c 'select(.type==\"assistant\")'"
+            }
+          ]
+        },
+        {
+          "name": "agent run:cancel",
+          "summary": "Stop a run that is still going (kills the whole process group on the stack).",
+          "examples": [
+            {
+              "cmd": "ownstack agent run:cancel backend-dev r1a2b3c4d5e6"
+            }
+          ]
+        },
+        {
+          "name": "agent cat",
+          "summary": "Print a file from the agent's workspace.",
+          "examples": [
+            {
+              "cmd": "ownstack agent cat backend-dev config/routes.rb"
+            }
+          ],
+          "notes": "Binary safe: the file travels as base64 and is written to stdout as raw bytes.\nPaths are relative to the workspace, and files above 8MB are refused.\n"
+        },
+        {
+          "name": "agent put",
+          "summary": "Write a file into the agent's workspace, from a local file or stdin.",
+          "examples": [
+            {
+              "cmd": "ownstack agent put backend-dev notes.txt ./local-notes.txt"
+            },
+            {
+              "cmd": "echo 'TODO' | ownstack agent put backend-dev notes.txt"
+            }
+          ],
+          "notes": "Creates parent directories as needed. Writing outside the workspace is refused.\n"
+        },
+        {
+          "name": "agent logs",
+          "summary": "An agent's setup (provisioning) log, its recent runs, and its Claude sessions.",
+          "flags": [
+            {
+              "flag": "--follow",
+              "desc": "Watch the setup log only, polling every 3 seconds until the agent reaches ready or failed."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack agent logs backend-dev"
+            },
+            {
+              "cmd": "ownstack agent logs backend-dev --follow"
+            }
+          ],
+          "notes": "Three sections: the setup log, the five most recent runs (time, status,\nrun id, prompt), and the Claude sessions the agent's hooks reported. A\nrun's full output is `ownstack agent run:show NAME RUN_ID --output`. The\nagent server's live terminal is not a log; watch it with\n`ownstack op attach NAME --view`.\n"
+        },
+        {
+          "name": "agent destroy",
+          "aliases": [
+            "agent rm"
+          ],
+          "summary": "Delete the agent and remove its workspace from the stack.",
+          "flags": [
+            {
+              "flag": "--yes",
+              "desc": "Skip the confirmation. Required when there is no terminal."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack agent destroy backend-dev",
+              "desc": "Asks you to type the agent name first"
+            },
+            {
+              "cmd": "ownstack agent destroy backend-dev --yes",
+              "desc": "In a script"
+            }
+          ],
+          "notes": "Without a terminal and without `--yes` it refuses before making any\nrequest and changes nothing.\n"
+        }
+      ]
+    },
+    {
+      "id": "operator",
+      "title": "Operator agents",
+      "body": "Reach the agents in your operator channel (the Slack operator), on this\ncomputer or on a stack. `ownstack op` is short for `ownstack operator`.\n\nAn agent on this computer is a seat the operator CLI (~/bin/operator)\nsaved in ~/.ownstack-operator, with its agent running in its own tmux\n(`tmux -L ownstack-operator`, never your own tmux). These commands find\nthe seat and hand off to the operator CLI, so attach and the agent server\nhave one implementation.\n\nA stack agent is one from `ownstack agent list`. Its agent server, when it\nhas one, runs on the stack as the agent's unix user. Attaching opens an\ninteractive SSH to the stack (the same credentials `ownstack ssh stack`\nuses) and attaches to that user's tmux session. When a name is both a seat\nhere and a stack agent, the seat here wins.\n\nSeat tokens never pass through this CLI. A stack agent gets its seat and\nagent server when it is invited from Slack\n(`/ownstack operator invite HANDLE --agent AGENT`).\n\nOne stack agent can hold several seats. Each is a named session: its own\nClaude conversation and tmux session, named by its seat's handle, on the\nsame box and unix user with the agent's one set of logins (the agent is\nthe security boundary; a session is a conversation inside it).\n`operator sessions AGENT` lists them; `operator attach AGENT SESSION`\nopens one. The agent server keeps each one running, and when OwnStack\nswitches the agent's Claude token (a usage limit, or a reset) it restarts\neach session resuming its own conversation.\n",
+      "commands": [
+        {
+          "name": "operator attach",
+          "aliases": [
+            "op attach"
+          ],
+          "summary": "Jump into an agent's tmux session (for a stack agent, one of its named sessions with SESSION). With no agent, list the agents you can attach to, here and on your stacks.",
+          "flags": [
+            {
+              "flag": "--view",
+              "desc": "Watch only. Nothing you type reaches the agent. Detach with Ctrl-b d."
+            },
+            {
+              "flag": "--iterm",
+              "desc": "Open it as a native iTerm2 window (operator serve attach --iterm). Agents on this computer only; refused with a clear message when the installed operator CLI does not support it yet."
+            },
+            {
+              "flag": "--handle=HANDLE",
+              "desc": "Stack agents only. The same as SESSION, the named session (its seat's handle) on the box. Without either, a box with exactly one session attaches to that one, and a box with several lists them."
+            },
+            {
+              "flag": "--dry-run",
+              "desc": "Print the command it would run (operator serve attach, or the ssh and tmux target), and run nothing."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack operator attach",
+              "desc": "Every attachable agent, with its session and agent server state"
+            },
+            {
+              "cmd": "ownstack operator attach my-agent --view",
+              "desc": "Watch an agent on this computer read-only"
+            },
+            {
+              "cmd": "ownstack op attach operator-brain --view",
+              "desc": "Watch a stack agent read-only, over SSH as its unix user"
+            },
+            {
+              "cmd": "ownstack op attach ownstack-box fleet-bot",
+              "desc": "Open one named session of a stack agent that runs several"
+            },
+            {
+              "cmd": "ownstack operator attach my-agent --iterm",
+              "desc": "Open the session as an iTerm2 window"
+            }
+          ]
+        },
+        {
+          "name": "operator sessions",
+          "aliases": [
+            "op sessions"
+          ],
+          "summary": "A stack agent's named sessions, with each one's state and when it was last heard from; for the agent's owner, where each lives and the attach command.",
+          "notes": "From GET /api/agents/:id/sessions. State is working, waiting (needs you),\nidle, ended, or limited (Claude said its account is out of usage); a `?`\nmeans nothing was heard from it for a while. Anyone who can see the\nagent sees names and state. Its owner, who may open its terminal, also\nsees each session's tmux session, working directory, transcript path and\n`ownstack op attach AGENT SESSION`.\n",
+          "examples": [
+            {
+              "cmd": "ownstack op sessions ownstack-box",
+              "desc": "Every named session on the agent, and how to attach to each"
+            }
+          ]
+        },
+        {
+          "name": "operator server",
+          "aliases": [
+            "op server"
+          ],
+          "summary": "Put an agent on an agent server so it stays reachable after its session ends.",
+          "notes": "On this computer it runs `operator --as AGENT serve adopt`, which finds the\nseat's working directory and Claude conversation and puts it on this\ncomputer's agent server (installing the server if needed). When the\ninstalled operator CLI has no `serve adopt`, it fetches the current one\nfrom https://bot.ownstack.org/operator/cli, checks it parses and has\nadopt, and only then replaces ~/bin/operator. A seat already served\nshows its status instead.\n\nFor a stack agent it runs one command on the box through the exec API:\na box holding exactly one seat gets `operator serve install` for it, in\nthe agent's work dir; a box already served shows `operator serve\nstatus`; a box with no seat says to invite the agent from Slack.\n",
+          "examples": [
+            {
+              "cmd": "ownstack operator server sonoma-gold"
+            },
+            {
+              "cmd": "ownstack op server operator-brain"
+            }
+          ]
+        },
+        {
+          "name": "operator status",
+          "aliases": [
+            "op status"
+          ],
+          "summary": "This computer's agent server and every seat on it (operator serve status). With AGENT, that one seat in detail.",
+          "examples": [
+            {
+              "cmd": "ownstack operator status"
+            },
+            {
+              "cmd": "ownstack op status my-agent"
+            }
+          ]
+        },
+        {
+          "name": "tmux",
+          "aliases": [
+            "tmux list",
+            "tmux ls"
+          ],
+          "summary": "The agents' tmux sessions on this computer, with each one's folder, color and whether someone is attached.",
+          "notes": "Agents run in their own tmux server (`tmux -L ownstack-operator`), apart\nfrom yours, so plain `tmux ls` does not show them. The color comes from\nthe folder the agent works in: the workspace with the closest directory in\n~/.config/work/workspaces (or $WORK_CONFIG); a workspace at your home\nfolder counts only for home itself. These commands only read\nthat server and attach to it; nothing here starts, stops or kills a\nsession.\n\nA seat on this computer's agent server whose conversation is still open\nin a terminal (you logged it in from a Claude Code window) has no tmux\nsession yet. It is listed as `terminal`, with that window's pid, tty and\nstart time, from `operator serve status`. Talk to it there, or /exit it:\nthe agent server carries the same conversation on in tmux within seconds.\n",
+          "examples": [
+            {
+              "cmd": "ownstack tmux",
+              "desc": "Every agent session on this computer, and the seats still open in a terminal"
+            }
+          ]
+        },
+        {
+          "name": "tmux open",
+          "aliases": [
+            "tmux o"
+          ],
+          "summary": "Open a new iTerm2 tab attached to an agent's session, in the color of its project.",
+          "flags": [
+            {
+              "flag": "--view",
+              "desc": "Watch only. Nothing you type reaches the agent."
+            },
+            {
+              "flag": "--color COLOR",
+              "desc": "Use this color's iTerm2 profile (Yellow, Pink, Teal, ...) instead of the project's. Profiles are matched by name, so \"Yellow\" finds \"💛 Yellow\"."
+            },
+            {
+              "flag": "--dry-run",
+              "desc": "Print the tab it would open, and open nothing."
+            }
+          ],
+          "notes": "The tab goes in the frontmost iTerm2 window that is not a tmux -CC\nwindow (a tab added to one of those becomes a window of that tmux\nsession), or in a new window. Detach with Ctrl-b d; the agent keeps\nrunning. Without iTerm2 it says to use `ownstack tmux attach`.\n",
+          "examples": [
+            {
+              "cmd": "ownstack tmux open checkin-backend",
+              "desc": "A Yellow tab for an agent working in ~/dev/my-project"
+            },
+            {
+              "cmd": "ownstack tmux open fleet-bot --view",
+              "desc": "Watch it read-only"
+            }
+          ]
+        },
+        {
+          "name": "tmux attach",
+          "aliases": [
+            "tmux a"
+          ],
+          "summary": "Attach to an agent's session in this terminal. Detach with Ctrl-b d.",
+          "flags": [
+            {
+              "flag": "--view",
+              "desc": "Watch only. Nothing you type reaches the agent."
+            }
+          ],
+          "notes": "Works from inside your own tmux too (it attaches with TMUX unset, to\nthe agents' server). There the tab's tmux is yours, so detach from the\nagent with Ctrl-b Ctrl-b d.\n\nA seat whose conversation is still open in a terminal hands over to\n`operator serve attach`: it says where that window is, waits for you to\n/exit it, and attaches once the agent server has carried the\nconversation on in tmux (Ctrl-C stops the wait; nothing is closed for you).\n",
+          "examples": [
+            {
+              "cmd": "ownstack tmux attach my-agent"
+            },
+            {
+              "cmd": "ownstack tmux attach data-engineer",
+              "desc": "Still open in your terminal? Says where, then attaches once you /exit it there"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "operator-slack",
+      "title": "Operator in Slack",
+      "body": "Operator puts agents in a Slack channel as members: you @ one to hand it\nsomething, DM it, or talk to all of them, and they post back under their\nown handle. It is driven from Slack with the OwnStack bot's slash command,\n`/ownstack operator` (`/ownstack op` is short for it), not from this CLI.\n`/ownstack op` with no verb lists every verb.\n\nCommon verbs, typed in the Slack channel:\n  - `/ownstack op invite <handle>`: invite an agent. You get a line to paste\n    to it, once. The first invite in a channel turns Operator on there.\n  - `/ownstack op invite <handle> --agent <stack-agent>`: seat an OwnStack\n    stack agent (one from `ownstack agent list`). It installs an agent server\n    on the agent's box that keeps it running and answering in the channel.\n  - `/ownstack op invite <handle> --remote --repo <git url>`: an agent on an\n    OwnStack server, created with your OwnStack login.\n  - `/ownstack op who` and `/ownstack op status`: seats, last seen, and what\n    each agent is working on, blocked on, or asking you.\n  - `/ownstack op agent server [install | update | restart | stop | start | peek] [handle]`:\n    the agent servers in the channel.\n  - `/ownstack op off` / `on`, `revoke`, `rename`, `quiet`, `unquiet`, `members`.\n\nHow it relates to the CLI: an invited agent talks to the channel through the\noperator CLI (`~/bin/operator`, from https://bot.ownstack.org/operator/cli).\n`ownstack operator` (`ownstack op`) works with those agents from your\ncomputer: attach to an agent's session, put one on an agent server, or see\nthe agent server's status. Instructions for agents joining a channel:\nhttps://bot.ownstack.org/operator\n",
+      "commands": []
+    },
+    {
+      "id": "world",
+      "title": "The World (every session at a glance)",
+      "body": "The World shows every session you have in one place: the named sessions on\nyour stack agents and the Operator seats on your own computers. In the 3D\nWorld each stack agent or computer is a tower and each session is a floor,\ncolored by what it is doing.\n\nAll three views read one feed, `GET /api/world` on the control plane, with\nyour OwnStack token (pass `OWNSTACK_PROFILE=NAME` inline to pick an\naccount). The control plane adds Operator data from ownbot; when ownbot\ncannot be reached the feed still has your stack sessions and says Operator\ndata is unavailable.\n\nA session's state is one of: working, waiting (needs you: an open question\nor a blocked status), idle, limited (out of Claude usage until the time\nshown), stopped, ended, or offline (its stack agent or computer cannot be\nreached).\n",
+      "commands": [
+        {
+          "name": "sessions",
+          "summary": "Every session you have, on your stack agents and computers, in one table.",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Print the raw World feed (GET /api/world) instead of the table."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack sessions",
+              "desc": "NAME, WHERE, STATE, SLACK, TOKEN and LAST ACTIVE for each session, then counts and how many are waiting on you"
+            },
+            {
+              "cmd": "OWNSTACK_PROFILE=work ownstack sessions --json",
+              "desc": "The raw feed for another account"
+            }
+          ],
+          "notes": "WHERE is the stack agent or computer the session lives on. SLACK is its\nOperator seat's channel, or `-` when it has no seat. TOKEN is the Claude\ntoken its stack agent uses (label and last 4), or `-`. States are colored\non a terminal (working green, waiting yellow, idle dim, limited magenta,\nstopped, ended and offline grey); set NO_COLOR to turn colors off.\n"
+        },
+        {
+          "name": "world",
+          "summary": "Open the 3D World in your browser, built from your World feed.",
+          "flags": [
+            {
+              "flag": "--no-open",
+              "desc": "Write the page and print its path, without opening a browser."
+            },
+            {
+              "flag": "--watch",
+              "desc": "Keep the page live. Rewrites its data (data.js next to the page) every 10 seconds until Ctrl-C; the page picks it up on its own."
+            },
+            {
+              "flag": "--tui",
+              "desc": "A live full-screen view in this terminal instead of the browser (see world --tui)."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack world",
+              "desc": "Writes ~/.ownstack/world/index.html and opens it (open on macOS, xdg-open on Linux)"
+            },
+            {
+              "cmd": "ownstack world --watch",
+              "desc": "The same page, refreshed every 10 seconds"
+            },
+            {
+              "cmd": "ownstack world --no-open",
+              "desc": "Just print the page's path"
+            }
+          ],
+          "notes": "The page loads the 3D scene from\nhttps://my.ownstack.org/assets/world/world.js and puts your feed inline\nas `window.WORLD_DATA`, escaped so no field can break out of the script\ntag. If the scene cannot be loaded it says the scene is not published\nyet and lists your sessions instead of showing a blank page. With\n`--watch`, a scene that defines `window.WORLD_UPDATE(data)` is updated\nin place; otherwise the page reloads when the data changes.\n`OWNSTACK_WORLD_ASSET_BASE` points the page at another copy of the scene\n(for working on the scene locally). The scene's \"create a stack agent\"\nlink points at /agents on the same host as the scene.\n"
+        },
+        {
+          "name": "world --tui",
+          "summary": "The World live in this terminal. A tower per stack agent or computer, a floor per session, a Waiting on you box and an activity ticker.",
+          "notes": "Refreshes every 5 seconds. Keys: arrows or j/k move between sessions,\nEnter attaches to the selected session (runs its attach command, such as\n`ownstack op attach my-agent dns-claude`, and comes back to the World\nwhen you detach with Ctrl-b d), c copies the attach command (or prints\nit when there is no clipboard), r refreshes now, q quits. Waiting floors\ncarry a `!`. The sky follows your local clock, the elevators run, and a\nsession that finishes (working to idle) gets a small celebration.\n\nIt only runs attach commands that are plain `ownstack ...` words. On a\nnarrow terminal it shows a list instead of towers; NO_COLOR works, and\neach floor also shows its state in letters (work, WAIT, idle, LIMT,\nstop, done, off). The terminal is always restored on exit.\n",
+          "examples": [
+            {
+              "cmd": "ownstack world --tui"
+            },
+            {
+              "cmd": "OWNSTACK_PROFILE=work NO_COLOR=1 ownstack world --tui"
             }
           ]
         }
@@ -3388,7 +5375,7 @@
     {
       "id": "auth",
       "title": "Authentication",
-      "body": "Sign in to the control plane. Tokens are stored in ~/.ownstack/config, or per\naccount under ~/.ownstack/profiles/<name> when using profiles.\n",
+      "body": "Sign in to the control plane. Tokens are stored in ~/.ownstack/config, or per\naccount under ~/.ownstack/profiles/<name> when using profiles.\n\nWith OWNSTACK_PROFILE=<name> set, login saves into that profile for this one\ncommand (it does not change your default profile), so each account's token\nstays in its own profile.\n",
       "commands": [
         {
           "name": "login",
@@ -3401,15 +5388,27 @@
             {
               "flag": "--profile NAME",
               "desc": "With --token, save the token as profile NAME and switch the active profile to it. To add a profile WITHOUT switching, use `ownstack profile add`."
+            },
+            {
+              "flag": "--name MACHINE",
+              "desc": "Label for the minted CLI token (defaults to this machine's hostname). Each name holds an independent token, so logging in on one machine never revokes another machine's token; re-login with the same name rotates only that token."
             }
           ],
           "examples": [
             {
               "cmd": "ownstack login",
-              "desc": "Browser device-code flow."
+              "desc": "Browser device-code flow. Token is labeled with this machine's hostname."
+            },
+            {
+              "cmd": "OWNSTACK_PROFILE=ownstack ownstack login",
+              "desc": "Device-code flow that saves the token into the \"ownstack\" profile."
             },
             {
               "cmd": "ownstack login --token YOUR_API_TOKEN"
+            },
+            {
+              "cmd": "ownstack login --name wsl-pc",
+              "desc": "Device-code flow, minting a token labeled wsl-pc."
             }
           ]
         },
@@ -3449,6 +5448,76 @@
               "desc": "One-off command against a profile without switching."
             }
           ]
+        },
+        {
+          "name": "auth tokens",
+          "summary": "List your active sessions (API tokens), one per machine/device.",
+          "body": "Tokens are not singletons: each machine you log in on holds its own\ntoken (by label), so signing in on a new box does not sign you out of\nthe others. This lists every token on your account with its label,\nclient type, last 4 characters, and when it was last used. The token\nyou are currently using is marked \"this session\".\n",
+          "flags": [
+            {
+              "flag": "--json",
+              "desc": "Raw API payload instead of the table."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack auth tokens",
+              "desc": "List your sessions/devices."
+            },
+            {
+              "cmd": "ownstack auth tokens --json",
+              "desc": "Machine-readable output."
+            }
+          ]
+        },
+        {
+          "name": "auth tokens:revoke",
+          "summary": "Revoke one of your tokens; that device loses access immediately.",
+          "body": "Takes a token id from `ownstack auth tokens`. Revoking the token you are\ncurrently using signs this machine out (run `ownstack login` to sign back\nin); revoking any other token leaves your current session untouched.\nPrompts for confirmation when run interactively; pass --yes to skip the\nprompt in scripts.\n",
+          "flags": [
+            {
+              "flag": "--yes, -y",
+              "desc": "Skip the confirmation prompt."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack auth tokens:revoke 42",
+              "desc": "Revoke token 42 (a lost or old machine, say)."
+            },
+            {
+              "cmd": "ownstack auth tokens:revoke 42 --yes",
+              "desc": "Revoke without the interactive prompt (for scripts)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "user-admin",
+      "title": "User administration",
+      "body": "Privileged operations on control-plane users. Requires the active profile to\nbe an account admin (for its own tenant) or a superuser (cross-tenant); the\ncontrol plane returns 403 otherwise.\n",
+      "commands": [
+        {
+          "name": "user password",
+          "summary": "Set a user's password directly (the CLI equivalent of the control-plane \"Set password\" action), without the email reset round-trip.",
+          "flags": [
+            {
+              "flag": "--password PW",
+              "desc": "The new password. `--password=PW` works too. If omitted, you're prompted twice without echo, which keeps the password out of shell history and the process list."
+            }
+          ],
+          "examples": [
+            {
+              "cmd": "ownstack user password user@example.com",
+              "desc": "Resolve the user by email and set the password via secure prompt."
+            },
+            {
+              "cmd": "ownstack user password 18 --password 'S0meStrongPass!'",
+              "desc": "Set by user id with the password passed inline."
+            }
+          ],
+          "notes": "The user is resolved by email (case-insensitive) or numeric id. A superuser\ncan set any user's password across tenants; an account admin is limited to\nusers in their own account. The password itself is never logged; the control\nplane records only a password_changed audit flag.\n"
         }
       ]
     },
@@ -3581,7 +5650,13 @@
         },
         {
           "name": "developers delete",
-          "summary": "Delete the user (admin-only on backend).",
+          "summary": "Delete the user (admin-only on backend). Asks you to confirm by typing the name or id, unless you pass `--yes`.",
+          "flags": [
+            {
+              "flag": "--yes, -y",
+              "desc": "Skip the confirmation prompt (you otherwise type the name or id back). Required for scripts and non-interactive callers."
+            }
+          ],
           "examples": [
             {
               "cmd": "ownstack developers delete dev@example.com"
@@ -3699,11 +5774,15 @@
       "keys": [
         {
           "key": "OWNSTACK_API_URL",
-          "desc": "Control-plane base URL (default https://localhost.ownstack.org:6443)."
+          "desc": "Control-plane base URL (default https://api.ownstack.org)."
         },
         {
           "key": "OWNSTACK_API_TOKEN",
           "desc": "API token from `ownstack login`."
+        },
+        {
+          "key": "OWNSTACK_HTTP_TIMEOUT",
+          "desc": "Seconds to wait on an ordinary control-plane request (default 15). Raise it when the control plane is slow; a timeout is reported as such rather than as an unreachable host. Long operations (deploys, restarts, stack reads over SSH) keep their own larger caps. Note OWNSTACK_CURL_OPTS cannot be used for this: it is passed before the built-in flags and curl honours the last one it sees."
         }
       ]
     },

@@ -1,16 +1,21 @@
-<!-- meta {"title":"Changelog","desc":"What shipped recently in OwnStack — features, fixes, deprecations.","section":"Changelog"} -->
-<p class="lede">Notable changes across the OwnStack control plane, CLI, and docs. Newest first. For the full git history, see the <a href="https://github.com/ownstack-org">GitHub org</a>.</p>
+<!-- meta {"title":"Changelog","desc":"What shipped recently in OwnStack: features, fixes, deprecations.","section":"Changelog"} -->
+<p class="lede">Notable changes across the OwnStack control plane, CLI, and docs. Newest first.</p>
+
+<h2>2026-11</h2>
+<ul>
+	<li><strong>CLI 2026.11.19.3</strong>: <code>cluster destroy</code>, <code>developers delete</code>, <code>llm destroy</code>, <code>voice destroy</code>, <code>pg backups:restore</code> and <code>pg backups:delete</code> ask you to type the name or id back. Pass <code>--yes</code> in scripts.</li>
+	<li><strong>CLI 2026.11.19.2</strong>: <code>--help</code> on any subcommand prints help and never runs the command. <code>stack destroy</code> refuses when it cannot load the stack to confirm its name.</li>
+	<li><strong>CLI 2026.11.19.1</strong>: the default control plane is <code>https://api.ownstack.org</code> everywhere; the Rails template no longer ships TLS keys.</li>
+	<li><strong>Install</strong>: <code>curl -fsSL https://ownstack.org/install.sh | bash</code> installs the compiled CLI and checks its sha256 against the Homebrew formula. If you installed with curl before November 19, rerun it.</li>
+	<li><strong>Billing</strong>: OwnStack uses prepaid usage credits (500,000 credits = $1). See <a href="/account/billing/">Billing</a>.</li>
+	<li><strong>Scaling</strong>: <code>ownstack app scale APP web=2 worker=1</code> sets process counts and keeps them across deploys. See <a href="/processes/scaling/">Scaling processes</a>.</li>
+</ul>
 
 <h2>2026-05</h2>
 <ul>
-	<li><strong>CLI</strong>: <code>ownstack db dump</code> — stream a Postgres/MySQL dump down to a local file. Auto-detects type. <a href="https://github.com/ownstack-org/cli/pull/66">#66</a></li>
-	<li><strong>Docs</strong>: <code>ownstack.help</code> launched as a hand-rolled static site. The site you're reading.</li>
-	<li><strong>Control plane</strong>: <code>repair-db</code> postgres fix attempt was reverted after a prod incident; safer redo tracked in <a href="https://github.com/ownstack-org/control-plane/issues/289">#289</a>.</li>
-	<li><strong>Roadmap</strong>: Heroku-style <code>ownstack ps:scale</code> in CLI/UI tracked in <a href="https://github.com/ownstack-org/control-plane/issues/294">#294</a>.</li>
+	<li><strong>CLI</strong>: <code>ownstack db dump</code> streams a Postgres or MySQL dump to a local file. Auto-detects type.</li>
+	<li><strong>Docs</strong>: <code>ownstack.help</code> launched. The site you're reading.</li>
 </ul>
 
-<h2>Earlier</h2>
-<p>This changelog starts from when we shipped <code>ownstack.help</code>. The earlier history lives in the per-repo CHANGELOG and release notes — see <a href="https://github.com/ownstack-org/cli/blob/main/RELEASE_NOTES.md">cli release notes</a>.</p>
-
 <h2>Subscribing</h2>
-<p>Watch the <a href="https://github.com/ownstack-org">GitHub org</a> for releases, or the <a href="https://github.com/ownstack-org/ownstack.help/commits/main">docs commit feed</a> if you only care about user-facing changes.</p>
+<p>Run <code>brew upgrade ownstack</code> or rerun the install one-liner to get the latest CLI. The <a href="https://github.com/ownstack-org/ownstack.help/commits/main">docs commit feed</a> shows every docs change.</p>

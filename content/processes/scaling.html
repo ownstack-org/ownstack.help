@@ -2,12 +2,10 @@
 <p class="lede">Scaling means changing how many containers a process type runs. Each container is fully isolated; <code>web</code> traffic is load-balanced across all <code>web.N</code> containers, queue workers all pull from the same queue. Scale changes are immediate — dokku spins up or shuts down containers to match.</p>
 
 <h2>Quick reference</h2>
-<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:scale &lt;app&gt; web=2 worker=4
-<span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:report &lt;app&gt;</code></pre>
-
-<div class="callout note">
-	<div><strong><code>ownstack ps:scale</code> is on the way</strong><p>The first-class CLI command — and matching dashboard controls — are tracked in <a href="https://github.com/ownstack-org/control-plane/issues/294">control-plane#294</a>. Until then, use the <code>ssh dokku@…</code> form above.</p></div>
-</div>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app scale &lt;app&gt; web=2 worker=4
+<span class="prompt">$</span> ownstack app scale &lt;app&gt; worker=0 --stack=&lt;stack&gt;   <span class="out"># one stack only</span>
+<span class="prompt">$</span> ownstack app ps &lt;app&gt;</code></pre>
+<p>The control plane saves the scale and re-applies it after every deploy. <code>0</code> stops that process type.</p>
 
 <h2>Per-stack, not per-app</h2>
 <p>Scale is dokku state on each stack. If your app deploys to stacks A and B and you set <code>worker=4</code> on A, B is unaffected. Either scale each stack to taste, or use the same numbers for active-active fairness.</p>
@@ -48,7 +46,7 @@
 </div>
 
 <h2>Scaling to zero</h2>
-<pre class="terminal"><code><span class="prompt">$</span> ssh dokku@&lt;stack-ip&gt; ps:scale &lt;app&gt; web=0</code></pre>
+<pre class="terminal"><code><span class="prompt">$</span> ownstack app scale &lt;app&gt; web=0</code></pre>
 <p>Sets the count to zero — containers stop, the app returns 502 to anything reaching the stack on its hostname. Useful for maintenance windows. Bring it back with <code>web=1</code>.</p>
 
 <h2>Healthchecks during scale-up</h2>

@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Billing — OwnStack</title>
-<meta name="description" content="How OwnStack pricing works: control plane, stacks, apps. What's billed by us vs your cloud provider.">
+<meta name="description" content="How OwnStack pricing works: prepaid usage credits, and what your cloud provider bills.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="alternate icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="stylesheet" href="/assets/site.css">
 <meta property="og:title" content="Billing — OwnStack">
-<meta property="og:description" content="How OwnStack pricing works: control plane, stacks, apps. What's billed by us vs your cloud provider.">
+<meta property="og:description" content="How OwnStack pricing works: prepaid usage credits, and what your cloud provider bills.">
 <meta property="og:site_name" content="OwnStack">
 </head>
 <body>
@@ -151,18 +151,17 @@
 		<article class="article">
 			<nav class="breadcrumb"><a href="/">Docs</a><span class="sep">›</span><a href="/account/">account</a><span class="sep">›</span><span>Billing</span></nav>
 			<h1>Billing</h1>
-			<p class="lede">OwnStack bills for the control plane and the apps it manages. Stacks themselves are billed by your cloud provider — OwnStack never marks up infrastructure.</p>
+			<p class="lede">OwnStack is paid for with prepaid usage credits. There are no subscriptions or plans. Servers themselves are billed by your cloud provider, and OwnStack never marks up infrastructure.</p>
 
-<h2 id="what-ownstack-bills">What OwnStack bills</h2>
-<table>
-	<thead><tr><th>Item</th><th>What it covers</th></tr></thead>
-	<tbody>
-		<tr><td>Hosted control plane</td><td>The <code>api.ownstack.org</code> service: the API, the deploy worker, the dashboard. Per-account.</td></tr>
-		<tr><td>Per-app fee</td><td>A small flat fee per active app, regardless of which stack it deploys to.</td></tr>
-		<tr><td>Add-ons</td><td>If you provision OwnStack-side add-ons (logdrain, support, heartbeat), each has its own line.</td></tr>
-	</tbody>
-</table>
-<p>Self-hosting the control plane removes the hosted-control-plane line — you pay for the underlying stack instead.</p>
+<h2 id="usage-credits">Usage credits</h2>
+<ul>
+	<li>500,000 credits = $1. Buy any amount from $1 to $50,000 on the <a href="https://ownstack.org/pricing">Pricing page</a> or with <code>ownstack credits add 25</code>.</li>
+	<li>Payment is by card through a Square checkout. We charge your card only when you buy credits; nothing renews.</li>
+	<li>Credits do not expire while your account is open.</li>
+	<li>Your apps keep running at a zero balance.</li>
+	<li><code>ownstack credits</code> shows your balance and recent activity.</li>
+</ul>
+<p>Credits are spent at the rates shown on the Pricing page. You get at least 30 days' email notice before usage starts drawing down your balance or before a rate goes up. The full terms are in the <a href="https://ownstack.org/billing-terms">Billing Terms</a>.</p>
 
 <h2 id="what-your-cloud-provider-bills">What your cloud provider bills</h2>
 <table>
@@ -181,7 +180,7 @@
 	<li>EC2 <code>t3.small</code> on-demand: ~$15/mo</li>
 	<li>EBS 30 GiB gp3: ~$2.40/mo</li>
 	<li>Bandwidth (light): ~$1/mo</li>
-	<li>OwnStack control plane + per-app: depends on plan</li>
+	<li>OwnStack: paid from your usage credits</li>
 </ul>
 <p>Reserved instances or savings plans cut the EC2 cost by ~40%.</p>
 
@@ -195,7 +194,7 @@
 		</article>
 	</main>
 	<aside class="toc" aria-label="On this page">
-		<h4>On this page</h4><ul><li class="h2"><a href="#what-ownstack-bills">What OwnStack bills</a></li><li class="h2"><a href="#what-your-cloud-provider-bills">What your cloud provider bills</a></li><li class="h2"><a href="#estimating-monthly-cost">Estimating monthly cost</a></li><li class="h2"><a href="#invoices">Invoices</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
+		<h4>On this page</h4><ul><li class="h2"><a href="#usage-credits">Usage credits</a></li><li class="h2"><a href="#what-your-cloud-provider-bills">What your cloud provider bills</a></li><li class="h2"><a href="#estimating-monthly-cost">Estimating monthly cost</a></li><li class="h2"><a href="#invoices">Invoices</a></li><li class="h2"><a href="#read-next">Read next</a></li></ul>
 	</aside>
 </div>
 <footer class="site-footer">
